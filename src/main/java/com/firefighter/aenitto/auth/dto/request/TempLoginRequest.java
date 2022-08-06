@@ -1,6 +1,9 @@
 package com.firefighter.aenitto.auth.dto.request;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Builder

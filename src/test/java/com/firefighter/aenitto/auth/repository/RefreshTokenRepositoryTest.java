@@ -1,8 +1,6 @@
 package com.firefighter.aenitto.auth.repository;
 
 import com.firefighter.aenitto.auth.domain.RefreshToken;
-import com.firefighter.aenitto.auth.token.Token;
-import com.firefighter.aenitto.rooms.domain.Room;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +11,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

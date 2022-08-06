@@ -3,7 +3,6 @@ package com.firefighter.aenitto.config;
 
 import com.firefighter.aenitto.auth.JwtAuthenticationFilter;
 import com.firefighter.aenitto.auth.service.TokenService;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig{
+public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, TokenService tokenService) throws

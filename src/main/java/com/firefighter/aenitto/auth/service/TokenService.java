@@ -1,6 +1,5 @@
 package com.firefighter.aenitto.auth.service;
 
-import com.firefighter.aenitto.auth.domain.RefreshToken;
 import com.firefighter.aenitto.auth.token.CurrentUserDetails;
 import com.firefighter.aenitto.auth.token.Token;
 import io.jsonwebtoken.*;

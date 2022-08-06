@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +19,6 @@ public class TokenServiceTest {
     @Test
     public void 토큰_생성하기() {
         Token token = tokenService.generateToken("UUID입니다","가나다라");
-        System.out.println(">>>>>>>>>>>>>> token = " + token);
     }
 
     @Test

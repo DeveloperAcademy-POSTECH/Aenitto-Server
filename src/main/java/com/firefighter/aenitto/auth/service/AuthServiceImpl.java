@@ -4,7 +4,7 @@ package com.firefighter.aenitto.auth.service;
 import com.firefighter.aenitto.auth.domain.RefreshToken;
 import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
 import com.firefighter.aenitto.auth.dto.response.TempLoginResponse;
-import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
+import com.firefighter.aenitto.auth.repository.RefreshTokenRepositoryImpl;
 import com.firefighter.aenitto.auth.token.Token;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -12,19 +12,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Qualifier(value = "authServiceImpl")
-@Transactional
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    @Qualifier("refreshTokenRepositoryImpl")
-    private final RefreshTokenRepository refreshTokenRepository;
-
-    @Qualifier("memberRepositoryImpl")
+    private final RefreshTokenRepositoryImpl refreshTokenRepository;
     private final MemberRepository memberRepository;
+    @Autowired
     private final TokenService tokenService;
 
     @Override

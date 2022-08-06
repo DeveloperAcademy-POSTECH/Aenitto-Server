@@ -2,7 +2,6 @@ package com.firefighter.aenitto.auth.token;
 
 import com.firefighter.aenitto.members.domain.Member;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import org.springframework.security.core.GrantedAuthority;

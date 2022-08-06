@@ -6,8 +6,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,13 +25,16 @@ public class Member extends CreationModificationLog {
 
     private String nickname;
 
+    private String socialId;
+
     @OneToMany(mappedBy = "member")
     private List<MemberRoom> memberRooms = new ArrayList<>();
 
     @Builder
-    public Member(UUID id, String nickname) {
+    public Member(UUID id, String nickname, String socialId) {
         this.id = id;
         this.nickname = nickname;
+        this.socialId = socialId;
     }
 
     public void changeNickname(String nickname) {

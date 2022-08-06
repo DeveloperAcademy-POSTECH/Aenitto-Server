@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -25,7 +26,15 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public void saveMember(Member member) {
+    public Member saveMember(Member member) {
         em.persist(member);
+        return member;
+    }
+
+    @Override
+    public Optional<Member> findBySocialId(String socialId) {
+        return Optional.ofNullable(em.createQuery("SELECT m FROM Member m WHERE m.socialId = :socialId", Member.class)
+                .setParameter("socialId" , socialId)
+                .getSingleResult());
     }
 }
