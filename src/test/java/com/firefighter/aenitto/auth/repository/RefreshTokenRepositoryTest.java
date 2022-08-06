@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,11 +58,11 @@ public class RefreshTokenRepositoryTest {
         // when
         final RefreshToken result = refreshTokenRepository.saveRefreshToken(refreshToken);
 
-        final RefreshToken findResult = refreshTokenRepository.findByMemberId(result.getMemberId());
+        final Optional<RefreshToken> findResult = refreshTokenRepository.findByMemberId(result.getMemberId());
 
         // then
-        assertThat(findResult.getId()).isNotNull();
-        assertThat(findResult.getMemberId()).isEqualTo(UUID.fromString("b48617b2-090d-4ee6-9033-b99f99d98304"));
-        assertThat(findResult.getRefreshToken()).isEqualTo("refreshToken입니다123123");
+        assertThat(findResult.get().getId()).isNotNull();
+        assertThat(findResult.get().getMemberId()).isEqualTo(UUID.fromString("b48617b2-090d-4ee6-9033-b99f99d98304"));
+        assertThat(findResult.get().getRefreshToken()).isEqualTo("refreshToken입니다123123");
     }
 }

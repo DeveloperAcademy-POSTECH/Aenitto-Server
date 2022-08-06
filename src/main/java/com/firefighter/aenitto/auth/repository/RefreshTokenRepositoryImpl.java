@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -20,10 +21,10 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository{
     }
 
     @Override
-    public RefreshToken findByMemberId(UUID memberId) {
-        return em.createQuery("SELECT r FROM RefreshToken r WHERE r.memberId = :memberId", RefreshToken.class)
+    public Optional<RefreshToken> findByMemberId(UUID memberId) {
+        return Optional.ofNullable(em.createQuery("SELECT r FROM RefreshToken r WHERE r.memberId = :memberId", RefreshToken.class)
                 .setParameter("memberId" , memberId)
-                .getSingleResult();
+                .getSingleResult());
     }
 
     @Override

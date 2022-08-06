@@ -28,7 +28,7 @@ public class IntegrationTest {
     @Autowired
     private EntityManager entityManager;
     @Autowired
-    private ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
     @Autowired
     WebApplicationContext webApplicationContext;
     protected MockMvc mockMvc;
