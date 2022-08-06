@@ -4,10 +4,14 @@ import com.firefighter.aenitto.members.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
+import org.springframework.context.support.BeanDefinitionDsl;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.management.relation.Role;
 import java.util.Collection;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
@@ -15,11 +19,18 @@ public class CurrentUserDetails implements UserDetails {
 
     @Delegate
     private final Member member;
-    private final Collection<? extends GrantedAuthority> authorities;
+
+    public CurrentUserDetails(Member member) {
+        this.member = member;
+    }
+
+    public static CurrentUserDetails of(Member member) {
+        return new CurrentUserDetails(member);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
