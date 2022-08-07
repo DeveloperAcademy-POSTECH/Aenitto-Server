@@ -21,6 +21,18 @@ public class RoomFixture {
         return room;
     }
 
+    public static Room roomFixture2() {
+        Room room = Room.builder()
+                .title("방제목2")
+                .capacity(10)
+                .startDate(LocalDate.of(2022, 6, 20))
+                .endDate(LocalDate.of(2022, 6, 30))
+                .build();
+        ReflectionTestUtils.setField(room, "id", 3L);
+        ReflectionTestUtils.setField(room, "state", RoomState.PRE);
+        return room;
+    }
+
     public static MemberRoom memberRoomFixture(Member member, Room room) {
         MemberRoom memberRoom = MemberRoom.builder()
                 .admin(false)
