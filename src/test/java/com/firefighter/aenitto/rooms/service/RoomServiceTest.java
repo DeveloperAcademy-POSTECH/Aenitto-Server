@@ -10,6 +10,7 @@ import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
+import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.firefighter.aenitto.members.MemberFixture.*;
@@ -42,12 +45,14 @@ public class RoomServiceTest {
 
     // Fixtures
     private Room room;
+    private Room room2;
     private Member member;
     private MemberRoom memberRoom;
 
     @BeforeEach
     void setup() {
         room = roomFixture();
+        room2 = roomFixture2();
         member = memberFixture();
         memberRoom = memberRoomFixture(member, room);
     }
@@ -248,5 +253,24 @@ public class RoomServiceTest {
 
         // then
         assertThat(roomState.getState()).isEqualTo("PROCESSING");
+    }
+
+    @DisplayName("참여 중인 방 조회 - 성공 (cursor 존재)")
+    @Test
+    void findParticipatingRoom_success_with_cursor() {
+        // given
+        List<Room> roomList = new ArrayList<>();
+        roomList.add(room);
+        roomList.add(room2);
+
+        when(roomRepository.findParticipatingRoomsByMemberIdWithCursor(any(UUID.class), anyLong(), anyInt()))
+                .thenReturn(roomList);
+
+        // when
+        ParticipatingRoomsResponse participatingRooms = target.getParticipatingRooms(member, 1L, 3);
+
+        // then
+        assertThat(participatingRooms.getParticipatingRooms().size()).isEqualTo(2);
+        assertThat(participatingRooms.getParticipatingRooms().get(0).getState()).isEqualTo("PROCESSING");
     }
 }
