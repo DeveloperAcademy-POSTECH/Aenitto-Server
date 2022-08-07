@@ -20,10 +20,6 @@ public class CurrentUserDetails implements UserDetails {
     @Delegate
     private final Member member;
 
-    public CurrentUserDetails(Member member) {
-        this.member = member;
-    }
-
     public static CurrentUserDetails of(Member member) {
         return new CurrentUserDetails(member);
     }

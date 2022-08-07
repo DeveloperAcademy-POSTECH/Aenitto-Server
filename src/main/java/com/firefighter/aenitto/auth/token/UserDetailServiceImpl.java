@@ -1,6 +1,5 @@
 package com.firefighter.aenitto.auth.token;
 
-import com.firefighter.aenitto.auth.exception.MemberNotFoundException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MemberRepository {
-    public Member findByMemberId(UUID memberId);
+    public Optional<Member> findByMemberId(UUID memberId);
 
     public Member updateMember(Member member);
 

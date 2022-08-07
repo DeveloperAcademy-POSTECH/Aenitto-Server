@@ -2,10 +2,7 @@ package com.firefighter.aenitto.members.domain;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;

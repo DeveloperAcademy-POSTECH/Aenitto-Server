@@ -16,8 +16,8 @@ public class MemberRepositoryImpl implements MemberRepository {
     private final EntityManager em;
 
     @Override
-    public Member findByMemberId(UUID memberId) {
-        return em.find(Member.class, memberId);
+    public Optional<Member> findByMemberId(UUID memberId) {
+        return Optional.ofNullable(em.find(Member.class, memberId));
     }
 
     @Override
