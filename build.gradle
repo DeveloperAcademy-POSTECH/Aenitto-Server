@@ -61,6 +61,11 @@ dependencies {
 //	inputs.dir snippetsDir
 //	dependsOn test
 //}
+
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')
+}
+
 ext {
 	snippetsDir = file('build/generated-snippets')
 }
