@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.dto.response;
 
+import com.firefighter.aenitto.common.response.PaginatedResponse;
 import com.firefighter.aenitto.rooms.domain.Room;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,12 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-public class ParticipatingRoomsResponse {
+public class ParticipatingRoomsResponse implements PaginatedResponse {
     private final List<ParticipatingRoom> participatingRooms;
 
     public static ParticipatingRoomsResponse of(List<Room> rooms) {
@@ -43,5 +45,21 @@ public class ParticipatingRoomsResponse {
                     .endDate(room.getEndDateValue())
                     .build();
         }
+    }
+
+    @Override
+    public Optional<String> nextCursor() {
+        Long cursor;
+        try {
+            cursor = this.participatingRooms.get(this.participatingRooms.size() - 1).getId();
+        } catch (IndexOutOfBoundsException e) {
+            cursor = null;
+        }
+        return Optional.ofNullable((cursor != null) ? String.valueOf(cursor) : null);
+    }
+
+    @Override
+    public int pageCount() {
+        return this.participatingRooms.size();
     }
 }
