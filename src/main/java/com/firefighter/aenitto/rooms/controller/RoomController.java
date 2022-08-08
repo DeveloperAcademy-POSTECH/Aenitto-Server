@@ -5,6 +5,7 @@ import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
+import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.UUID;
@@ -27,7 +29,7 @@ public class RoomController {
     public ResponseEntity createRoom(
             @Valid @RequestBody final CreateRoomRequest createRoomRequest
     ) {
-        final Member member = Member.builder().nickname("mock").build();
+        final Member member = mockLoginMember();
         final Long roomId = roomService.createRoom(member, createRoomRequest);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId)).build();
     }
@@ -58,6 +60,18 @@ public class RoomController {
         final Member member = mockLoginMember();
         return ResponseEntity.ok(roomService.getRoomState(member, roomId));
     }
+
+    // TODO: RoomAPI 메타데이터 Response Header 에 넣기 (22.08.07)
+    @GetMapping("/rooms")
+    public ResponseEntity<ParticipatingRoomsResponse> findParticipatingRooms(
+            @RequestParam Long cursor,
+            @RequestParam(defaultValue = "3") int limit
+    ) {
+        final Member member = mockLoginMember();
+        // cursor 있으면, next 가 있어야 함.
+        return ResponseEntity.ok(roomService.getParticipatingRooms(member, cursor, limit));
+    }
+
 
     private Member mockLoginMember() {
         return Member.builder()
