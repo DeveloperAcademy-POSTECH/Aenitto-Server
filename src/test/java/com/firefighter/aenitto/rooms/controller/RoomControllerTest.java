@@ -1,6 +1,5 @@
 package com.firefighter.aenitto.rooms.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
@@ -36,8 +35,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
+import static org.hamcrest.Matchers.hasLength;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
@@ -64,6 +67,7 @@ class RoomControllerTest {
     // Fixture
     private Member member;
     private Room room;
+    private Room room2;
     private MemberRoom memberRoom;
 
     @BeforeEach
@@ -74,6 +78,7 @@ class RoomControllerTest {
                 .build();
         objectMapper = new ObjectMapper();
         room = roomFixture();
+        room2 = roomFixture2();
         member = memberFixture();
         memberRoom = memberRoomFixture(member, room);
     }
@@ -268,11 +273,49 @@ class RoomControllerTest {
         );
 
         perform
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state", is(room.getState().toString())))
                 .andDo(document("방 상태 조회", responseFields(
                         fieldWithPath("state").description("방 상태")
                 )));
         verify(roomService, times(1)).getRoomState(any(Member.class), anyLong());
+    }
+
+    @DisplayName("참여 중인 방 조회 - 성공")
+    @Test
+    void participatingRoom_success() throws Exception {
+        final Long cursor = 0L;
+        final int count = 3;
+
+        List<Room> rooms = new ArrayList<>();
+        rooms.add(room);
+        rooms.add(room2);
+
+        final String url = "/api/v1/rooms?cursor=" + cursor + "&count=" + count;
+        when(roomService.getParticipatingRooms(any(Member.class), anyLong(), anyInt()))
+                .thenReturn(RoomResponseDtoBuilder.participatingRoomsResponse(rooms));
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        perform
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("참여 중인 방 조회", responseFields(
+                        fieldWithPath("participatingRooms").description("참여 중인 방"),
+                        fieldWithPath("participatingRooms[0].id").description("Room Id"),
+                        fieldWithPath("participatingRooms[0].title").description("방 제목"),
+                        fieldWithPath("participatingRooms[0].state").description("방 상태"),
+                        fieldWithPath("participatingRooms[0].participatingCount").description("참여 인원"),
+                        fieldWithPath("participatingRooms[0].capacity").description("수용 인원"),
+                        fieldWithPath("participatingRooms[0].startDate").description("시작일"),
+                        fieldWithPath("participatingRooms[0].endDate").description("종료일")
+                )));
+
+        verify(roomService, times(1)).getParticipatingRooms(any(Member.class), anyLong(), anyInt());
     }
 }
