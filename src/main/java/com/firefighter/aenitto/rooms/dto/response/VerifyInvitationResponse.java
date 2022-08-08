@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 public class VerifyInvitationResponse {
-    // TODO 참여하고 있는 인원 수도 반환해야함.
     private final Long id;
     private final String title;
     private final int capacity;
+    private final int participatingCount;
     private final String startDate;
     private final String endDate;
 
@@ -26,6 +26,7 @@ public class VerifyInvitationResponse {
                 .capacity(room.getCapacity())
                 .startDate(DateConverter.localDateToString(room.getStartDate()))
                 .endDate(DateConverter.localDateToString(room.getEndDate()))
+                .participatingCount(room.getMemberRooms().size())
                 .build();
     }
 }

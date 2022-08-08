@@ -1,9 +1,11 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepositoryImpl;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
@@ -87,10 +89,10 @@ public class RoomServiceTest {
                 .thenThrow(EmptyResultDataAccessException.class);
 
         // given
-        final VerifyInvitationRequest request = verifyInviationRequest();
+        final VerifyInvitationRequest request = RoomRequestDtoBuilder.verifyInvitationRequest();
 
         // when, then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(InvitationNotFoundException.class)
                 .isThrownBy(() -> {
                     target.verifyInvitation(member, request);
                 });
@@ -107,10 +109,10 @@ public class RoomServiceTest {
                 .thenReturn(memberRoom);
 
         // then
-        final VerifyInvitationRequest verifyInvitationRequest = verifyInviationRequest();
+        final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
 
         // when, then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
                 .isThrownBy(() -> {
                     target.verifyInvitation(member, verifyInvitationRequest);
                 });
@@ -128,7 +130,7 @@ public class RoomServiceTest {
                 .thenThrow(EmptyResultDataAccessException.class);
 
         // given
-        final VerifyInvitationRequest verifyInvitationRequest = verifyInviationRequest();
+        final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
 
         // when
         VerifyInvitationResponse response = target.verifyInvitation(member, verifyInvitationRequest);
@@ -148,10 +150,10 @@ public class RoomServiceTest {
                 .thenReturn(memberRoom);
 
         // given
-        final ParticipateRoomRequest request = participateRoomRequest();
+        final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
 
         // when, then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
                 .isThrownBy(() -> {
                     target.participateRoom(member, room.getId(), request);
                 });
@@ -168,10 +170,10 @@ public class RoomServiceTest {
                 .thenThrow(EmptyResultDataAccessException.class);
 
         // given
-        final ParticipateRoomRequest request = participateRoomRequest();
+        final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
 
         // when, then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(RoomNotFoundException.class)
                 .isThrownBy(() -> {
                     target.participateRoom(member, room.getId(), request);
                 });
@@ -189,14 +191,13 @@ public class RoomServiceTest {
                 .thenReturn(Room.builder().capacity(0).build());
 
         // given
-        final ParticipateRoomRequest request = participateRoomRequest();
+        final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
 
         // when, then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(RoomCapacityExceededException.class)
                 .isThrownBy(() -> {
                     target.participateRoom(member, room.getId(), request);
-                })
-                .withMessage("수용인원 초과");
+                });
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
     }
@@ -212,7 +213,7 @@ public class RoomServiceTest {
                 .thenReturn(room);
 
         // given
-        final ParticipateRoomRequest request = participateRoomRequest();
+        final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
 
         // when
         Long roomId = target.participateRoom(member, room.getId(), request);
@@ -221,18 +222,5 @@ public class RoomServiceTest {
         assertThat(roomId).isEqualTo(room.getId());
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
-    }
-
-    // TODO - Request, Response builder 로 refactor
-    private VerifyInvitationRequest verifyInviationRequest() {
-        return VerifyInvitationRequest.builder()
-                .invitationCode("5R2DV2")
-                .build();
-    }
-
-    private ParticipateRoomRequest participateRoomRequest() {
-        return ParticipateRoomRequest.builder()
-                .colorIdx(1)
-                .build();
     }
 }
