@@ -14,7 +14,8 @@ public enum RoomErrorCode implements ErrorCode {
 
     ROOM_ALREADY_PARTICIPATING(CONFLICT, "이미 참여 중인 방입니다."),
     ROOM_NOT_FOUND(NOT_FOUND, "방이 존재하지 않습니다."),
-    ROOM_CAPACITY_EXCEEDED(BAD_REQUEST, "방의 수용인원을 초과하였습니다.")
+    ROOM_CAPACITY_EXCEEDED(BAD_REQUEST, "방의 수용인원을 초과하였습니다."),
+    ROOM_NOT_PARTICIPATING(FORBIDDEN, "방이 존재하지 않거나 참여 권한이 없는 방입니다.")
     ;
     private final HttpStatus status;
     private final String message;

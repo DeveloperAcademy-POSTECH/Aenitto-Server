@@ -8,6 +8,8 @@ import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
+import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
+import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -98,6 +101,25 @@ public class RoomServiceImpl implements RoomService {
         memberRepository.updateMember(member);
 
         return roomId;
+    }
+
+    @Override
+    public GetRoomStateResponse getRoomState(Member member, Long roomId) {
+        MemberRoom memberRoom;
+        // 참여 중인 방이 아닐 경우 -> throw
+        try {
+            memberRoom = roomRepository.findMemberRoomById(member.getId(), roomId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new RoomNotParticipatingException();
+        }
+
+        return GetRoomStateResponse.of(memberRoom.getRoom());
+    }
+
+    @Override
+    public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit) {
+        List<Room> participatingRooms = roomRepository.findParticipatingRoomsByMemberIdWithCursor(member.getId(), cursor, limit);
+        return ParticipatingRoomsResponse.of(participatingRooms);
     }
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {

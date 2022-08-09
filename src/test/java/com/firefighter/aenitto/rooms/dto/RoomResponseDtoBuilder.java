@@ -1,14 +1,24 @@
 package com.firefighter.aenitto.rooms.dto;
 
 import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
+import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 
-import static com.firefighter.aenitto.rooms.RoomFixture.ROOM_1;
+import java.util.List;
+
 
 public class RoomResponseDtoBuilder {
-    private static final Room room = ROOM_1;
 
-    public static VerifyInvitationResponse verifyInvitationResponse() {
+    public static VerifyInvitationResponse verifyInvitationResponse(Room room) {
         return VerifyInvitationResponse.from(room);
+    }
+
+    public static GetRoomStateResponse getRoomStateResponse(Room room) {
+        return GetRoomStateResponse.of(room);
+    }
+
+    public static ParticipatingRoomsResponse participatingRoomsResponse(List<Room> rooms) {
+        return ParticipatingRoomsResponse.of(rooms);
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -227,7 +228,88 @@ class RoomRepositoryImplTest {
         assertNotNull(memberRoom1);
         assertThat(member1.getMemberRooms().size()).isEqualTo(1);
         assertThat(room1.getMemberRooms().size()).isEqualTo(1);
-
     }
 
+    @DisplayName("참여 중인 방 조회 - 성공 (cursor null)")
+    @Test
+    void findParticipatingRooms_success_without_cursor() {
+        // given
+        Room room1 = Room.builder().title("방 제목1").build();
+        Room room2 = Room.builder().title("방 제목2").build();
+        Room room3 = Room.builder().title("방 제목3").build();
+        Room room4 = Room.builder().title("방 제목4").build();
+        Room room5 = Room.builder().title("방 제목5").build();
+
+        MemberRoom memberRoom1 = MemberRoom.builder().build();
+        MemberRoom memberRoom2 = MemberRoom.builder().build();
+        MemberRoom memberRoom3 = MemberRoom.builder().build();
+        MemberRoom memberRoom4 = MemberRoom.builder().build();
+        MemberRoom memberRoom5 = MemberRoom.builder().build();
+
+        memberRoom1.setMemberRoom(member, room1);
+        memberRoom2.setMemberRoom(member, room2);
+        memberRoom3.setMemberRoom(member, room3);
+        memberRoom4.setMemberRoom(member, room4);
+        memberRoom5.setMemberRoom(member, room5);
+
+        em.persist(member);
+        em.persist(room1);
+        em.persist(room2);
+        em.persist(room3);
+        em.persist(room4);
+        em.persist(room5);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Room> res = roomRepository.findParticipatingRoomsByMemberIdWithCursor(member.getId(), null, 3);
+
+        // then
+        assertThat(res.size()).isEqualTo(3);
+        assertThat(res.get(0).getTitle()).isEqualTo("방 제목5");
+        assertThat(res.get(1).getTitle()).isEqualTo("방 제목4");
+        assertThat(res.get(2).getTitle()).isEqualTo("방 제목3");
+    }
+
+    @DisplayName("참여 중인 방 조회 - 성공 (cursor 존재")
+    @Test
+    void findParticipatinRoom_success_without_cursor() {
+        // given
+        Room room1 = Room.builder().title("방 제목1").build();
+        Room room2 = Room.builder().title("방 제목2").build();
+        Room room3 = Room.builder().title("방 제목3").build();
+        Room room4 = Room.builder().title("방 제목4").build();
+        Room room5 = Room.builder().title("방 제목5").build();
+
+        MemberRoom memberRoom1 = MemberRoom.builder().build();
+        MemberRoom memberRoom2 = MemberRoom.builder().build();
+        MemberRoom memberRoom3 = MemberRoom.builder().build();
+        MemberRoom memberRoom4 = MemberRoom.builder().build();
+        MemberRoom memberRoom5 = MemberRoom.builder().build();
+
+        memberRoom1.setMemberRoom(member, room1);
+        memberRoom2.setMemberRoom(member, room2);
+        memberRoom3.setMemberRoom(member, room3);
+        memberRoom4.setMemberRoom(member, room4);
+        memberRoom5.setMemberRoom(member, room5);
+
+        em.persist(member);
+        em.persist(room1);
+        em.persist(room2);
+        em.persist(room3);
+        em.persist(room4);
+        em.persist(room5);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Room> res = roomRepository.findParticipatingRoomsByMemberIdWithCursor(member.getId(), room3.getId(), 3);
+
+        // then
+        assertThat(res.size()).isEqualTo(2);
+        assertThat(res.get(0).getTitle()).isEqualTo("방 제목2");
+        assertThat(res.get(1).getTitle()).isEqualTo("방 제목1");
+    }
 }
