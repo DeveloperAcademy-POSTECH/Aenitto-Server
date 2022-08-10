@@ -12,6 +12,5 @@ import java.util.UUID;
 @Documented
 @WithSecurityContext(factory = WithMockCustomMemberSecurityContextFactory.class)
 public @interface WithMockCustomMember {
-    String name() default "userName";
-//    UUID id() default ;
+    String nickName() default "nickname";
 }

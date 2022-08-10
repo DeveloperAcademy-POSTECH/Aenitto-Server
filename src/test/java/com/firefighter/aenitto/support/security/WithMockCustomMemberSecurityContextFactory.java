@@ -18,14 +18,7 @@ public class WithMockCustomMemberSecurityContextFactory implements WithSecurityC
     public SecurityContext createSecurityContext(WithMockCustomMember customMember) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-//        UsernamePasswordAuthenticationToken authentication =
-//                new UsernamePasswordAuthenticationToken(
-//                        CurrentUserDetails.of(createMember(customMember.id(), customMember.name())),
-//                        null
-////                        createAuthorityList(customMember.role().getRole()));
-//                );
-
-        CurrentUserDetails principal = CurrentUserDetails.of(createMember(customMember.name()));
+        CurrentUserDetails principal = CurrentUserDetails.of(createMember("nickname"));
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, principal.getPassword(), principal.getAuthorities());
         context.setAuthentication(auth);
         return context;
@@ -33,6 +26,7 @@ public class WithMockCustomMemberSecurityContextFactory implements WithSecurityC
 
     private Member createMember(String nickname) {
         return Member.builder()
+                .id(UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
                 .nickname(nickname)
                 .socialId("socialId")
                 .build();

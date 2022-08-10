@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
+@Transactional
 public class AuthServiceImplTest {
 
     private final UUID memberId = UUID.fromString("b48617b2-090d-4ee6-9033-b99f99d98304");
@@ -55,29 +57,29 @@ public class AuthServiceImplTest {
 
     }
 
-//    @Test
-//    @DisplayName("임시 login 성공 - 회원가입")
-//    public void temp_login() {
-//
-//        // given
-//        doReturn(member()).when(memberRepository).saveMember(any(Member.class));
-//        doReturn(token()).when(tokenService).generateToken("socialId입니다", "USER");
-//        doReturn(refreshToken()).when(refreshTokenRepository).saveRefreshToken(any(RefreshToken.class));
-//        TempLoginRequest tempLoginRequest = TempLoginRequest.builder()
-//                .accessToken("accessToken")
-//                .build();
-//
-//        // when
-//        final TempLoginResponse result = target.loginOrSignIn(tempLoginRequest);
-//
-//        //then
-//        assertThat(result.getAccessToken()).isNotNull();
-//
-//        // then
-//       assertAll(
-//               () -> verify(memberRepository).saveMember(any(Member.class))
-//       );
-//    }
+    @Test
+    @DisplayName("임시 login 성공 - 회원가입")
+    public void temp_login() {
+
+        // given
+        doReturn(member()).when(memberRepository).saveMember(any(Member.class));
+        doReturn(token()).when(tokenService).generateToken("socialId입니다", "USER");
+        doReturn(refreshToken()).when(refreshTokenRepository).saveRefreshToken(any(RefreshToken.class));
+        TempLoginRequest tempLoginRequest = TempLoginRequest.builder()
+                .accessToken("accessToken")
+                .build();
+
+        // when
+        final TempLoginResponse result = target.loginOrSignIn(tempLoginRequest);
+
+        //then
+        assertThat(result.getAccessToken()).isNotNull();
+
+        // then
+       assertAll(
+               () -> verify(memberRepository).saveMember(any(Member.class))
+       );
+    }
     private Member member() {
         return Member.builder()
                 .id(UUID.fromString("b48617b2-090d-4ee6-9033-b99f99d98304"))

@@ -7,6 +7,7 @@ import java.util.UUID;
 public class MemberFixture {
     public static final Member MEMBER_1 = Member.builder()
             .id(UUID.randomUUID())
-            .nickname("Leo")
+            .nickname("LEO")
+            .socialId("socialId")
             .build();
 }
