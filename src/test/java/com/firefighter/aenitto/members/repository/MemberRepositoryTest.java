@@ -78,7 +78,6 @@ class MemberRepositoryTest {
         em.flush();
         em.clear();
 
-        assertThat(mergedMember.getId()).isEqualTo(member.getId());
 
         Member findMember = em.find(Member.class, member.getId());
 

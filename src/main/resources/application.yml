@@ -1,6 +1,12 @@
 ### Default Profile
 spring:
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -11,14 +17,14 @@ spring:
       develop: develop, developdb
 
 ---
-### Test Profile
+## Test Profile
 spring:
   config:
     activate:
       on-profile: test
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost/~/h2/aenitto
+    url:  jdbc:h2:tcp://localhost/~/test
     username: sa
 
   jpa:
@@ -32,7 +38,7 @@ spring:
     show-sql: true
 
 ---
-### Develop Profile
+## Develop Profile
 spring:
   jpa:
     properties:

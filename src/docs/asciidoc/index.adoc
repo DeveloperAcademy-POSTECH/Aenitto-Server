@@ -10,6 +10,12 @@
 //[[Member-API]]
 //== Member API
 //
-//[[Member-단일-조회]]
-//=== Member 단일 조회
-//operation::member-get[snippets='http-request,path-parameters,http-response,response-fields']
+[[Member-단일-조회]]
+=== Member 단일 조회
+operation::temp-login[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[Member-API]]
+== Member API
+[[Member-닉네임-수정]]
+=== Member 닉네임 수정
+operation::change-nickname[snippets='http-request,http-response,request-fields']
