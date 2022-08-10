@@ -18,7 +18,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("testdb")
 public class MemberIntegrationTest extends IntegrationTest {
     @Autowired
     MemberRepository memberRepository;
