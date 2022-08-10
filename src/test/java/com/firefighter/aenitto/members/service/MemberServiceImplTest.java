@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER_DETAILS;
-import static com.firefighter.aenitto.members.MemberFixture.MEMBER_1;
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -34,7 +34,7 @@ public class MemberServiceImplTest {
 
     @BeforeEach
     void setup() {
-        member = MEMBER_1;
+        member = memberFixture();
         currentUserDetails = CURRENT_USER_DETAILS;
     }
 

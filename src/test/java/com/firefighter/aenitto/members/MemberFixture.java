@@ -6,9 +6,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.UUID;
 
 public class MemberFixture {
-    public static final Member MEMBER_1 = Member.builder()
-            .id(UUID.randomUUID())
-            .nickname("LEO")
-            .socialId("socialId")
-            .build();
+    public static Member memberFixture() {
+        Member member = Member.builder()
+                .nickname("Leo")
+                .build();
+        ReflectionTestUtils.setField(member, "id", UUID.randomUUID());
+        return member;
+    }
 }
