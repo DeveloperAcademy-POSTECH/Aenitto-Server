@@ -5,12 +5,14 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepositoryImpl;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
+import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,7 @@ public class RoomServiceTest {
     private Room room2;
     private Member member;
     private MemberRoom memberRoom;
+    private MemberRoom memberRoom2;
 
     @BeforeEach
     void setup() {
@@ -55,6 +58,7 @@ public class RoomServiceTest {
         room2 = roomFixture2();
         member = memberFixture();
         memberRoom = memberRoomFixture(member, room);
+        memberRoom2 = memberRoomFixture(member, room2);
     }
 
     @DisplayName("방 생성 성공")
@@ -272,5 +276,46 @@ public class RoomServiceTest {
         // then
         assertThat(participatingRooms.getParticipatingRooms().size()).isEqualTo(2);
         assertThat(participatingRooms.getParticipatingRooms().get(0).getState()).isEqualTo("PROCESSING");
+    }
+
+    @DisplayName("방 상세 정보 조회 (PRE) - 실패 (참여 중인 방이 아님)")
+    @Test
+    void getRoomDetail_PRE_fail_roomNo() {
+        // given
+        final Long roomId = 1L;
+        final RoomState state = RoomState.PRE;
+
+        // when, then
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenThrow(EmptyResultDataAccessException.class);
+
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.getRoomDetail(member, roomId, state);
+                });
+    }
+
+    @DisplayName("방 상세 정보 조회 (PRE) - 성공")
+    @Test
+    void getRoomDetail_PRE_success() {
+        // given
+        final Long roomId = 1L;
+        final RoomState state = RoomState.PRE;
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(memberRoom2);
+
+        RoomDetailResponse roomDetail = target.getRoomDetail(member, roomId, state);
+        RoomDetailResponse.RoomDetail roomDetail1 = roomDetail.getRoom();
+
+        // then
+        assertThat(roomDetail.getAdmin()).isNull();
+        assertThat(roomDetail.getDidViewRoulette()).isNull();
+        assertThat(roomDetail.getManittee()).isNull();
+        assertThat(roomDetail.getMessages()).isNull();
+        assertThat(roomDetail1.getId()).isEqualTo(3L);
+        assertThat(roomDetail1.getState()).isEqualTo("PRE");
+        assertThat(roomDetail1.getTitle()).isEqualTo("방제목2");
     }
 }
