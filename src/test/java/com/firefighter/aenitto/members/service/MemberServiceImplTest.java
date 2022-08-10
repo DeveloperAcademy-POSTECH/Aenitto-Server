@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ public class MemberServiceImplTest {
     private MemberServiceImpl target;
 
     @Mock
+    @Qualifier("memberRepositoryImpl")
     private MemberRepository memberRepository;
 
     private Member member;
@@ -34,7 +36,6 @@ public class MemberServiceImplTest {
 
     @BeforeEach
     void setup() {
-        member = memberFixture();
         currentUserDetails = CURRENT_USER_DETAILS;
     }
 
@@ -42,17 +43,17 @@ public class MemberServiceImplTest {
     @DisplayName("닉네임 수정 - 성공")
     void set_nickname_success(){
         //given
-        String nickname = "바뀐 닉네임";
+        String nickname = "바뀐닉네임";
         doReturn(Optional.of(currentUserDetails.getMember())).when(memberRepository).findByMemberId(any());
 
         //when
-        target.setNickname(member, nickname);
+        target.setNickname(currentUserDetails.getMember(), nickname);
 
         //then
-        Member member = currentUserDetails.getMember();
+        Member member1 = currentUserDetails.getMember();
         assertAll(
-                () -> verify(memberRepository).findByMemberId(member.getId()),
-                ()-> assertEquals(nickname, member.getNickname())
+                () -> verify(memberRepository).findByMemberId(member1.getId()),
+                ()-> assertEquals(nickname, member1.getNickname())
         );
     }
 
