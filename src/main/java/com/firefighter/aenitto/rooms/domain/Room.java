@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.rooms.domain;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
+import com.firefighter.aenitto.common.utils.DateConverter;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -43,8 +44,7 @@ public class Room extends CreationModificationLog {
     private LocalDate endDate;
 
     @Builder
-    public Room(Long id, String title, int capacity, String invitation, LocalDate startDate, LocalDate endDate) {
-        this.id = id;
+    public Room(String title, int capacity, String invitation, LocalDate startDate, LocalDate endDate) {
         this.title = title;
         this.capacity = capacity;
         this.invitation = invitation;
@@ -54,6 +54,14 @@ public class Room extends CreationModificationLog {
 
     public void createInvitation() {
         this.invitation = randomSixNumUpperString();
+    }
+
+    public String getStartDateValue() {
+        return DateConverter.localDateToString(this.startDate);
+    }
+
+    public String getEndDateValue() {
+        return DateConverter.localDateToString(this.endDate);
     }
 
     public boolean unAcceptable() {

@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.members;
 
 import com.firefighter.aenitto.members.domain.Member;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
 

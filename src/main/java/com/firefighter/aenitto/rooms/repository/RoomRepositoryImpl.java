@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -53,5 +54,20 @@ public class RoomRepositoryImpl implements RoomRepository {
                 .setParameter("memberId", memberId)
                 .setParameter("roomId", roomId)
                 .getSingleResult();
+    }
+
+    @Override
+    public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit) {
+        return em.createQuery(
+                        "SELECT r" +
+                                " FROM MemberRoom mr" +
+                                " JOIN mr.room r" +
+                                " JOIN mr.member m" +
+                                " WHERE m.id = :memberId" +
+                                ((cursor == null) ? "" : " AND r.id < " + cursor) +
+                                " ORDER BY r.id DESC", Room.class)
+                .setParameter("memberId", memberId)
+                .setMaxResults(limit)
+                .getResultList();
     }
 }

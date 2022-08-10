@@ -4,6 +4,8 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
+import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
+import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 
 public interface RoomService {
@@ -12,4 +14,9 @@ public interface RoomService {
     public VerifyInvitationResponse verifyInvitation(Member member, VerifyInvitationRequest verifyInvitationRequest);
 
     public Long participateRoom(Member member, Long roomId, ParticipateRoomRequest request);
+
+    public GetRoomStateResponse getRoomState(Member member, Long roomId);
+
+    public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit);
+
 }

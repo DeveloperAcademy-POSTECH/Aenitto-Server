@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.rooms.domain;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
+import com.firefighter.aenitto.common.exception.room.RoomAlreadyParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import lombok.AccessLevel;
@@ -44,8 +45,7 @@ public class MemberRoom extends CreationModificationLog {
     private ParticipantRole role;
 
     @Builder
-    public MemberRoom(Long id, boolean admin, int colorIdx) {
-        this.id = id;
+    public MemberRoom(boolean admin, int colorIdx) {
         this.admin = admin;
         this.colorIdx = colorIdx;
     }
@@ -63,6 +63,9 @@ public class MemberRoom extends CreationModificationLog {
     }
 
     public void setMemberRoom(Member member, Room room) {
+        if (this.member != null || this.room != null) {
+            throw new RoomAlreadyParticipatingException();
+        }
         this.member = member;
         this.room = room;
         member.getMemberRooms().add(this);

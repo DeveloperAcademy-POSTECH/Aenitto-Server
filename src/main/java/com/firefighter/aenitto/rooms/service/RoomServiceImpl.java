@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
@@ -7,6 +8,8 @@ import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
+import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
+import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Qualifier(value = "roomServiceImpl")
@@ -65,43 +71,61 @@ public class RoomServiceImpl implements RoomService {
         try {
             findRoom = roomRepository.findByInvitation(invitation);
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException("초대코드 없음");
+            throw new InvitationNotFoundException();
         }
 
-        // TODO (Leo) 07.09 이미 참여 중인 방 logic refactor
         // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
-        try {
-            roomRepository.findMemberRoomById(member.getId(), findRoom.getId());
-            throw new IllegalArgumentException("이미 참여 중인 방");
-        } catch (EmptyResultDataAccessException e) {
-            return VerifyInvitationResponse.from(findRoom);
-        }
+        throwExceptionIfParticipating(member.getId(), findRoom.getId());
 
+        return VerifyInvitationResponse.from(findRoom);
     }
 
     @Override
     public Long participateRoom(Member member, Long roomId, ParticipateRoomRequest request) {
         // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
-        try {
-            roomRepository.findMemberRoomById(member.getId(), roomId);
-            throw new IllegalArgumentException("이미 참여 중인 방");
-        } catch (EmptyResultDataAccessException e) {}
+        throwExceptionIfParticipating(member.getId(), roomId);
 
         // roomId로 방 조회 -> 없을 경우 throw
         Room findRoom;
         try {
             findRoom = roomRepository.findRoomById(roomId);
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException("방이 존재하지 않음");
+            throw new RoomNotFoundException();
         }
 
         // 방의 수용인원이 초과했을 경우 -> throw
-        if (findRoom.unAcceptable()) throw new IllegalArgumentException("수용인원 초과");
+        if (findRoom.unAcceptable()) throw new RoomCapacityExceededException();
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
         memberRepository.updateMember(member);
 
         return roomId;
+    }
+
+    @Override
+    public GetRoomStateResponse getRoomState(Member member, Long roomId) {
+        MemberRoom memberRoom;
+        // 참여 중인 방이 아닐 경우 -> throw
+        try {
+            memberRoom = roomRepository.findMemberRoomById(member.getId(), roomId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new RoomNotParticipatingException();
+        }
+
+        return GetRoomStateResponse.of(memberRoom.getRoom());
+    }
+
+    @Override
+    public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit) {
+        List<Room> participatingRooms = roomRepository.findParticipatingRoomsByMemberIdWithCursor(member.getId(), cursor, limit);
+        return ParticipatingRoomsResponse.of(participatingRooms);
+    }
+
+    private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
+        try {
+            roomRepository.findMemberRoomById(memberId, roomId);
+            throw new RoomAlreadyParticipatingException();
+        } catch (EmptyResultDataAccessException e) {}
     }
 }

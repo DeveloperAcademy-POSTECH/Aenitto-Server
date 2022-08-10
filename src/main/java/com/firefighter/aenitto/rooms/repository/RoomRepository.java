@@ -4,6 +4,7 @@ package com.firefighter.aenitto.rooms.repository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface RoomRepository {
@@ -12,4 +13,6 @@ public interface RoomRepository {
     public Room findRoomById(Long id);
     public Room findByInvitation(String invitation);
     public MemberRoom findMemberRoomById(UUID memberId, Long roomId);
+
+    public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit);
 }
