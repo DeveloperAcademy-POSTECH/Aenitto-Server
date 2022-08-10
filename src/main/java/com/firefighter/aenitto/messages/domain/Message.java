@@ -42,6 +42,12 @@ public class Message extends CreationLog {
     @Column
     private String imgUrl;
 
+    public void sendMessage(Member sender, Member receiver, Room room) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.room = room;
+    }
+
     @Builder
     public Message(String content, String imgUrl) {
         this.content = content;
