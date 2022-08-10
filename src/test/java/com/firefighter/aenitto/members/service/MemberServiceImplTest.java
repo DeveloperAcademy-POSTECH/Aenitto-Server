@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.Optional;
 
 import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER_DETAILS;
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -57,7 +56,7 @@ public class MemberServiceImplTest {
         );
     }
 
-    @DisplayName("유저 성함 저장 - 실패 / 존재하지 않는 유저의 경우")
+    @DisplayName("닉네임 수정 - 실패 / 존재하지 않는 유저의 경우")
     @Test
     void set_nickname_fail_not_found_member() throws Exception {
 
@@ -67,7 +66,7 @@ public class MemberServiceImplTest {
 
         // when, then
         assertThrows(MemberNotFoundException.class,
-                () -> target.setNickname(member, nickname));
+                () -> target.setNickname(currentUserDetails.getMember(), nickname));
     }
 
 }
