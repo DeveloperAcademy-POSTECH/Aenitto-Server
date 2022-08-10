@@ -43,5 +43,14 @@ public class RoomFixture {
         return memberRoom;
     }
 
+    // TODO: Fixture function 들 refactor (22.08.10)
+    public static Room transientRoomFixture(int number, int capacity, int date) {
+        return Room.builder()
+                .title("방제목" + number)
+                .capacity(capacity)
+                .startDate(LocalDate.of(2022, 7, date))
+                .endDate(LocalDate.of(2022, 7, date + 1))
+                .build();
+    }
 
 }
