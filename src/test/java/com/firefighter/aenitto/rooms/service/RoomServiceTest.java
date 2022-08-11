@@ -46,7 +46,7 @@ public class RoomServiceTest {
     private MemberRepositoryImpl memberRepository;
 
     // Fixtures
-    private Room room;
+    private Room room1;
     private Room room2;
     private Member member;
     private MemberRoom memberRoom;
@@ -54,11 +54,11 @@ public class RoomServiceTest {
 
     @BeforeEach
     void setup() {
-        room = roomFixture();
+        room1 = roomFixture1();
         room2 = roomFixture2();
         member = memberFixture();
-        memberRoom = memberRoomFixture(member, room);
-        memberRoom2 = memberRoomFixture(member, room2);
+        memberRoom = memberRoomFixture1(member, room1);
+        memberRoom2 = memberRoomFixture1(member, room2);
     }
 
     @DisplayName("방 생성 성공")
@@ -71,7 +71,7 @@ public class RoomServiceTest {
                 .thenThrow(EmptyResultDataAccessException.class)
                 .thenReturn(Room.builder().build());
         when(roomRepository.saveRoom(any(Room.class)))
-                .thenReturn(room);
+                .thenReturn(room1);
 
         // given
         CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
@@ -113,7 +113,7 @@ public class RoomServiceTest {
     void verifyInvitation_fail_participating() {
         // mock
         when(roomRepository.findByInvitation(anyString()))
-                .thenReturn(room);
+                .thenReturn(room1);
         when(roomRepository.findMemberRoomById(any(), anyLong()))
                 .thenReturn(memberRoom);
 
@@ -134,7 +134,7 @@ public class RoomServiceTest {
     void verifyInvitation_success() {
         // mock
         when(roomRepository.findByInvitation(anyString()))
-                .thenReturn(room);
+                .thenReturn(room1);
         when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
 
@@ -145,9 +145,9 @@ public class RoomServiceTest {
         VerifyInvitationResponse response = target.verifyInvitation(member, verifyInvitationRequest);
 
         // then
-        assertThat(response.getCapacity()).isEqualTo(room.getCapacity());
-        assertThat(response.getId()).isEqualTo(room.getId());
-        assertThat(response.getTitle()).isEqualTo(room.getTitle());
+        assertThat(response.getCapacity()).isEqualTo(room1.getCapacity());
+        assertThat(response.getId()).isEqualTo(room1.getId());
+        assertThat(response.getTitle()).isEqualTo(room1.getTitle());
         verify(roomRepository, times(1)).findByInvitation(anyString());
     }
 
@@ -164,7 +164,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.participateRoom(member, room.getId(), request);
+                    target.participateRoom(member, room1.getId(), request);
                 });
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
     }
@@ -184,7 +184,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(RoomNotFoundException.class)
                 .isThrownBy(() -> {
-                    target.participateRoom(member, room.getId(), request);
+                    target.participateRoom(member, room1.getId(), request);
                 });
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
@@ -205,7 +205,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(RoomCapacityExceededException.class)
                 .isThrownBy(() -> {
-                    target.participateRoom(member, room.getId(), request);
+                    target.participateRoom(member, room1.getId(), request);
                 });
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
@@ -219,16 +219,16 @@ public class RoomServiceTest {
         when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
         when(roomRepository.findRoomById(anyLong()))
-                .thenReturn(room);
+                .thenReturn(room1);
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
 
         // when
-        Long roomId = target.participateRoom(member, room.getId(), request);
+        Long roomId = target.participateRoom(member, room1.getId(), request);
 
         // then
-        assertThat(roomId).isEqualTo(room.getId());
+        assertThat(roomId).isEqualTo(room1.getId());
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
     }
@@ -241,7 +241,7 @@ public class RoomServiceTest {
 
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.getRoomState(member, room.getId());
+                    target.getRoomState(member, room1.getId());
                 });
     }
 
@@ -253,7 +253,7 @@ public class RoomServiceTest {
                 .thenReturn(memberRoom);
 
         // when
-        GetRoomStateResponse roomState = target.getRoomState(member, room.getId());
+        GetRoomStateResponse roomState = target.getRoomState(member, room1.getId());
 
         // then
         assertThat(roomState.getState()).isEqualTo("PROCESSING");
@@ -264,7 +264,7 @@ public class RoomServiceTest {
     void findParticipatingRoom_success_with_cursor() {
         // given
         List<Room> roomList = new ArrayList<>();
-        roomList.add(room);
+        roomList.add(room1);
         roomList.add(room2);
 
         when(roomRepository.findParticipatingRoomsByMemberIdWithCursor(any(UUID.class), anyLong(), anyInt()))
@@ -314,7 +314,7 @@ public class RoomServiceTest {
         assertThat(roomDetail.getDidViewRoulette()).isNull();
         assertThat(roomDetail.getManittee()).isNull();
         assertThat(roomDetail.getMessages()).isNull();
-        assertThat(roomDetail1.getId()).isEqualTo(3L);
+        assertThat(roomDetail1.getId()).isEqualTo(2L);
         assertThat(roomDetail1.getState()).isEqualTo("PRE");
         assertThat(roomDetail1.getTitle()).isEqualTo("방제목2");
     }

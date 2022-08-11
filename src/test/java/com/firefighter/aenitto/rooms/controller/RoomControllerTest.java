@@ -24,8 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -40,7 +38,6 @@ import java.util.List;
 
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
-import static org.hamcrest.Matchers.hasLength;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
@@ -49,8 +46,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 
@@ -70,7 +65,7 @@ class RoomControllerTest {
 
     // Fixture
     private Member member;
-    private Room room;
+    private Room room1;
     private Room room2;
     private MemberRoom memberRoom;
 
@@ -81,10 +76,10 @@ class RoomControllerTest {
                 .apply(documentationConfiguration(restDocumentation))
                 .build();
         objectMapper = new ObjectMapper();
-        room = roomFixture();
+        room1 = roomFixture1();
         room2 = roomFixture2();
         member = memberFixture();
-        memberRoom = memberRoomFixture(member, room);
+        memberRoom = memberRoomFixture1(member, room1);
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -159,7 +154,7 @@ class RoomControllerTest {
     void verifyInvitation_success() throws Exception {
         // given
         final String url = "/api/v1/invitations/verification";
-        final VerifyInvitationResponse response = RoomResponseDtoBuilder.verifyInvitationResponse(room);
+        final VerifyInvitationResponse response = RoomResponseDtoBuilder.verifyInvitationResponse(room1);
         when(roomService.verifyInvitation(any(Member.class), any(VerifyInvitationRequest.class)))
                 .thenReturn(response);
 
@@ -176,8 +171,8 @@ class RoomControllerTest {
         // then
         perform
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.capacity", is(room.getCapacity())))
-                .andExpect(jsonPath("$.title", is(room.getTitle())))
+                .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
+                .andExpect(jsonPath("$.title", is(room1.getTitle())))
                 .andExpect(jsonPath("$.participatingCount", is(1)))
                 .andDo(document("초대코드 검증", requestFields(
                         fieldWithPath("invitationCode").description("초대코드")
@@ -268,7 +263,7 @@ class RoomControllerTest {
         final Long roomId = 1L;
         final String url = "/api/v1/rooms/" + roomId + "/state";
         when(roomService.getRoomState(any(Member.class), anyLong()))
-                .thenReturn(RoomResponseDtoBuilder.getRoomStateResponse(room));
+                .thenReturn(RoomResponseDtoBuilder.getRoomStateResponse(room1));
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -279,7 +274,7 @@ class RoomControllerTest {
         perform
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state", is(room.getState().toString())))
+                .andExpect(jsonPath("$.state", is(room1.getState().toString())))
                 .andDo(document("방 상태 조회", responseFields(
                         fieldWithPath("state").description("방 상태")
                 )));
@@ -293,7 +288,7 @@ class RoomControllerTest {
         final int count = 3;
 
         List<Room> rooms = new ArrayList<>();
-        rooms.add(room);
+        rooms.add(room1);
         rooms.add(room2);
 
         final String url = "/api/v1/rooms?cursor=" + cursor + "&count=" + count;
