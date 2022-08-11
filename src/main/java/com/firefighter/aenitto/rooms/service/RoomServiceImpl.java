@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional(readOnly = true)
 @Qualifier(value = "roomServiceImpl")
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
