@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: test
+    active: testdb
 
   sql:
     init:
@@ -9,10 +9,6 @@ spring:
 
   jpa:
     defer-datasource-initialization: true
-    hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
 ---
 # H2 IN MEMORY TEST
 spring:
@@ -21,7 +17,7 @@ spring:
       on-profile: testdb
   datasource:
     driver-class-name: org.h2.Driver
-    url:  jdbc:h2:tcp://localhost/~/test
+    url: jdbc:h2:mem:testdb
     username: sa
 
   jpa:
