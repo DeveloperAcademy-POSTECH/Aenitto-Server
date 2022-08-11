@@ -68,8 +68,8 @@ public class MemberRoom extends CreationModificationLog {
         }
         this.member = member;
         this.room = room;
-        member.getMemberRooms().add(this);
         room.getMemberRooms().add(this);
+        member.getMemberRooms().add(this);
     }
 }
 

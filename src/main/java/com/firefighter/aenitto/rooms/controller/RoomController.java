@@ -29,10 +29,10 @@ public class RoomController {
 
     @PostMapping("/rooms")
     public ResponseEntity createRoom(
-            @CurrentMember Member member,
+            @CurrentMember Member currentMember,
             @Valid@RequestBody final CreateRoomRequest createRoomRequest
     ) {
-        final Long roomId = roomService.createRoom(member, createRoomRequest);
+        final Long roomId = roomService.createRoom(currentMember, createRoomRequest);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId)).build();
     }
 

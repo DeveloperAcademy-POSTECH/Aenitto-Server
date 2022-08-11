@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -36,9 +37,11 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public Long createRoom(Member member, CreateRoomRequest createRoomRequest) {
+    public Long createRoom(Member currentMember, CreateRoomRequest createRoomRequest) {
         // Dto -> Entity
         final Room room = createRoomRequest.toEntity();
+        final Member member = memberRepository.findByMemberId(currentMember.getId())
+                .orElseThrow(MemberNotFoundException::new);
 
         // Room invitation 생성 -> 존재하지 않는 random 코드 나올 때 까지.
         do {
@@ -56,7 +59,6 @@ public class RoomServiceImpl implements RoomService {
                 .build();
 
         memberRoom.setMemberRoom(member, room);
-
         memberRepository.updateMember(member);
         return roomRepository.saveRoom(room).getId();
     }
