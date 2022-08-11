@@ -2,14 +2,14 @@
 spring:
   sql:
     init:
-      mode: always
+      mode: never
       encoding: UTF-8
   profiles:
     active: develop # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
       develop: develop, developdb
 
-  defer-datasource-initialization: true
+  defer-datasource-initialization: truw
 
 ---
 ## Test Profile
