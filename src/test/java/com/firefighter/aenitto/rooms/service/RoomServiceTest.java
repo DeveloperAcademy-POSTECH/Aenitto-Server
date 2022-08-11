@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.auth.token.CurrentUserDetails;
 import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepositoryImpl;
@@ -24,8 +25,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER_DETAILS;
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.mockito.Mockito.*;
@@ -48,12 +51,14 @@ public class RoomServiceTest {
     private Room room2;
     private Member member;
     private MemberRoom memberRoom;
+    private CurrentUserDetails currentUserDetails;
 
     @BeforeEach
     void setup() {
         room = roomFixture();
         room2 = roomFixture2();
         member = memberFixture();
+        currentUserDetails = CURRENT_USER_DETAILS;
         memberRoom = memberRoomFixture(member, room);
     }
 
@@ -61,6 +66,7 @@ public class RoomServiceTest {
     @Test
     void createRoomTest() {
         // mock
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findByInvitation(anyString()))
                 .thenThrow(EmptyResultDataAccessException.class)
                 .thenThrow(EmptyResultDataAccessException.class)
@@ -83,7 +89,6 @@ public class RoomServiceTest {
         // then
         assertThat(roomId).isEqualTo(1L);
         verify(roomRepository, times(1)).saveRoom(any(Room.class));
-        verify(memberRepository, times(1)).updateMember(any(Member.class));
     }
 
     @DisplayName("초대코드 검증 - 실패 (초대코드 존재하지 않음)")
