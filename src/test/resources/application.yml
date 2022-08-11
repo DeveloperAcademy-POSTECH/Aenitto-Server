@@ -4,7 +4,7 @@ spring:
 
   sql:
     init:
-      mode: never
+      mode: always
       encoding: UTF-8
 
   jpa:
