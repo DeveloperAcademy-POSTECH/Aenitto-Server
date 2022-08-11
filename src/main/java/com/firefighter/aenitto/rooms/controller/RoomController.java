@@ -38,10 +38,10 @@ public class RoomController {
 
     @PostMapping("/invitations/verification")
     public ResponseEntity verifyInvitation(
+            @CurrentMember Member currentMember,
             @Valid @RequestBody final VerifyInvitationRequest request
     ) {
-        final Member member = mockLoginMember();
-        final VerifyInvitationResponse response = roomService.verifyInvitation(member, request);
+        final VerifyInvitationResponse response = roomService.verifyInvitation(currentMember, request);
         return ResponseEntity.ok(response);
     }
 

@@ -59,7 +59,7 @@ public class RoomServiceImpl implements RoomService {
                 .build();
 
         memberRoom.setMemberRoom(member, room);
-        memberRepository.updateMember(member);
+//        memberRepository.updateMember(currentMember);
         return roomRepository.saveRoom(room).getId();
     }
 
