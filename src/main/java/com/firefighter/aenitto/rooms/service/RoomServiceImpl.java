@@ -103,12 +103,13 @@ public class RoomServiceImpl implements RoomService {
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
-        System.out.println(memberRoom.getId());
         return roomId;
     }
 
     @Override
-    public GetRoomStateResponse getRoomState(Member member, Long roomId) {
+    public GetRoomStateResponse getRoomState(Member currentMember, Long roomId) {
+        Member member = memberRepository.findByMemberId(currentMember.getId())
+                .orElseThrow(MemberNotFoundException::new);
         MemberRoom memberRoom;
         // 참여 중인 방이 아닐 경우 -> throw
         try {
@@ -116,7 +117,7 @@ public class RoomServiceImpl implements RoomService {
         } catch (EmptyResultDataAccessException e) {
             throw new RoomNotParticipatingException();
         }
-
+        System.out.println(memberRoom.getRoom().getTitle());
         return GetRoomStateResponse.of(memberRoom.getRoom());
     }
 

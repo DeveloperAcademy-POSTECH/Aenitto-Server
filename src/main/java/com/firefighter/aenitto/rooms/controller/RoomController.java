@@ -57,10 +57,10 @@ public class RoomController {
 
     @GetMapping("/rooms/{roomId}/state")
     public ResponseEntity<GetRoomStateResponse> getRoomState(
+            @CurrentMember Member currentMember,
             @PathVariable final Long roomId
     ) {
-        final Member member = mockLoginMember();
-        return ResponseEntity.ok(roomService.getRoomState(member, roomId));
+        return ResponseEntity.ok(roomService.getRoomState(currentMember, roomId));
     }
 
     // TODO: RoomAPI 메타데이터 Response Header 에 넣기 (22.08.07)

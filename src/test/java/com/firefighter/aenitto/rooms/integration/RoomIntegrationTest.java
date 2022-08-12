@@ -4,6 +4,7 @@ package com.firefighter.aenitto.rooms.integration;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
+import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
@@ -12,26 +13,28 @@ import com.firefighter.aenitto.support.security.WithMockCustomMember;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WithMockCustomMember
+@ActiveProfiles("testdb")
 public class RoomIntegrationTest extends IntegrationTest {
     private Room room;
 
     @DisplayName("방 생성 -> 성공")
     @Test
-    @WithMockCustomMember
     void create_room() throws Exception {
         // given
         CreateRoomRequest request = RoomRequestDtoBuilder.createRoomRequest();
@@ -46,7 +49,6 @@ public class RoomIntegrationTest extends IntegrationTest {
 
     @DisplayName("초대코드 검증 -> 성공")
     @Test
-    @WithMockCustomMember
     void verifyInvitation_success() throws Exception {
         // given
         VerifyInvitationRequest request = VerifyInvitationRequest.builder()
@@ -76,5 +78,18 @@ public class RoomIntegrationTest extends IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/rooms/1"));
+    }
+
+    @Sql("classpath:room.sql")
+    @DisplayName("방 상태 조회 -> 성공")
+    @Test
+    void getStateRoom_success() throws Exception {
+
+        // when, then
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/v1/rooms/1/state")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.state", is("PRE")));
     }
 }
