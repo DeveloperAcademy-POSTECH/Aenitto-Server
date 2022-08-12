@@ -83,7 +83,10 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Long participateRoom(Member member, Long roomId, ParticipateRoomRequest request) {
+    @Transactional
+    public Long participateRoom(Member currentMember, Long roomId, ParticipateRoomRequest request) {
+        Member member = memberRepository.findByMemberId(currentMember.getId())
+                .orElseThrow(MemberNotFoundException::new);
         // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
         throwExceptionIfParticipating(member.getId(), roomId);
 
@@ -100,8 +103,7 @@ public class RoomServiceImpl implements RoomService {
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
-        memberRepository.updateMember(member);
-
+        System.out.println(memberRoom.getId());
         return roomId;
     }
 

@@ -47,11 +47,11 @@ public class RoomController {
 
     @PostMapping("/rooms/{roomId}/participants")
     public ResponseEntity participateRoom(
+            @CurrentMember Member currentMember,
             @PathVariable final Long roomId,
             @RequestBody final ParticipateRoomRequest request
     ) {
-        final Member member = mockLoginMember();
-        roomService.participateRoom(member, roomId, request);
+        roomService.participateRoom(currentMember, roomId, request);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId)).build();
     }
 
