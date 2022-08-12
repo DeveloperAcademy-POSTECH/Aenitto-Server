@@ -117,7 +117,6 @@ public class RoomServiceImpl implements RoomService {
         } catch (EmptyResultDataAccessException e) {
             throw new RoomNotParticipatingException();
         }
-        System.out.println(memberRoom.getRoom().getTitle());
         return GetRoomStateResponse.of(memberRoom.getRoom());
     }
 
