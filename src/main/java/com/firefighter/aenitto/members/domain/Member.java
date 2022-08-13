@@ -2,12 +2,7 @@ package com.firefighter.aenitto.members.domain;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,12 +22,15 @@ public class Member extends CreationModificationLog {
 
     private String nickname;
 
+    private String socialId;
+
     @OneToMany(mappedBy = "member")
     private List<MemberRoom> memberRooms = new ArrayList<>();
 
     @Builder
-    public Member(String nickname) {
+    public Member(String nickname, String socialId) {
         this.nickname = nickname;
+        this.socialId = socialId;
     }
 
     public void changeNickname(String nickname) {

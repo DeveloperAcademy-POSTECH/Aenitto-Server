@@ -2,6 +2,13 @@ spring:
   profiles:
     active: test
 
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+
+  jpa:
+    defer-datasource-initialization: true
 ---
 # H2 IN MEMORY TEST
 spring:
@@ -30,18 +37,17 @@ spring:
       on-profile: postgres-test
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/Aenitto
+    url: jdbc:postgresql://localhost:5432/aenito
     username: postgres
-    password:
+
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
       show-sql: true
       database: postgresql
       database-platform: org.hibernate.dialect.PostgreSQLDialect
       generate-ddl: true
 
       naming:
-        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl

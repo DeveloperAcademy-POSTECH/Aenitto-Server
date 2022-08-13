@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.controller;
 
+import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
@@ -27,9 +28,9 @@ public class RoomController {
 
     @PostMapping("/rooms")
     public ResponseEntity createRoom(
+            @CurrentMember Member member,
             @Valid @RequestBody final CreateRoomRequest createRoomRequest
     ) {
-        final Member member = mockLoginMember();
         final Long roomId = roomService.createRoom(member, createRoomRequest);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId)).build();
     }
