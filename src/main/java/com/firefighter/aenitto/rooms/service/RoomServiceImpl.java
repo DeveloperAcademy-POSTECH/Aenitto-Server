@@ -4,6 +4,7 @@ import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
@@ -137,6 +138,29 @@ public class RoomServiceImpl implements RoomService {
         return ParticipatingRoomsResponse.of(participatingRooms);
     }
 
+    @Override
+    public void startAenitto(Member member, Long roomId) {
+        // 참여 중인 방이 아닐 경우 -> throw Exception
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        // 방장이 아닌 경우 -> throw Exception
+        throwExceptionIfNotAdmin(memberRoom);
+        // 이미 시작한 방일 경우 -> throw Exception
+        Room room = memberRoom.getRoom();
+        if (room.getState() != RoomState.PRE) {
+            throw new RoomAlreadyStartedException();
+        }
+        // 최소 수용인원 이하일 경우 -> throw Exception
+        if (room.cannotStart()) {
+            throw new RoomInsufficientParticipantsException();
+        }
+
+        // 참여인원에 대하여 Relation 생성
+        Relation.createRelations(room.getMemberRooms(), room);
+
+        // RoomState 수정
+        room.setState(RoomState.PROCESSING);
+    }
+
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
         try {
             roomRepository.findMemberRoomById(memberId, roomId);
@@ -152,5 +176,11 @@ public class RoomServiceImpl implements RoomService {
             throw new RoomNotParticipatingException();
         }
         return memberRoom;
+    }
+
+    private void throwExceptionIfNotAdmin(MemberRoom memberRoom) {
+        if (!memberRoom.isAdmin()) {
+            throw new RoomUnAuthorizedException();
+        }
     }
 }
