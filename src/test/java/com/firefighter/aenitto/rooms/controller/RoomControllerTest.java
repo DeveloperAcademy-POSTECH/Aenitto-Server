@@ -1,9 +1,12 @@
 package com.firefighter.aenitto.rooms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firefighter.aenitto.common.exception.ErrorCode;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
+import com.firefighter.aenitto.common.exception.room.RoomNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
+import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -28,26 +31,31 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+//import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+//import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
@@ -316,5 +324,78 @@ class RoomControllerTest {
                 )));
 
         verify(roomService, times(1)).getParticipatingRooms(any(Member.class), anyLong(), anyInt());
+    }
+
+    @DisplayName("게임 시작 - 실패 (참여 중인 방이 아님) ")
+    @Test
+    void startAenitto_fail_not_participating() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/" + roomId + "/state";
+
+        // when
+        doThrow(new RoomNotParticipatingException()).when(roomService).startAenitto(any(Member.class), anyLong());
+
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.patch(url)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus().value())))
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @DisplayName("게임 시작 - 실패 (방장이 아님) ")
+    @Test
+    void startAenitto_fail_unauthorized() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/" + roomId + "/state";
+
+        // when
+        doThrow(new RoomUnAuthorizedException()).when(roomService).startAenitto(any(Member.class), anyLong());
+
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.patch(url)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status", is(RoomErrorCode.ROOM_UNAUTHORIZED.getStatus().value())))
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_UNAUTHORIZED.getMessage())));
+    }
+
+    @DisplayName("게임 시작 - 성공")
+    @Test
+    void startAenitto_success() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}/state";
+
+        // when
+        doNothing().when(roomService).startAenitto(any(Member.class), anyLong());
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.patch(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document(
+                        "마니또 시작하기",
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        )));
+
+        verify(roomService, times(1)).startAenitto(any(Member.class), anyLong());
     }
 }
