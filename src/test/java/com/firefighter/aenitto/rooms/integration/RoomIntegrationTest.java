@@ -107,7 +107,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.participatingRooms[0].id", is(1)))
                 .andExpect(jsonPath("$.participatingRooms[0].title", is("제목")))
                 .andExpect(jsonPath("$.participatingRooms[0].state", is("PRE")))
-                .andExpect(jsonPath("$.participatingRooms[0].participaingCount", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[0].participatingCount", is(1)))
                 .andExpect(jsonPath("$.participatingRooms[0].capacity", is(13)));
     }
 }

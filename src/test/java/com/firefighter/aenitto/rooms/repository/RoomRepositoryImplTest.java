@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Transactional
-@ActiveProfiles("testdb")
 class RoomRepositoryImplTest {
     @Autowired EntityManager em;
     @Autowired RoomRepositoryImpl roomRepository;
