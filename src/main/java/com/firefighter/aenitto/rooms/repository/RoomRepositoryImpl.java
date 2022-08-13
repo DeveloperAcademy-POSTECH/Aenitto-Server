@@ -47,10 +47,8 @@ public class RoomRepositoryImpl implements RoomRepository {
         return em.createQuery(
                         "SELECT mr" +
                                 " FROM MemberRoom mr" +
-                                " JOIN mr.room r" +
-                                " JOIN mr.member m" +
-                                " WHERE m.id = :memberId" +
-                                " AND r.id = :roomId", MemberRoom.class)
+                                " WHERE mr.member.id = :memberId" +
+                                " AND mr.room.id = :roomId", MemberRoom.class)
                 .setParameter("memberId", memberId)
                 .setParameter("roomId", roomId)
                 .getSingleResult();
@@ -59,13 +57,11 @@ public class RoomRepositoryImpl implements RoomRepository {
     @Override
     public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit) {
         return em.createQuery(
-                        "SELECT r" +
+                        "SELECT mr.room" +
                                 " FROM MemberRoom mr" +
-                                " JOIN mr.room r" +
-                                " JOIN mr.member m" +
-                                " WHERE m.id = :memberId" +
-                                ((cursor == null) ? "" : " AND r.id < " + cursor) +
-                                " ORDER BY r.id DESC", Room.class)
+                                " WHERE mr.member.id = :memberId" +
+                                ((cursor == null) ? "" : " AND mr.room.id < " + cursor) +
+                                " ORDER BY mr.room.id DESC", Room.class)
                 .setParameter("memberId", memberId)
                 .setMaxResults(limit)
                 .getResultList();
