@@ -47,6 +47,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -75,7 +76,7 @@ class RoomControllerTest {
     void init(RestDocumentationContextProvider restDocumentation) {
         mockMvc = MockMvcBuilders.standaloneSetup(roomController)
                 .setControllerAdvice(GlobalExceptionHandler.class)
-                .apply(documentationConfiguration(restDocumentation))
+                .apply(documentationConfiguration(restDocumentation).operationPreprocessors())
                 .build();
         objectMapper = new ObjectMapper();
         room1 = roomFixture1();
@@ -104,6 +105,8 @@ class RoomControllerTest {
         perform.andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andDo(document("방 생성",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields( // 6
                                 fieldWithPath("room.title").description("Post 제목"), // 7
                                 fieldWithPath("room.capacity").description("Post 내용").optional(), // 8
@@ -179,6 +182,8 @@ class RoomControllerTest {
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
                 .andExpect(jsonPath("$.participatingCount", is(1)))
                 .andDo(document("초대코드 검증",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("invitationCode").description("초대코드")
                         ), responseFields(
@@ -235,6 +240,8 @@ class RoomControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/rooms/1"))
                 .andDo(document("방 참여",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
                         ),
@@ -291,6 +298,8 @@ class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state", is(room1.getState().toString())))
                 .andDo(document("방 상태 조회",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
                         ),
@@ -325,6 +334,8 @@ class RoomControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("참여 중인 방 조회",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestParameters(
                                 parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
                                 parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
@@ -409,6 +420,8 @@ class RoomControllerTest {
                 .andExpect(status().isNoContent())
                 .andDo(document(
                         "마니또 시작하기",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
                         )));
