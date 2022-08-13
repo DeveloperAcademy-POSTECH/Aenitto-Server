@@ -30,7 +30,7 @@ public class MemberRoom extends CreationModificationLog {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToMany(mappedBy = "memberRoom")
+    @OneToMany(mappedBy = "memberRoom", cascade = CascadeType.ALL)
     private List<IndividualMission> individualMissions = new ArrayList<>();
 
     private boolean admin;
