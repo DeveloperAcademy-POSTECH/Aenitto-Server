@@ -1,10 +1,8 @@
 package com.firefighter.aenitto.rooms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.common.exception.ErrorCode;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.common.exception.room.RoomNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
 import com.firefighter.aenitto.members.domain.Member;
@@ -33,11 +31,9 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,13 +46,11 @@ import static org.mockito.Mockito.*;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-//import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-//import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs
@@ -109,13 +103,15 @@ class RoomControllerTest {
         // then
         perform.andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
-                .andDo(document("post-create", // 5
+                .andDo(document("방 생성",
                         requestFields( // 6
                                 fieldWithPath("room.title").description("Post 제목"), // 7
                                 fieldWithPath("room.capacity").description("Post 내용").optional(), // 8
                                 fieldWithPath("room.startDate").description("시작일").optional(),
                                 fieldWithPath("room.endDate").description("마지막일"),
                                 fieldWithPath("member.colorIdx").description("참여자 색상 index")
+                        ), responseHeaders(
+                                headerWithName("Location").description("생성된 방의 위치")
                         )
                 ));
     }
@@ -182,17 +178,18 @@ class RoomControllerTest {
                 .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
                 .andExpect(jsonPath("$.participatingCount", is(1)))
-                .andDo(document("초대코드 검증", requestFields(
-                        fieldWithPath("invitationCode").description("초대코드")
-                )))
-                .andDo(document("초대코드 검증", responseFields(
-                        fieldWithPath("id").description("멤버 id"),
-                        fieldWithPath("title").description("방 제목"),
-                        fieldWithPath("capacity").description("수용 가능 인원"),
-                        fieldWithPath("participatingCount").description("현재 참여 인원"),
-                        fieldWithPath("startDate").description("시작 일자"),
-                        fieldWithPath("endDate").description("종료 일자")
-                )));
+                .andDo(document("초대코드 검증",
+                        requestFields(
+                                fieldWithPath("invitationCode").description("초대코드")
+                        ), responseFields(
+                                fieldWithPath("id").description("멤버 id"),
+                                fieldWithPath("title").description("방 제목"),
+                                fieldWithPath("capacity").description("수용 가능 인원"),
+                                fieldWithPath("participatingCount").description("현재 참여 인원"),
+                                fieldWithPath("startDate").description("시작 일자"),
+                                fieldWithPath("endDate").description("종료 일자")
+                        )
+                ));
     }
 
     @DisplayName("초대코드 검증 - 실패 (초대코드가 6자가 아닌 경우)")
@@ -220,25 +217,35 @@ class RoomControllerTest {
     void participateRoom_success() throws Exception {
         // given
         final Long roomId = 1L;
-        final String url = "/api/v1/rooms/" + roomId + "/participants";
+        final String url = "/api/v1/rooms/{roomId}/participants";
         final ParticipateRoomRequest request = ParticipateRoomRequest.builder().colorIdx(1).build();
         when(roomService.participateRoom(any(Member.class), anyLong(), any(ParticipateRoomRequest.class)))
                 .thenReturn(roomId);
 
         // when
         ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
+                RestDocumentationRequestBuilders.post(url, roomId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
         // then
         perform
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/rooms/1"))
-                .andDo(document("방 참여", requestFields(
-                        fieldWithPath("colorIdx").description("참여 색상")
-                )));
+                .andDo(document("방 참여",
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        requestFields(
+                        fieldWithPath("colorIdx").description("참여할 캐릭터의 색상 인덱스")
+                        ),
+                        responseHeaders(
+                                headerWithName("Location").description("방 위치")
+                        )
+                ));
+        verify(roomService, times(1)).participateRoom(any(Member.class), anyLong(), any(ParticipateRoomRequest.class));
     }
 
     @DisplayName("방 상태 조회 - 실패 (참여 x)")
@@ -269,13 +276,13 @@ class RoomControllerTest {
     @Test
     void getStateRoom_success() throws Exception {
         final Long roomId = 1L;
-        final String url = "/api/v1/rooms/" + roomId + "/state";
+        final String url = "/api/v1/rooms/{roomId}/state";
         when(roomService.getRoomState(any(Member.class), anyLong()))
                 .thenReturn(RoomResponseDtoBuilder.getRoomStateResponse(room1));
 
         // when
         ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.get(url)
+                RestDocumentationRequestBuilders.get(url, roomId)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -283,9 +290,14 @@ class RoomControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state", is(room1.getState().toString())))
-                .andDo(document("방 상태 조회", responseFields(
-                        fieldWithPath("state").description("방 상태")
-                )));
+                .andDo(document("방 상태 조회",
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("state").description("방 상태")
+                        )
+                ));
         verify(roomService, times(1)).getRoomState(any(Member.class), anyLong());
     }
 
@@ -312,7 +324,12 @@ class RoomControllerTest {
         perform
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("참여 중인 방 조회", responseFields(
+                .andDo(document("참여 중인 방 조회",
+                        requestParameters(
+                                parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
+                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
+                        ),
+                        responseFields(
                         fieldWithPath("participatingRooms").description("참여 중인 방"),
                         fieldWithPath("participatingRooms[0].id").description("Room Id"),
                         fieldWithPath("participatingRooms[0].title").description("방 제목"),
