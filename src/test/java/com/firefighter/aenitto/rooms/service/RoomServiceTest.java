@@ -241,12 +241,14 @@ public class RoomServiceTest {
     @DisplayName("방 상태 확인 - 실패 (참여 중인 방 x)")
     @Test
     void getRoomstate_fail_not_participating() {
-        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+        //given
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
 
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.getRoomState(member, room.getId());
+                    target.getRoomState(currentUserDetails.getMember(), room.getId());
                 });
     }
 
@@ -254,11 +256,12 @@ public class RoomServiceTest {
     @Test
     void getRoomState_success() {
         // given
-        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenReturn(memberRoom);
 
         // when
-        GetRoomStateResponse roomState = target.getRoomState(member, room.getId());
+        GetRoomStateResponse roomState = target.getRoomState(currentUserDetails.getMember(), room.getId());
 
         // then
         assertThat(roomState.getState()).isEqualTo("PROCESSING");
