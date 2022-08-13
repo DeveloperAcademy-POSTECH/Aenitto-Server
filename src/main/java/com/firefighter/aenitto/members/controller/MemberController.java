@@ -1,8 +1,5 @@
 package com.firefighter.aenitto.members.controller;
 
-import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
-import com.firefighter.aenitto.auth.dto.response.TempLoginResponse;
-import com.firefighter.aenitto.auth.service.AuthService;
 import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.dto.request.ChangeNicknameRequest;

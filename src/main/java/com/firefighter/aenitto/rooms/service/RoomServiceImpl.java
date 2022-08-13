@@ -5,12 +5,15 @@ import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
+import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -121,9 +124,50 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public RoomDetailResponse getRoomDetail(Member member, Long roomId, RoomState state) {
+        final MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        final Room room = memberRoom.getRoom();
+
+        switch (room.getState()) {
+            case PRE:
+                return RoomDetailResponse.buildPreResponse(room);
+            case PROCESSING:
+                return null;
+            case POST:
+                return null;
+            default:
+                // RoomState 가 올바르지 않음 Exception 던짐.
+                return null;
+        }
+    }
+
+    @Override
     public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit) {
         List<Room> participatingRooms = roomRepository.findParticipatingRoomsByMemberIdWithCursor(member.getId(), cursor, limit);
         return ParticipatingRoomsResponse.of(participatingRooms);
+    }
+
+    @Override
+    public void startAenitto(Member member, Long roomId) {
+        // 참여 중인 방이 아닐 경우 -> throw Exception
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        // 방장이 아닌 경우 -> throw Exception
+        throwExceptionIfNotAdmin(memberRoom);
+        // 이미 시작한 방일 경우 -> throw Exception
+        Room room = memberRoom.getRoom();
+        if (room.getState() != RoomState.PRE) {
+            throw new RoomAlreadyStartedException();
+        }
+        // 최소 수용인원 이하일 경우 -> throw Exception
+        if (room.cannotStart()) {
+            throw new RoomInsufficientParticipantsException();
+        }
+
+        // 참여인원에 대하여 Relation 생성
+        Relation.createRelations(room.getMemberRooms(), room);
+
+        // RoomState 수정
+        room.setState(RoomState.PROCESSING);
     }
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
@@ -131,5 +175,21 @@ public class RoomServiceImpl implements RoomService {
             roomRepository.findMemberRoomById(memberId, roomId);
             throw new RoomAlreadyParticipatingException();
         } catch (EmptyResultDataAccessException e) {}
+    }
+
+    private MemberRoom throwExceptionIfNotParticipating(UUID memberId, Long roomId) {
+        final MemberRoom memberRoom;
+        try {
+            memberRoom = roomRepository.findMemberRoomById(memberId, roomId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new RoomNotParticipatingException();
+        }
+        return memberRoom;
+    }
+
+    private void throwExceptionIfNotAdmin(MemberRoom memberRoom) {
+        if (!memberRoom.isAdmin()) {
+            throw new RoomUnAuthorizedException();
+        }
     }
 }

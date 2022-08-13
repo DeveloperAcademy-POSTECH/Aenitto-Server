@@ -10,6 +10,10 @@
 //[[Member-API]]
 //== Member API
 //
+//[[Member-단일-조회]]
+//=== Member 단일 조회
+//operation::member-get[snippets='http-request,path-parameters,http-response,response-fields']
+
 [[Member-단일-조회]]
 === Member 단일 조회
 operation::temp-login[snippets='http-request,path-parameters,http-response,response-fields']
@@ -19,3 +23,21 @@ operation::temp-login[snippets='http-request,path-parameters,http-response,respo
 [[Member-닉네임-수정]]
 === Member 닉네임 수정
 operation::change-nickname[snippets='http-request,http-response,request-fields']
+
+== 마니또 시작하기
+operation::마니또 시작하기[snippets='path-parameters,http-request,http-response']
+
+== 방 상태 조회
+operation::방 상태 조회[snippets='path-parameters,http-request,http-response,response-fields']
+
+== 방 생성
+operation::방 생성[snippets='http-request,request-fields,http-response']
+
+== 방 참여
+operation::방 참여[snippets='path-parameters,http-request,request-fields,http-response']
+
+== 참여 중인 방 조회
+operation::참여 중인 방 조회[snippets='request-parameters,http-request,http-response,response-fields']
+
+== 초대코드 검증
+operation::초대코드 검증[snippets='http-request,request-fields,http-response,response-fields']

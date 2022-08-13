@@ -2,7 +2,6 @@ package com.firefighter.aenitto.rooms.controller;
 
 import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
-import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
@@ -74,10 +73,12 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getParticipatingRooms(currentMember, cursor, limit));
     }
 
-
-    private Member mockLoginMember() {
-        return Member.builder()
-                .nickname("Mock")
-                .build();
+    @PatchMapping("/rooms/{roomId}/state")
+    public ResponseEntity startAenitto(
+            @CurrentMember Member member,
+            @PathVariable Long roomId
+    ) {
+        roomService.startAenitto(member, roomId);
+        return ResponseEntity.noContent().build();
     }
 }
