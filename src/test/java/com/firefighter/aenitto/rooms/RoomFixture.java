@@ -23,6 +23,27 @@ public class RoomFixture {
         return memberRoom;
     }
 
+    public static MemberRoom memberRoomFixture2(Member member, Room room) {
+        MemberRoom memberRoom = baseMemberRoomFixture(2);
+        memberRoom.setMemberRoom(member, room);
+        return memberRoom;
+    }
+    public static MemberRoom memberRoomFixture3(Member member, Room room) {
+        MemberRoom memberRoom = baseMemberRoomFixture(3);
+        memberRoom.setMemberRoom(member, room);
+        return memberRoom;
+    }
+    public static MemberRoom memberRoomFixture4(Member member, Room room) {
+        MemberRoom memberRoom = baseMemberRoomFixture(4);
+        memberRoom.setMemberRoom(member, room);
+        return memberRoom;
+    }
+    public static MemberRoom memberRoomFixture5(Member member, Room room) {
+        MemberRoom memberRoom = baseMemberRoomFixture(5);
+        memberRoom.setMemberRoom(member, room);
+        return memberRoom;
+    }
+
     private static MemberRoom baseMemberRoomFixture(int number) {
         MemberRoom memberRoom = transientMemberRoomFixture(number);
         ReflectionTestUtils.setField(memberRoom, "id", number * 1L);
