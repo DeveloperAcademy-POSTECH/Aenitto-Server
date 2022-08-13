@@ -84,6 +84,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public Long participateRoom(Member member, Long roomId, ParticipateRoomRequest request) {
         // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
         throwExceptionIfParticipating(member.getId(), roomId);
@@ -115,6 +116,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public RoomDetailResponse getRoomDetail(Member member, Long roomId, RoomState state) {
         final MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
         final Room room = memberRoom.getRoom();
@@ -139,6 +141,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public void startAenitto(Member member, Long roomId) {
         // 참여 중인 방이 아닐 경우 -> throw Exception
         MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
