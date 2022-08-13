@@ -56,6 +56,10 @@ public class Room extends CreationModificationLog {
         this.invitation = randomSixNumUpperString();
     }
 
+    public void setState(RoomState state) {
+        this.state = state;
+    }
+
     public String getStartDateValue() {
         return DateConverter.localDateToString(this.startDate);
     }
@@ -64,6 +68,13 @@ public class Room extends CreationModificationLog {
         return DateConverter.localDateToString(this.endDate);
     }
 
+    public int participantsCount() {
+        return memberRooms.size();
+    }
+
+    public boolean cannotStart() {
+        return (5 > participantsCount());
+    }
     public boolean unAcceptable() {
         return (capacity <= memberRooms.size());
     }

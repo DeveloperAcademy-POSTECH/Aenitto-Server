@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -81,10 +82,11 @@ public class AuthServiceImplTest {
        );
     }
     private Member member() {
-        return Member.builder()
-                .id(UUID.fromString("b48617b2-090d-4ee6-9033-b99f99d98304"))
+        Member member = Member.builder()
                 .socialId("socialId입니다")
                 .build();
+        ReflectionTestUtils.setField(member, "id", UUID.fromString("b48617b2-090d-4ee6-9033-b99f99d98304"));
+        return member;
     }
 
     private Token token() {
