@@ -72,6 +72,14 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getParticipatingRooms(member, cursor, limit));
     }
 
+    @PatchMapping("/rooms/{roomId}/state")
+    public ResponseEntity startAenitto(
+            @PathVariable Long roomId
+    ) {
+        final Member member = mockLoginMember();
+        roomService.startAenitto(member, roomId);
+        return ResponseEntity.noContent().build();
+    }
 
     private Member mockLoginMember() {
         return Member.builder()
