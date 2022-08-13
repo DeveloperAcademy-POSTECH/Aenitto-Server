@@ -156,7 +156,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_fail_participating() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenReturn(memberRoom);
 
         // given
@@ -174,7 +175,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_fail_no_room() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
         when(roomRepository.findRoomById(anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
@@ -195,7 +197,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_fail_unacceptable() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
         when(roomRepository.findRoomById(anyLong()))
                 .thenReturn(Room.builder().capacity(0).build());
@@ -217,7 +220,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_success() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
         when(roomRepository.findRoomById(anyLong()))
                 .thenReturn(room);

@@ -17,6 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -91,5 +93,21 @@ public class RoomIntegrationTest extends IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state", is("PRE")));
+    }
+
+    @Sql("classpath:room.sql")
+    @DisplayName("참여중인 방 조회 -> 성공")
+    @Test
+    void participatingRoom_success() throws Exception {
+        // given, when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get( "/api/v1/rooms?" + "limit=" + 1)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.participatingRooms[0].id", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[0].title", is("제목")))
+                .andExpect(jsonPath("$.participatingRooms[0].state", is("PRE")))
+                .andExpect(jsonPath("$.participatingRooms[0].participaingCount", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[0].capacity", is(13)));
     }
 }
