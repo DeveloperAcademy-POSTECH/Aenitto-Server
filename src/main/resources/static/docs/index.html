@@ -645,6 +645,7 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v1/rooms/1/state HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -690,6 +691,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms/1/state HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -743,6 +745,7 @@ Content-Length: 28
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/v1/rooms HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Content-Length: 164
 Host: localhost:8080
 
@@ -846,6 +849,7 @@ Location: /api/v1/rooms/1</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/v1/rooms/1/participants HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Content-Length: 20
 Host: localhost:8080
 
@@ -925,6 +929,7 @@ default = 3</p></td>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms?cursor=0&amp;count=3 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1029,6 +1034,7 @@ Content-Length: 402
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/v1/invitations/verification HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Content-Length: 33
 Host: localhost:8080
 
@@ -1136,7 +1142,7 @@ Content-Length: 145
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-08-13 19:19:36 +0900
+Last updated 2022-08-13 20:22:26 +0900
 </div>
 </div>
 </body>
