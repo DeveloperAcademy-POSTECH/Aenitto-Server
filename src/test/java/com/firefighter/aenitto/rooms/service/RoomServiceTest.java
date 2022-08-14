@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.auth.token.CurrentUserDetails;
 import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepositoryImpl;
@@ -28,8 +29,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER_DETAILS;
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.mockito.Mockito.*;
@@ -56,6 +59,8 @@ public class RoomServiceTest {
     private Member member4;
     private Member member5;
     private MemberRoom memberRoom;
+
+    private CurrentUserDetails currentUserDetails;
     private MemberRoom memberRoom2;
     private MemberRoom memberRoom3;
     private MemberRoom memberRoom4;
@@ -66,6 +71,7 @@ public class RoomServiceTest {
         room1 = roomFixture1();
         room2 = roomFixture2();
         member = memberFixture();
+        currentUserDetails = CURRENT_USER_DETAILS;
         member2 = memberFixture2();
         member3 = memberFixture3();
         member4 = memberFixture4();
@@ -77,6 +83,7 @@ public class RoomServiceTest {
     @Test
     void createRoomTest() {
         // mock
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findByInvitation(anyString()))
                 .thenThrow(EmptyResultDataAccessException.class)
                 .thenThrow(EmptyResultDataAccessException.class)
@@ -99,7 +106,6 @@ public class RoomServiceTest {
         // then
         assertThat(roomId).isEqualTo(1L);
         verify(roomRepository, times(1)).saveRoom(any(Room.class));
-        verify(memberRepository, times(1)).updateMember(any(Member.class));
     }
 
     @DisplayName("초대코드 검증 - 실패 (초대코드 존재하지 않음)")
@@ -167,7 +173,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_fail_participating() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenReturn(memberRoom);
 
         // given
@@ -185,7 +192,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_fail_no_room() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
         when(roomRepository.findRoomById(anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
@@ -206,7 +214,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_fail_unacceptable() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
         when(roomRepository.findRoomById(anyLong()))
                 .thenReturn(Room.builder().capacity(0).build());
@@ -228,7 +237,8 @@ public class RoomServiceTest {
     @Test
     void participateRoom_success() {
         // mock
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
         when(roomRepository.findRoomById(anyLong()))
                 .thenReturn(room1);
@@ -248,12 +258,14 @@ public class RoomServiceTest {
     @DisplayName("방 상태 확인 - 실패 (참여 중인 방 x)")
     @Test
     void getRoomstate_fail_not_participating() {
-        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+        //given
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
 
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.getRoomState(member, room1.getId());
+                    target.getRoomState(currentUserDetails.getMember(), room1.getId());
                 });
     }
 
@@ -261,11 +273,13 @@ public class RoomServiceTest {
     @Test
     void getRoomState_success() {
         // given
-        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenReturn(memberRoom);
 
         // when
-        GetRoomStateResponse roomState = target.getRoomState(member, room1.getId());
+        GetRoomStateResponse roomState = target.getRoomState(currentUserDetails.getMember(), room1.getId());
+
 
         // then
         assertThat(roomState.getState()).isEqualTo("PROCESSING");

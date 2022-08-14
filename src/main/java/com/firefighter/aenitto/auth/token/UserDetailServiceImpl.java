@@ -7,11 +7,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class UserDetailServiceImpl implements UserDetailsService {
     private final MemberRepository memberRepository;
 

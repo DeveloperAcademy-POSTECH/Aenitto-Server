@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -25,8 +26,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Qualifier(value = "roomServiceImpl")
 @Transactional(readOnly = true)
+@Qualifier(value = "roomServiceImpl")
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
 
@@ -39,9 +40,11 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public Long createRoom(Member member, CreateRoomRequest createRoomRequest) {
+    public Long createRoom(Member currentMember, CreateRoomRequest createRoomRequest) {
         // Dto -> Entity
         final Room room = createRoomRequest.toEntity();
+        final Member member = memberRepository.findByMemberId(currentMember.getId())
+                .orElseThrow(MemberNotFoundException::new);
 
         // Room invitation 생성 -> 존재하지 않는 random 코드 나올 때 까지.
         do {
@@ -59,8 +62,7 @@ public class RoomServiceImpl implements RoomService {
                 .build();
 
         memberRoom.setMemberRoom(member, room);
-
-        memberRepository.updateMember(member);
+//        memberRepository.updateMember(currentMember);
         return roomRepository.saveRoom(room).getId();
     }
 
@@ -85,7 +87,10 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public Long participateRoom(Member member, Long roomId, ParticipateRoomRequest request) {
+    public Long participateRoom(Member currentMember, Long roomId, ParticipateRoomRequest request) {
+        Member member = memberRepository.findByMemberId(currentMember.getId())
+                .orElseThrow(MemberNotFoundException::new);
+                
         // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
         throwExceptionIfParticipating(member.getId(), roomId);
 
@@ -102,16 +107,20 @@ public class RoomServiceImpl implements RoomService {
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
-        memberRepository.updateMember(member);
-
         return roomId;
     }
 
     @Override
-    public GetRoomStateResponse getRoomState(Member member, Long roomId) {
+    public GetRoomStateResponse getRoomState(Member currentMember, Long roomId) {
+        Member member = memberRepository.findByMemberId(currentMember.getId())
+                .orElseThrow(MemberNotFoundException::new);
+        MemberRoom memberRoom;
         // 참여 중인 방이 아닐 경우 -> throw
-        final MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
-
+        try {
+            memberRoom = roomRepository.findMemberRoomById(member.getId(), roomId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new RoomNotParticipatingException();
+        }
         return GetRoomStateResponse.of(memberRoom.getRoom());
     }
 

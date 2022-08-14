@@ -18,7 +18,7 @@ import java.util.Random;
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends CreationModificationLog {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id")
     private Long id;
 

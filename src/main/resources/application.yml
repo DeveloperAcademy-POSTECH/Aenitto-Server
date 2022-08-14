@@ -16,7 +16,7 @@ spring:
     group: # 포함시킬 하위 프로필명
       develop: develop, developdb
 
-  defer-datasource-initialization: truw
+  defer-datasource-initialization: true
 
 ---
 ## Test Profile
