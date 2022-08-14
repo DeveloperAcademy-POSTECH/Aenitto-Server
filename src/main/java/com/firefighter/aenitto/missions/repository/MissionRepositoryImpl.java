@@ -20,6 +20,12 @@ public class MissionRepositoryImpl implements MissionRepository {
     private final EntityManager em;
 
     @Override
+    public CommonMission saveCommonMission(CommonMission commonMission) {
+        em.persist(commonMission);
+        return commonMission;
+    }
+
+    @Override
     public Optional<Mission> findRandomMission(MissionType missionType) {
         return Optional.ofNullable(
                 em.createQuery(
@@ -35,13 +41,13 @@ public class MissionRepositoryImpl implements MissionRepository {
     }
 
     @Override
-    public Optional<CommonMission> findTodayCommonMission() {
+    public Optional<CommonMission> findCommonMissionByDate(LocalDate date) {
         return Optional.ofNullable(
                 em.createQuery(
                         "SELECT c" +
                                 " FROM CommonMission c" +
-                                " WHERE c.date = :today", CommonMission.class)
-                .setParameter("today", LocalDate.now())
+                                " WHERE c.date = :date", CommonMission.class)
+                .setParameter("date", date)
                 .getResultStream()
                 .findFirst()
                 .orElse(null)

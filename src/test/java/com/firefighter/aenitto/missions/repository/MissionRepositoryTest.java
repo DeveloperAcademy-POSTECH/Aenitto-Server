@@ -117,7 +117,7 @@ public class MissionRepositoryTest {
     @DisplayName("오늘 자 공통미션 찾기 - 실패")
     @Test
     void findTodayCommonMission_fail() {
-        assertThat(repository.findTodayCommonMission().isEmpty()).isTrue();
+        assertThat(repository.findCommonMissionByDate(LocalDate.now()).isEmpty()).isTrue();
     }
 
     @DisplayName("오늘 자 공통미션 칮기 - 성공")
@@ -134,7 +134,7 @@ public class MissionRepositoryTest {
         em.clear();
 
         // when
-        Optional<CommonMission> todayCommonMission = repository.findTodayCommonMission();
+        Optional<CommonMission> todayCommonMission = repository.findCommonMissionByDate(LocalDate.now());
 
         // then
         assertThat(todayCommonMission.get().getId()).isEqualTo(commonMission1.getId());
