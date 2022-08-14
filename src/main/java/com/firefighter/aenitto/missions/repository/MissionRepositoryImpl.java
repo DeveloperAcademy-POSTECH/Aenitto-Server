@@ -27,30 +27,24 @@ public class MissionRepositoryImpl implements MissionRepository {
 
     @Override
     public Optional<Mission> findRandomMission(MissionType missionType) {
-        return Optional.ofNullable(
-                em.createQuery(
-                                "SELECT m" +
-                                        " FROM Mission m" +
-                                        " WHERE m.type = :missionType" +
-                                        " ORDER BY random()", Mission.class)
-                        .setParameter("missionType", missionType)
-                        .getResultStream()
-                        .findFirst()
-                        .orElse(null)
-        );
+        return em.createQuery(
+                        "SELECT m" +
+                                " FROM Mission m" +
+                                " WHERE m.type = :missionType" +
+                                " ORDER BY random()", Mission.class)
+                .setParameter("missionType", missionType)
+                .getResultStream()
+                .findFirst();
     }
 
     @Override
     public Optional<CommonMission> findCommonMissionByDate(LocalDate date) {
-        return Optional.ofNullable(
-                em.createQuery(
+        return em.createQuery(
                         "SELECT c" +
                                 " FROM CommonMission c" +
                                 " WHERE c.date = :date", CommonMission.class)
                 .setParameter("date", date)
                 .getResultStream()
-                .findFirst()
-                .orElse(null)
-        );
+                .findFirst();
     }
 }
