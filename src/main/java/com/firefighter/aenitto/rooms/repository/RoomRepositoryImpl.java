@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.repository;
 
+import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +65,16 @@ public class RoomRepositoryImpl implements RoomRepository {
                                 " ORDER BY mr.room.id DESC", Room.class)
                 .setParameter("memberId", memberId)
                 .setMaxResults(limit)
+                .getResultList();
+    }
+
+    @Override
+    public List<MemberRoom> findRoomParticipants(Long roomId) {
+        return em.createQuery(
+                        "SELECT mr" +
+                                " FROM MemberRoom mr" +
+                                " WHERE mr.room.id = :roomId")
+                .setParameter("roomId", roomId)
                 .getResultList();
     }
 }

@@ -313,4 +313,45 @@ class RoomRepositoryImplTest {
         assertThat(res.get(0).getTitle()).isEqualTo("방 제목2");
         assertThat(res.get(1).getTitle()).isEqualTo("방 제목1");
     }
+
+    @DisplayName("참여중인 멤버 조회")
+    @Test
+    void findRoomParticipantsTest() {
+        // given
+        Member member1 = Member.builder().build();
+        Member member2 = Member.builder().build();
+        Member member3 = Member.builder().build();
+        Member member4 = Member.builder().build();
+        Member member5 = Member.builder().build();
+
+        MemberRoom memberRoom1 = MemberRoom.builder().build();
+        MemberRoom memberRoom2 = MemberRoom.builder().colorIdx(1).build();
+        MemberRoom memberRoom3 = MemberRoom.builder().build();
+        MemberRoom memberRoom4 = MemberRoom.builder().build();
+        MemberRoom memberRoom5 = MemberRoom.builder().build();
+
+        memberRoom1.setMemberRoom(member1, room);
+        memberRoom2.setMemberRoom(member2, room);
+        memberRoom3.setMemberRoom(member3, room);
+        memberRoom4.setMemberRoom(member4, room);
+        memberRoom5.setMemberRoom(member5, room);
+
+        em.persist(room);
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(member3);
+        em.persist(member4);
+        em.persist(member5);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<MemberRoom> res = roomRepository.findRoomParticipants(room.getId());
+
+        // then
+        assertThat(res.size()).isEqualTo(5);
+        assertThat(res.get(0).getColorIdx()).isEqualTo(0);
+        assertThat(res.get(1).getColorIdx()).isEqualTo(1);
+    }
 }
