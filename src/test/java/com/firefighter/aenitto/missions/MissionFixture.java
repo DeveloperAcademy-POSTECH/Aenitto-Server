@@ -5,6 +5,9 @@ import com.firefighter.aenitto.missions.domain.MissionType;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class MissionFixture {
+    public static Mission missionFixture1_Common() {
+        return baseMissionFixture(1, MissionType.COMMON);
+    }
 
     private static Mission baseMissionFixture(int number, MissionType type) {
         Mission mission = transientMissionFixture(number, type);
