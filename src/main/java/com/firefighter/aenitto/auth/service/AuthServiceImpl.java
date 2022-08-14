@@ -23,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Qualifier("RefreshTokenRepositoryImpl")
     private final RefreshTokenRepository refreshTokenRepository;
+    @Qualifier("memberRepositoryImpl")
     private final MemberRepository memberRepository;
     @Autowired
     private final TokenService tokenService;

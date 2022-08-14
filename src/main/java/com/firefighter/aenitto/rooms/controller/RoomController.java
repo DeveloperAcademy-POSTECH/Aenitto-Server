@@ -28,29 +28,29 @@ public class RoomController {
 
     @PostMapping("/rooms")
     public ResponseEntity createRoom(
-            @CurrentMember Member member,
-            @Valid @RequestBody final CreateRoomRequest createRoomRequest
+            @CurrentMember Member currentMember,
+            @Valid@RequestBody final CreateRoomRequest createRoomRequest
     ) {
-        final Long roomId = roomService.createRoom(member, createRoomRequest);
+        final Long roomId = roomService.createRoom(currentMember, createRoomRequest);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId)).build();
     }
 
     @PostMapping("/invitations/verification")
     public ResponseEntity verifyInvitation(
-            @CurrentMember Member member,
+            @CurrentMember Member currentMember,
             @Valid @RequestBody final VerifyInvitationRequest request
     ) {
-        final VerifyInvitationResponse response = roomService.verifyInvitation(member, request);
+        final VerifyInvitationResponse response = roomService.verifyInvitation(currentMember, request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/rooms/{roomId}/participants")
     public ResponseEntity participateRoom(
-            @CurrentMember Member member,
+            @CurrentMember Member currentMember,
             @PathVariable final Long roomId,
             @RequestBody final ParticipateRoomRequest request
     ) {
-        roomService.participateRoom(member, roomId, request);
+        roomService.participateRoom(currentMember, roomId, request);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId)).build();
     }
 
@@ -65,12 +65,12 @@ public class RoomController {
     // TODO: RoomAPI 메타데이터 Response Header 에 넣기 (22.08.07)
     @GetMapping("/rooms")
     public ResponseEntity<ParticipatingRoomsResponse> findParticipatingRooms(
-            @CurrentMember Member member,
+            @CurrentMember Member currentMember,
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "3") int limit
     ) {
         // cursor 있으면, next 가 있어야 함.
-        return ResponseEntity.ok(roomService.getParticipatingRooms(member, cursor, limit));
+        return ResponseEntity.ok(roomService.getParticipatingRooms(currentMember, cursor, limit));
     }
 
     @PatchMapping("/rooms/{roomId}/state")
