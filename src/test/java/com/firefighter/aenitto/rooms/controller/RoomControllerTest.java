@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
@@ -13,8 +14,10 @@ import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
+import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
+import com.firefighter.aenitto.support.security.WithMockCustomMember;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -33,12 +37,13 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
+import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
@@ -68,9 +73,14 @@ class RoomControllerTest {
 
     // Fixture
     private Member member;
+    private Member member2;
+    private Member member3;
     private Room room1;
     private Room room2;
     private MemberRoom memberRoom;
+    private MemberRoom memberRoom2;
+    private MemberRoom memberRoom3;
+
 
     @BeforeEach
     void init(RestDocumentationContextProvider restDocumentation) {
@@ -82,7 +92,11 @@ class RoomControllerTest {
         room1 = roomFixture1();
         room2 = roomFixture2();
         member = memberFixture();
+        member2 = memberFixture2();
+        member3 = memberFixture3();
         memberRoom = memberRoomFixture1(member, room1);
+        memberRoom2 = memberRoomFixture2(member2, room1);
+        memberRoom3 = memberRoomFixture3(member3, room1);
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -428,4 +442,54 @@ class RoomControllerTest {
 
         verify(roomService, times(1)).startAenitto(any(Member.class), anyLong());
     }
+
+    @DisplayName("방에 참여중인 멤버 조회하기 - 실패 (참여중인 방이 아님)")
+    @Test
+    void find_room_participants_fail_not_participating() throws Exception{
+        //given
+        final long id = 10L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+        doThrow(new RoomNotParticipatingException()).when(roomService)
+                .getRoomParticipants(any(Member.class), anyLong());
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(url, id)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer TestToken")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+
+    }
+
+    @DisplayName("방에 참여중인 멤버 조회하기 - 성공")
+    @Test
+    @WithMockCustomMember
+    void find_room_participants_success() throws Exception{
+        //given
+        final long id = 1L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        List<MemberRoom> memberRooms = new ArrayList<>();
+        memberRooms.add(memberRoom);
+        memberRooms.add(memberRoom2);
+        memberRooms.add(memberRoom3);
+
+        RoomParticipantsResponse response = RoomResponseDtoBuilder.roomParticipantsResponse(memberRooms);
+        when(roomService.getRoomParticipants(any(Member.class), anyLong()))
+                .thenReturn(response);
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(url, id)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer TestToken")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count", is(response.getCount())))
+                .andExpect(jsonPath("$.member[0].nickname", is(response.getMember().get(0).getNickname())))
+                .andExpect(jsonPath("$.member[0].colorIdx", is(response.getMember().get(0).getColorIdx())));
+
+    }
+
 }
