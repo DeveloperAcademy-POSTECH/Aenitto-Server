@@ -11,10 +11,7 @@ import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
-import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
-import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
+import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -168,6 +165,12 @@ public class RoomServiceImpl implements RoomService {
 
         // RoomState 수정
         room.setState(RoomState.PROCESSING);
+    }
+
+    @Override
+    public RoomParticipantsResponse getRoomParticipants(Member currentMember, Long roomId){
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+        return RoomParticipantsResponse.of(memberRoom.getRoom().getMemberRooms());
     }
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {

@@ -15,5 +15,4 @@ public interface RoomRepository {
     public MemberRoom findMemberRoomById(UUID memberId, Long roomId);
 
     public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit);
-    public List<MemberRoom> findRoomParticipants(Long roomId);
 }

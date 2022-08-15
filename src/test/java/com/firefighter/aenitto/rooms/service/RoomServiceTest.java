@@ -448,4 +448,21 @@ public class RoomServiceTest {
         assertThat(room1.getRelations().get(3).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(4).getManittee()).isNotNull();
     }
+
+    @DisplayName("방 멤버 조회 - 실패(참여하지 않은 방)")
+    @Test
+    void find_roomParticipants() {
+        //given
+        final Long roomId = 1L;
+
+        //when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenThrow(EmptyResultDataAccessException.class);
+
+        //then
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(()-> {
+                    target.getRoomParticipants(member, roomId);
+                });
+    }
 }

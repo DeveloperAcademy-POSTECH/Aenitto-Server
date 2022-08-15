@@ -68,13 +68,4 @@ public class RoomRepositoryImpl implements RoomRepository {
                 .getResultList();
     }
 
-    @Override
-    public List<MemberRoom> findRoomParticipants(Long roomId) {
-        return em.createQuery(
-                        "SELECT mr" +
-                                " FROM MemberRoom mr" +
-                                " WHERE mr.room.id = :roomId")
-                .setParameter("roomId", roomId)
-                .getResultList();
-    }
 }
