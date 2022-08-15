@@ -77,7 +77,10 @@ class RoomControllerTest {
     private Member member3;
     private Room room1;
     private Room room2;
+
+    private Room room3;
     private MemberRoom memberRoom;
+    private MemberRoom memberRoom1;
     private MemberRoom memberRoom2;
     private MemberRoom memberRoom3;
 
@@ -91,12 +94,14 @@ class RoomControllerTest {
         objectMapper = new ObjectMapper();
         room1 = roomFixture1();
         room2 = roomFixture2();
+        room3 = roomFixture2();
         member = memberFixture();
         member2 = memberFixture2();
         member3 = memberFixture3();
         memberRoom = memberRoomFixture1(member, room1);
-        memberRoom2 = memberRoomFixture2(member2, room1);
-        memberRoom3 = memberRoomFixture3(member3, room1);
+        memberRoom1 = memberRoomFixture1(member, room3);
+        memberRoom2 = memberRoomFixture2(member2, room3);
+        memberRoom3 = memberRoomFixture3(member3, room3);
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -473,7 +478,7 @@ class RoomControllerTest {
         final String url = "/api/v1/rooms/{roomId}/participants";
 
         List<MemberRoom> memberRooms = new ArrayList<>();
-        memberRooms.add(memberRoom);
+        memberRooms.add(memberRoom1);
         memberRooms.add(memberRoom2);
         memberRooms.add(memberRoom3);
 
@@ -487,8 +492,8 @@ class RoomControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.count", is(response.getCount())))
-                .andExpect(jsonPath("$.member[0].nickname", is(response.getMember().get(0).getNickname())))
-                .andExpect(jsonPath("$.member[0].colorIdx", is(response.getMember().get(0).getColorIdx())))
+                .andExpect(jsonPath("$.members[0].nickname", is(response.getMembers().get(0).getNickname())))
+                .andExpect(jsonPath("$.members[0].colorIdx", is(response.getMembers().get(0).getColorIdx())))
                 .andDo(print())
                 .andDo(document("함께하는 친구들 리스트",
                         preprocessRequest(prettyPrint()),   // (2)
@@ -501,8 +506,8 @@ class RoomControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("count").description("방에 함께 있는 친구 수"),
-                                fieldWithPath("member[].nickname").description("친구 닉네임"),
-                                fieldWithPath("member[].colorIdx").description("참여자 색상 index")
+                                fieldWithPath("members[].nickname").description("친구 닉네임"),
+                                fieldWithPath("members[].colorIdx").description("참여자 색상 index")
                         )
                 ));
 

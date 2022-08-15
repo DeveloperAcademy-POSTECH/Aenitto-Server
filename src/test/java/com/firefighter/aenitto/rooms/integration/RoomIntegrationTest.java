@@ -107,7 +107,21 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.participatingRooms[0].id", is(1)))
                 .andExpect(jsonPath("$.participatingRooms[0].title", is("제목")))
                 .andExpect(jsonPath("$.participatingRooms[0].state", is("PRE")))
-                .andExpect(jsonPath("$.participatingRooms[0].participatingCount", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[0].participatingCount", is(3)))
                 .andExpect(jsonPath("$.participatingRooms[0].capacity", is(13)));
+    }
+
+    @Sql("classpath:room.sql")
+    @DisplayName("함께하는 친구들 조회 -> 성공")
+    @Test
+    void get_room_participants_success() throws Exception {
+        // given, when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get( "/api/v1/rooms/{roomId}/participants", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count", is(3)))
+                .andExpect(jsonPath("$.members[0].nickname", is("nickname")))
+                .andExpect(jsonPath("$.members[0].colorIdx", is(1)));
     }
 }

@@ -50,12 +50,14 @@ public class RoomServiceTest {
     // Fixtures
     private Room room1;
     private Room room2;
+    private Room room3;
     private Member member;
     private Member member2;
     private Member member3;
     private Member member4;
     private Member member5;
     private MemberRoom memberRoom;
+    private MemberRoom memberRoom1;
 
     private CurrentUserDetails currentUserDetails;
     private MemberRoom memberRoom2;
@@ -67,6 +69,7 @@ public class RoomServiceTest {
     void setup() {
         room1 = roomFixture1();
         room2 = roomFixture2();
+        room3 = roomFixture2();
         member = memberFixture();
         currentUserDetails = CURRENT_USER_DETAILS;
         member2 = memberFixture2();
@@ -74,8 +77,9 @@ public class RoomServiceTest {
         member4 = memberFixture4();
         member5 = memberFixture5();
         memberRoom = memberRoomFixture1(member, room1);
-        memberRoom2 = memberRoomFixture2(member2, room1);
-        memberRoom3 = memberRoomFixture3(member3, room1);
+        memberRoom1 = memberRoomFixture1(member, room3);
+        memberRoom2 = memberRoomFixture2(member2, room3);
+        memberRoom3 = memberRoomFixture3(member3, room3);
     }
 
     @DisplayName("방 생성 성공")
@@ -474,13 +478,13 @@ public class RoomServiceTest {
 
         //when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(memberRoom1);
         RoomParticipantsResponse roomParticipantsResponse = target.getRoomParticipants(member, room1.getId());
 
         //then
         assertThat(roomParticipantsResponse.getCount()).isEqualTo(3);
-        assertThat(roomParticipantsResponse.getMember().get(0).getNickname()).isNotNull();
-        assertThat(roomParticipantsResponse.getMember().get(1).getNickname()).isNotNull();
-        assertThat(roomParticipantsResponse.getMember().get(2).getNickname()).isNotNull();
+        assertThat(roomParticipantsResponse.getMembers().get(0).getNickname()).isNotNull();
+        assertThat(roomParticipantsResponse.getMembers().get(1).getNickname()).isNotNull();
+        assertThat(roomParticipantsResponse.getMembers().get(2).getNickname()).isNotNull();
     }
 }

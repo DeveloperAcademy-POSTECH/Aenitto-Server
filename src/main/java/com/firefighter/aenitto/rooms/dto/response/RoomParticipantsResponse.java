@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 public class RoomParticipantsResponse {
 
     private final int count;
-    private final List<RoomParticipants> member;
+    private final List<RoomParticipants> members;
 
     public static RoomParticipantsResponse of(List<MemberRoom> memberRooms){
         return RoomParticipantsResponse.builder()
                 .count(memberRooms.size())
-                .member(memberRooms.stream().map(RoomParticipants::of)
+                .members(memberRooms.stream().map(RoomParticipants::of)
                         .collect(Collectors.toList())).build();
     }
 
