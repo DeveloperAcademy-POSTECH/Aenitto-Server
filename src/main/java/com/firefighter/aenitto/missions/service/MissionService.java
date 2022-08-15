@@ -6,4 +6,6 @@ import java.time.LocalDate;
 
 public interface MissionService {
     Long setDailyCommonMission(LocalDate date);
+
+    void setDailyIndividualMission(LocalDate date);
 }

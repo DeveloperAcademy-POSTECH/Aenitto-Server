@@ -6,6 +6,9 @@ import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Qualifier("missionServiceImpl")
@@ -39,7 +44,21 @@ public class MissionServiceImpl implements MissionService {
                 .orElseThrow(MissionEmptyException::new);
 
         return missionRepository.saveCommonMission(CommonMission.createCommonMission(date, mission)).getId();
-        // Individual mission
-        // Processing 인 모든 Room 가져옴 -> Room iter하면서, MemberRoom iter하면서 random으로 individial mission 등록
+    }
+
+    @Override
+    @Transactional
+    public void setDailyIndividualMission(LocalDate date) throws MissionAlreadySetException, MissionEmptyException {
+        List<Room> roomsProcessing = roomRepository.findRoomsByState(RoomState.PROCESSING);
+        for (Room room : roomsProcessing) {
+            for (MemberRoom memberRoom : room.getMemberRooms()) {
+                if (memberRoom.didSetDailyIndividualMission(date)) {
+                    throw new MissionAlreadySetException();
+                }
+                Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
+                        .orElseThrow(MissionEmptyException::new);
+                memberRoom.addIndividualMission(mission, date);
+            }
+        }
     }
 }
