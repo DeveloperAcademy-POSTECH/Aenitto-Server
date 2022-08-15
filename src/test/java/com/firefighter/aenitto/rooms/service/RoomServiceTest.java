@@ -12,10 +12,7 @@ import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
-import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
-import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
+import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -77,6 +74,8 @@ public class RoomServiceTest {
         member4 = memberFixture4();
         member5 = memberFixture5();
         memberRoom = memberRoomFixture1(member, room1);
+        memberRoom2 = memberRoomFixture2(member2, room1);
+        memberRoom3 = memberRoomFixture3(member3, room1);
     }
 
     @DisplayName("방 생성 성공")
@@ -451,7 +450,7 @@ public class RoomServiceTest {
 
     @DisplayName("방 멤버 조회 - 실패(참여하지 않은 방)")
     @Test
-    void find_roomParticipants() {
+    void find_roomParticipants_fail_not_participating() {
         //given
         final Long roomId = 1L;
 
@@ -464,5 +463,24 @@ public class RoomServiceTest {
                 .isThrownBy(()-> {
                     target.getRoomParticipants(member, roomId);
                 });
+    }
+
+    @DisplayName("방 멤버 조회 - 성공")
+    @Test
+    void find_roomParticipants_success() {
+        //given
+        final Long roomId = 1L;
+        List<MemberRoom> memberRooms;
+
+        //when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(memberRoom);
+        RoomParticipantsResponse roomParticipantsResponse = target.getRoomParticipants(member, room1.getId());
+
+        //then
+        assertThat(roomParticipantsResponse.getCount()).isEqualTo(3);
+        assertThat(roomParticipantsResponse.getMember().get(0).getNickname()).isNotNull();
+        assertThat(roomParticipantsResponse.getMember().get(1).getNickname()).isNotNull();
+        assertThat(roomParticipantsResponse.getMember().get(2).getNickname()).isNotNull();
     }
 }
