@@ -482,13 +482,29 @@ class RoomControllerTest {
                 .thenReturn(response);
 
         //when, then, docs
-        mockMvc.perform(MockMvcRequestBuilders.get(url, id)
+        mockMvc.perform(RestDocumentationRequestBuilders.get(url, id)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer TestToken")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.count", is(response.getCount())))
                 .andExpect(jsonPath("$.member[0].nickname", is(response.getMember().get(0).getNickname())))
-                .andExpect(jsonPath("$.member[0].colorIdx", is(response.getMember().get(0).getColorIdx())));
+                .andExpect(jsonPath("$.member[0].colorIdx", is(response.getMember().get(0).getColorIdx())))
+                .andDo(print())
+                .andDo(document("함께하는 친구들 리스트",
+                        preprocessRequest(prettyPrint()),   // (2)
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("count").description("방에 함께 있는 친구 수"),
+                                fieldWithPath("member[].nickname").description("친구 닉네임"),
+                                fieldWithPath("member[].colorIdx").description("참여자 색상 index")
+                        )
+                ));
 
     }
 
