@@ -9,6 +9,10 @@ public class MissionFixture {
         return baseMissionFixture(1, MissionType.COMMON);
     }
 
+    public static Mission missionFixture2_Individual() {
+        return baseMissionFixture(2, MissionType.INDIVIDUAL);
+    }
+
     private static Mission baseMissionFixture(int number, MissionType type) {
         Mission mission = transientMissionFixture(number, type);
         ReflectionTestUtils.setField(mission, "id", number * 1L);
