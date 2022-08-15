@@ -1,6 +1,8 @@
 package com.firefighter.aenitto.rooms.repository;
 
+import com.firefighter.aenitto.members.MemberFixture;
 import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.rooms.RoomFixture;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
@@ -12,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -312,5 +313,54 @@ class RoomRepositoryImplTest {
         assertThat(res.size()).isEqualTo(2);
         assertThat(res.get(0).getTitle()).isEqualTo("방 제목2");
         assertThat(res.get(1).getTitle()).isEqualTo("방 제목1");
+    }
+
+    @DisplayName("진행 상황 기준으로 방 가져오기 - 성공")
+    @Test
+    void findRoomsByState_success() {
+        // given
+        Room room1 = RoomFixture.transientRoomFixture(1, 10, 10);
+        Room room2 = RoomFixture.transientRoomFixture(2, 10, 10);
+        room1.setState(RoomState.PRE);
+        room2.setState(RoomState.PROCESSING);
+
+        Member member1 = MemberFixture.transientMemberFixture(1);
+        Member member2 = MemberFixture.transientMemberFixture(2);
+        Member member3 = MemberFixture.transientMemberFixture(3);
+        Member member4 = MemberFixture.transientMemberFixture(4);
+        Member member5 = MemberFixture.transientMemberFixture(5);
+
+        MemberRoom memberRoom1 = RoomFixture.transientMemberRoomFixture(1);
+        MemberRoom memberRoom2 = RoomFixture.transientMemberRoomFixture(2);
+        MemberRoom memberRoom3 = RoomFixture.transientMemberRoomFixture(3);
+        MemberRoom memberRoom4 = RoomFixture.transientMemberRoomFixture(4);
+        MemberRoom memberRoom5 = RoomFixture.transientMemberRoomFixture(5);
+
+        memberRoom1.setMemberRoom(member1, room1);
+        memberRoom2.setMemberRoom(member2, room1);
+        memberRoom3.setMemberRoom(member3, room1);
+        memberRoom4.setMemberRoom(member4, room2);
+        memberRoom5.setMemberRoom(member5, room2);
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(member3);
+        em.persist(member4);
+        em.persist(member5);
+        em.persist(room1);
+        em.persist(room2);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Room> roomsProcessing = roomRepository.findRoomsByState(RoomState.PROCESSING);
+        List<Room> roomsPre = roomRepository.findRoomsByState(RoomState.PRE);
+
+        // then
+        assertThat(roomsProcessing).hasSize(1);
+        assertThat(roomsPre).hasSize(1);
+        assertThat(roomsProcessing.get(0).getMemberRooms()).hasSize(2);
+        assertThat(roomsPre.get(0).getMemberRooms()).hasSize(3);
     }
 }
