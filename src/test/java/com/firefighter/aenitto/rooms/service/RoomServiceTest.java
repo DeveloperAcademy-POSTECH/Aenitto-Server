@@ -333,7 +333,7 @@ public class RoomServiceTest {
 
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.getRoomDetail(member1, roomId, state);
+                    target.getRoomDetail(member1, roomId);
                 });
     }
 
@@ -349,7 +349,7 @@ public class RoomServiceTest {
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
                 .thenReturn(memberRoom2);
 
-        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId, state);
+        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
         RoomDetailResponse.RoomDetail roomDetail1 = roomDetail.getRoom();
 
         // then
@@ -378,7 +378,7 @@ public class RoomServiceTest {
 
         assertThatExceptionOfType(RelationNotFoundException.class)
                 .isThrownBy(() -> {
-                    target.getRoomDetail(member1, roomId, state);
+                    target.getRoomDetail(member1, roomId);
                 });
     }
 
@@ -400,7 +400,7 @@ public class RoomServiceTest {
 
         assertThatExceptionOfType(MissionNotFoundException.class)
                 .isThrownBy(() -> {
-                    target.getRoomDetail(member1, roomId, state);
+                    target.getRoomDetail(member1, roomId);
                 });
     }
 
@@ -424,7 +424,7 @@ public class RoomServiceTest {
         when(messageRepository.findUnreadMessageCount(any(UUID.class), anyLong()))
                 .thenReturn(3);
 
-        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId, state);
+        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
         RoomDetailResponse.RoomDetail room = roomDetail.getRoom();
         RoomDetailResponse.ManitteeInfo manittee = roomDetail.getManittee();
         RoomDetailResponse.MessageInfo messages = roomDetail.getMessages();
@@ -458,7 +458,7 @@ public class RoomServiceTest {
         when(messageRepository.findUnreadMessageCount(any(UUID.class), anyLong()))
                 .thenReturn(3);
 
-        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId, state);
+        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
         RoomDetailResponse.RoomDetail room = roomDetail.getRoom();
         RoomDetailResponse.ManitteeInfo manittee = roomDetail.getManittee();
         RoomDetailResponse.MessageInfo messages = roomDetail.getMessages();

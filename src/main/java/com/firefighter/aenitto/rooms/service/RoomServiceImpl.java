@@ -136,7 +136,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public RoomDetailResponse getRoomDetail(Member member, Long roomId, RoomState state) {
+    public RoomDetailResponse getRoomDetail(Member member, Long roomId) {
         final MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
         final Room room = memberRoom.getRoom();
 
