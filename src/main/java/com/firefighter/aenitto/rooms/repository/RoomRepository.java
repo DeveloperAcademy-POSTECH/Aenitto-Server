@@ -2,10 +2,12 @@ package com.firefighter.aenitto.rooms.repository;
 
 
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface RoomRepository {
@@ -16,4 +18,6 @@ public interface RoomRepository {
     public MemberRoom findMemberRoomById(UUID memberId, Long roomId);
     public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit);
     public List<Room> findRoomsByState(RoomState state);
+
+    public Optional<Relation> findRelationByManittoId(UUID memberId, Long roomId);
 }
