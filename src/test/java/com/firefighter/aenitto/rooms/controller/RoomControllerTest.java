@@ -191,7 +191,7 @@ class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
-                .andExpect(jsonPath("$.participatingCount", is(1)))
+                .andExpect(jsonPath("$.participatingCount", is(2)))
                 .andDo(document("초대코드 검증",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -474,6 +474,11 @@ class RoomControllerTest {
                                 fieldWithPath("room.startDate").description("시작 일자"),
                                 fieldWithPath("room.endDate").description("종료 일자"),
                                 fieldWithPath("room.state").description("방 상태"),
+                                fieldWithPath("participants").description("방 참여자 정보"),
+                                fieldWithPath("participants.count").description("참여자 수"),
+                                fieldWithPath("participants.members").description("방 참여자들"),
+                                fieldWithPath("participants.members[0].id").description("참여자 id"),
+                                fieldWithPath("participants.members[0].nickname").description("참여자 닉네임"),
                                 fieldWithPath("manittee").description("마니띠 정보"),
                                 fieldWithPath("manittee.nickname").description("마니띠 닉네임"),
                                 fieldWithPath("mission").description("개별 미션 정보"),

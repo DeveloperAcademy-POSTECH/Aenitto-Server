@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.dto.response;
 
+import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
@@ -9,17 +10,50 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class RoomDetailResponse {
     private final RoomDetail room;
+    private final ParticipantsInfo participants;
     private final ManitteeInfo manittee;
     private final MissionInfo mission;
     private final Boolean didViewRoulette;
     private final Boolean admin;
     private final MessageInfo messages;
+
+    public static RoomDetailResponse buildPreResponse(Room room, MemberRoom memberRoom) {
+        return RoomDetailResponse.builder()
+                .room(RoomDetail.of(room))
+                .participants(ParticipantsInfo.of(room.getMemberRooms()))
+                .admin(memberRoom.isAdmin())
+                .build();
+    }
+
+    public static RoomDetailResponse buildProcessingResponse(Room room, Relation relation, MemberRoom memberRoom, boolean didView, Mission mission, int messageCount) {
+        return RoomDetailResponse.builder()
+                .room(RoomDetail.of(room))
+                .manittee(ManitteeInfo.of(relation))
+                .mission(MissionInfo.of(mission))
+                .didViewRoulette(didView)
+                .admin(memberRoom.isAdmin())
+                .messages(new MessageInfo(messageCount))
+                .build();
+    }
+
+    public static RoomDetailResponse buildPostResponse(Room room, Relation relation, MemberRoom memberRoom, int messageCount) {
+        return RoomDetailResponse.builder()
+                .room(RoomDetail.of(room))
+                .admin(memberRoom.isAdmin())
+                .manittee(ManitteeInfo.of(relation))
+                .messages(new MessageInfo(messageCount))
+                .build();
+    }
 
     @Getter
     @Builder
@@ -43,30 +77,34 @@ public class RoomDetailResponse {
         }
     }
 
-    public static RoomDetailResponse buildPreResponse(Room room) {
-        return RoomDetailResponse.builder()
-                .room(RoomDetail.of(room))
-                .build();
-    }
+    @Getter @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(force = true)
+    public static class ParticipantsInfo {
+        private final int count;
+        private final List<MemberInfo> members;
 
-    public static RoomDetailResponse buildProcessingResponse(Room room, Relation relation, MemberRoom memberRoom, boolean didView, Mission mission, int messageCount) {
-        return RoomDetailResponse.builder()
-                .room(RoomDetail.of(room))
-                .manittee(ManitteeInfo.of(relation))
-                .mission(MissionInfo.of(mission))
-                .didViewRoulette(didView)
-                .admin(memberRoom.isAdmin())
-                .messages(new MessageInfo(messageCount))
-                .build();
-    }
+        public static ParticipantsInfo of(List<MemberRoom> memberRooms) {
+            return ParticipantsInfo.builder()
+                    .count(memberRooms.size())
+                    .members(memberRooms
+                                    .stream()
+                                    .map(MemberInfo::new)
+                                    .collect(Collectors.toList()))
+                    .build();
+        }
 
-    public static RoomDetailResponse buildPostResponse(Room room, Relation relation, MemberRoom memberRoom, int messageCount) {
-        return RoomDetailResponse.builder()
-                .room(RoomDetail.of(room))
-                .admin(memberRoom.isAdmin())
-                .manittee(ManitteeInfo.of(relation))
-                .messages(new MessageInfo(messageCount))
-                .build();
+        @Getter
+        @NoArgsConstructor(force = true)
+        public static class MemberInfo {
+            private final UUID id;
+            private final String nickname;
+            public MemberInfo(MemberRoom memberRoom) {
+                Member member = memberRoom.getMember();
+                this.id = member.getId();
+                this.nickname = member.getNickname();
+            }
+        }
     }
 
     @Getter

@@ -142,7 +142,7 @@ public class RoomServiceImpl implements RoomService {
 
         switch (room.getState()) {
             case PRE:
-                return RoomDetailResponse.buildPreResponse(room);
+                return RoomDetailResponse.buildPreResponse(room, memberRoom);
             case PROCESSING: {
                 // 마니띠, 룰렛 봤는지, admin 인지, 미션, 읽지 않은 메시지 수
                 Relation relation = roomRepository.findRelationByManittoId(member.getId(), roomId)

@@ -353,7 +353,7 @@ public class RoomServiceTest {
         RoomDetailResponse.RoomDetail roomDetail1 = roomDetail.getRoom();
 
         // then
-        assertThat(roomDetail.getAdmin()).isNull();
+        assertThat(roomDetail.getAdmin()).isEqualTo(false);
         assertThat(roomDetail.getDidViewRoulette()).isNull();
         assertThat(roomDetail.getManittee()).isNull();
         assertThat(roomDetail.getMessages()).isNull();

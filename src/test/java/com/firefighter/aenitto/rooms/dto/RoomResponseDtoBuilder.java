@@ -29,6 +29,7 @@ public class RoomResponseDtoBuilder {
         return RoomDetailResponse.builder()
                 .room(RoomDetailResponse.RoomDetail.of(room))
                 .manittee(RoomDetailResponse.ManitteeInfo.of(relation))
+                .participants(RoomDetailResponse.ParticipantsInfo.of(room.getMemberRooms()))
                 .messages(new RoomDetailResponse.MessageInfo(3))
                 .admin(false)
                 .didViewRoulette(false)
