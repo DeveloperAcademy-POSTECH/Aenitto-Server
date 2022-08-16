@@ -6,7 +6,10 @@ import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
 import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.missions.MissionFixture;
+import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
@@ -39,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
@@ -67,10 +71,13 @@ class RoomControllerTest {
     private ObjectMapper objectMapper;
 
     // Fixture
-    private Member member;
-    private Room room1;
-    private Room room2;
-    private MemberRoom memberRoom;
+    Member member;
+    Member member2;
+    Room room1;
+    Room room2;
+    MemberRoom memberRoom;
+    MemberRoom memberRoom2;
+    Mission mission1;
 
     @BeforeEach
     void init(RestDocumentationContextProvider restDocumentation) {
@@ -82,7 +89,11 @@ class RoomControllerTest {
         room1 = roomFixture1();
         room2 = roomFixture2();
         member = memberFixture();
+        member2 = memberFixture2();
         memberRoom = memberRoomFixture1(member, room1);
+        memberRoom2 = memberRoomFixture2(member2, room1);
+
+        mission1 = MissionFixture.missionFixture2_Individual();
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -427,5 +438,52 @@ class RoomControllerTest {
                         )));
 
         verify(roomService, times(1)).startAenitto(any(Member.class), anyLong());
+    }
+
+    @DisplayName("방 정보 조회 - 성공")
+    @Test
+    void roomDetail_PRE() throws Exception {
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+        Relation.createRelations(room1.getMemberRooms(), room1);
+
+        // when
+        when(roomService.getRoomDetail(any(Member.class), anyLong()))
+                .thenReturn(RoomResponseDtoBuilder.roomDetailResponse(room1, room1.getRelations().get(0), mission1));
+
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document(
+                        "방 정보 조회",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("room").description("방 정보"),
+                                fieldWithPath("room.id").description("방 id"),
+                                fieldWithPath("room.title").description("방 제목"),
+                                fieldWithPath("room.startDate").description("시작 일자"),
+                                fieldWithPath("room.endDate").description("종료 일자"),
+                                fieldWithPath("room.state").description("방 상태"),
+                                fieldWithPath("manittee").description("마니띠 정보"),
+                                fieldWithPath("manittee.nickname").description("마니띠 닉네임"),
+                                fieldWithPath("mission").description("개별 미션 정보"),
+                                fieldWithPath("mission.id").description("미션 id"),
+                                fieldWithPath("mission.content").description("미션 내용"),
+                                fieldWithPath("didViewRoulette").description("룰렛 돌리는 화면 시청 여부"),
+                                fieldWithPath("admin").description("방장 여부"),
+                                fieldWithPath("messages").description("읽지 않은 메시지 정보"),
+                                fieldWithPath("messages.count").description("읽지 않은 메시지 개수")
+                        )
+                ));
     }
 }
