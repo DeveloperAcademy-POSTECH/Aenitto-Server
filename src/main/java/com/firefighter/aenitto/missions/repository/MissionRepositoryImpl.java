@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.missions.repository;
 
 import com.firefighter.aenitto.missions.domain.CommonMission;
+import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,19 @@ public class MissionRepositoryImpl implements MissionRepository {
                                 " FROM CommonMission c" +
                                 " WHERE c.date = :date", CommonMission.class)
                 .setParameter("date", date)
+                .getResultStream()
+                .findFirst();
+    }
+
+    @Override
+    public Optional<IndividualMission> findIndividualMissionByDate(LocalDate date, Long memberRoomId) {
+        return em.createQuery(
+                        "SELECT im" +
+                                " FROM IndividualMission im" +
+                                " WHERE im.date = :date" +
+                                " AND im.memberRoom.id = :memberRoomId", IndividualMission.class)
+                .setParameter("date", date)
+                .setParameter("memberRoomId", memberRoomId)
                 .getResultStream()
                 .findFirst();
     }
