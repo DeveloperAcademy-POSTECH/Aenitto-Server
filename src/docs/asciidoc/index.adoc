@@ -30,6 +30,9 @@ operation::마니또 시작하기[snippets='path-parameters,http-request,http-re
 == 방 상태 조회
 operation::방 상태 조회[snippets='path-parameters,http-request,http-response,response-fields']
 
+== 방 정보 조회
+operation::방 정보 조회[snippets='path-parameters,http-request,http-response,response-fields']
+
 == 방 생성
 operation::방 생성[snippets='http-request,request-fields,http-response']
 
