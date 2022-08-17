@@ -12,10 +12,12 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.support.IntegrationTest;
 import com.firefighter.aenitto.support.security.WithMockCustomMember;
+import org.apache.coyote.Request;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -315,5 +317,55 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.participatingRooms[2].id", is(1)))
                 .andExpect(jsonPath("$.participatingRooms[3].id", is(5)))
                 .andExpect(jsonPath("$.participatingRooms[4].id", is(2)));
+    }
+
+    @Sql({
+            SqlPath.ROOM_GET_PARTICIPATING_ROOMS
+    })
+    @DisplayName("방 삭제 - 실패 (방장이 아님)")
+    @Test
+    void deleteRoom_fail_not_admin() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_UNAUTHORIZED.getMessage())));
+    }
+
+    @Sql({
+            SqlPath.ROOM_GET_PARTICIPATING_ROOMS
+    })
+    @DisplayName("방 삭제 - 성공")
+    @Test
+    void deleteRoom_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        Room beforeDelete = em.find(Room.class, roomId);
+        assertThat(beforeDelete.isDeleted()).isFalse();
+        flushAndClear();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isNoContent());
+
+        Room afterDelete = em.find(Room.class, roomId);
+        assertThat(afterDelete.isDeleted()).isTrue();
     }
 }
