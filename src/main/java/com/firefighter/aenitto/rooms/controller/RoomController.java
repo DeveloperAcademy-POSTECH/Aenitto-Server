@@ -69,15 +69,13 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getRoomDetail(member, roomId));
     }
 
-    // TODO: RoomAPI 메타데이터 Response Header 에 넣기 (22.08.07)
     @GetMapping("/rooms")
     public ResponseEntity<ParticipatingRoomsResponse> findParticipatingRooms(
-            @CurrentMember Member currentMember,
-            @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "3") int limit
+            @CurrentMember Member currentMember
+//            @RequestParam(required = false) Long cursor,
+//            @RequestParam(defaultValue = "3") int limit
     ) {
-        // cursor 있으면, next 가 있어야 함.
-        return ResponseEntity.ok(roomService.getParticipatingRooms(currentMember, cursor, limit));
+        return ResponseEntity.ok(roomService.getParticipatingRooms(currentMember));
     }
 
     @PatchMapping("/rooms/{roomId}/state")

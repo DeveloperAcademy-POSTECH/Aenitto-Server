@@ -71,6 +71,16 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     @Override
+    public List<Room> findAllParticipatingRooms(UUID memberId) {
+        return em.createQuery(
+                        "SELECT mr.room" +
+                                " FROM MemberRoom mr" +
+                                " WHERE mr.member.id = :memberId" +
+                                " ORDER BY mr.room.id DESC", Room.class)
+                .setParameter("memberId", memberId)
+                .getResultList();
+    }
+    @Override
     public List<Room> findRoomsByState(RoomState state) {
         return em.createQuery(
                         "SELECT DISTINCT r" +

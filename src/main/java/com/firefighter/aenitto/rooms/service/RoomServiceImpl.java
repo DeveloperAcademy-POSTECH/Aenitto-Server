@@ -4,6 +4,7 @@ import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.mission.MissionEmptyException;
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
+import com.firefighter.aenitto.common.utils.RoomComparator;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
@@ -184,6 +185,11 @@ public class RoomServiceImpl implements RoomService {
     public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit) {
         List<Room> participatingRooms = roomRepository.findParticipatingRoomsByMemberIdWithCursor(member.getId(), cursor, limit);
         return ParticipatingRoomsResponse.of(participatingRooms);
+    }
+
+    @Override
+    public ParticipatingRoomsResponse getParticipatingRooms(Member member) {
+        return ParticipatingRoomsResponse.of(RoomComparator.sortRooms(roomRepository.findAllParticipatingRooms(member.getId())));
     }
 
     @Override

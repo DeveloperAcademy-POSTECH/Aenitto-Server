@@ -17,6 +17,8 @@ public interface RoomRepository {
     public Room findByInvitation(String invitation);
     public MemberRoom findMemberRoomById(UUID memberId, Long roomId);
     public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit);
+
+    public List<Room> findAllParticipatingRooms(UUID memberId);
     public List<Room> findRoomsByState(RoomState state);
 
     public Optional<Relation> findRelationByManittoId(UUID memberId, Long roomId);
