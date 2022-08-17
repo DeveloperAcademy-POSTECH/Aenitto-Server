@@ -27,7 +27,7 @@ public class RoomController {
 
     @PostMapping("/rooms")
     public ResponseEntity createRoom(
-            @CurrentMember Member currentMember,
+            @CurrentMember final Member currentMember,
             @Valid@RequestBody final CreateRoomRequest createRoomRequest
     ) {
         final Long roomId = roomService.createRoom(currentMember, createRoomRequest);
@@ -36,7 +36,7 @@ public class RoomController {
 
     @PostMapping("/invitations/verification")
     public ResponseEntity verifyInvitation(
-            @CurrentMember Member currentMember,
+            @CurrentMember final Member currentMember,
             @Valid @RequestBody final VerifyInvitationRequest request
     ) {
         final VerifyInvitationResponse response = roomService.verifyInvitation(currentMember, request);
@@ -55,7 +55,7 @@ public class RoomController {
 
     @GetMapping("/rooms/{roomId}/state")
     public ResponseEntity<GetRoomStateResponse> getRoomState(
-            @CurrentMember Member currentMember,
+            @CurrentMember final Member currentMember,
             @PathVariable final Long roomId
     ) {
         return ResponseEntity.ok(roomService.getRoomState(currentMember, roomId));
@@ -71,7 +71,7 @@ public class RoomController {
 
     @GetMapping("/rooms")
     public ResponseEntity<ParticipatingRoomsResponse> findParticipatingRooms(
-            @CurrentMember Member currentMember
+            @CurrentMember final Member currentMember
 //            @RequestParam(required = false) Long cursor,
 //            @RequestParam(defaultValue = "3") int limit
     ) {
@@ -80,10 +80,19 @@ public class RoomController {
 
     @PatchMapping("/rooms/{roomId}/state")
     public ResponseEntity startAenitto(
-            @CurrentMember Member member,
-            @PathVariable Long roomId
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId
     ) {
         roomService.startAenitto(member, roomId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/rooms/{roomId}")
+    public ResponseEntity deleteRoom(
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId
+    ) {
+        roomService.deleteRoom(member, roomId);
         return ResponseEntity.noContent().build();
     }
 }
