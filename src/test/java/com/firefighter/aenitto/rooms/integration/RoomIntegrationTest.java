@@ -2,9 +2,8 @@ package com.firefighter.aenitto.rooms.integration;
 
 
 import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
-import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
+import com.firefighter.aenitto.common.utils.SqlPath;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
@@ -13,12 +12,10 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.support.IntegrationTest;
 import com.firefighter.aenitto.support.security.WithMockCustomMember;
-import org.apache.coyote.Request;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -108,8 +105,8 @@ public class RoomIntegrationTest extends IntegrationTest {
     }
 
     @Sql({
-            "classpath:member.sql",
-            "classpath:room-pre.sql"
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PRE
     })
     @DisplayName("방 정보 조회 (PRE) - 실패 (참여 중x)")
     @Test
@@ -131,9 +128,9 @@ public class RoomIntegrationTest extends IntegrationTest {
     }
 
     @Sql({
-            "classpath:member.sql",
-            "classpath:room-processing.sql",
-            "classpath:memberRoom.sql",
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM
     })
     @DisplayName("방 정보 조회 (PROCESSING) - 실패 (Relation x)")
     @Test
@@ -155,10 +152,10 @@ public class RoomIntegrationTest extends IntegrationTest {
     }
 
     @Sql({
-            "classpath:member.sql",
-            "classpath:room-processing.sql",
-            "classpath:memberRoom.sql",
-            "classpath:relation.sql"
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.RELATION
     })
     @DisplayName("방 정보 조회 (PROCESSING) - 실패 (금일의 개별 미션 설정 x)")
     @Test
@@ -181,9 +178,9 @@ public class RoomIntegrationTest extends IntegrationTest {
 
 
     @Sql({
-            "classpath:member.sql",
-            "classpath:room-pre.sql",
-            "classpath:memberRoom.sql",
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PRE,
+            SqlPath.MEMBER_ROOM
     })
     @DisplayName("방 정보 조회 (PRE) - 성공")
     @Test
@@ -213,17 +210,15 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.mission.id").doesNotExist())
                 .andExpect(jsonPath("$.mission.content").doesNotExist())
                 .andExpect(jsonPath("$.messages.count").doesNotExist());
-
     }
 
-    // TODO: path enum (22.08.17)
     @Sql({
-            "classpath:member.sql",
-            "classpath:room-processing.sql",
-            "classpath:memberRoom.sql",
-            "classpath:message.sql",
-            "classpath:relation.sql",
-            "classpath:mission.sql"
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.MESSAGE,
+            SqlPath.RELATION,
+            SqlPath.MISSION
     })
     @DisplayName("방 정보 조회 (PROCESSING) - 성공")
     @Test
@@ -263,11 +258,11 @@ public class RoomIntegrationTest extends IntegrationTest {
     }
 
     @Sql({
-            "classpath:member.sql",
-            "classpath:room-post.sql",
-            "classpath:memberRoom.sql",
-            "classpath:message.sql",
-            "classpath:relation.sql",
+            SqlPath.MEMBER,
+            SqlPath.ROOM_POST,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.MESSAGE,
+            SqlPath.RELATION
     })
     @DisplayName("방 정보 조회 (POST) - 성공")
     @Test
@@ -299,7 +294,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.messages.count").exists());
     }
 
-    @Sql("classpath:room-getParticipatingRooms.sql")
+    @Sql(SqlPath.ROOM_GET_PARTICIPATING_ROOMS)
     @DisplayName("참여 중인 방 조회 - 성공")
     @Test
     void findParticipatingRooms_success() throws Exception {
