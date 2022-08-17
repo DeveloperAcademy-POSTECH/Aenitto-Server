@@ -35,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -104,10 +105,10 @@ public class RoomServiceTest {
         // mock
         when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findByInvitation(anyString()))
-                .thenThrow(EmptyResultDataAccessException.class)
-                .thenThrow(EmptyResultDataAccessException.class)
-                .thenThrow(EmptyResultDataAccessException.class)
-                .thenReturn(Room.builder().build());
+                .thenReturn(Optional.of(Room.builder().build()))
+                .thenReturn(Optional.of(Room.builder().build()))
+                .thenReturn(Optional.of(Room.builder().build()))
+                .thenReturn(Optional.empty());
         when(roomRepository.saveRoom(any(Room.class)))
                 .thenReturn(room1);
 
@@ -132,7 +133,7 @@ public class RoomServiceTest {
     void verifyInvitation_fail_invalid() {
         // mock
         when(roomRepository.findByInvitation(anyString()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
 
         // given
         final VerifyInvitationRequest request = RoomRequestDtoBuilder.verifyInvitationRequest();
@@ -150,9 +151,9 @@ public class RoomServiceTest {
     void verifyInvitation_fail_participating() {
         // mock
         when(roomRepository.findByInvitation(anyString()))
-                .thenReturn(room1);
+                .thenReturn(Optional.of(room1));
         when(roomRepository.findMemberRoomById(any(), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(Optional.of(memberRoom));
 
         // then
         final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
@@ -171,9 +172,9 @@ public class RoomServiceTest {
     void verifyInvitation_success() {
         // mock
         when(roomRepository.findByInvitation(anyString()))
-                .thenReturn(room1);
+                .thenReturn(Optional.of(room1));
         when(roomRepository.findMemberRoomById(eq(member1.getId()), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
 
         // given
         final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
@@ -194,7 +195,7 @@ public class RoomServiceTest {
         // mock
         when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(Optional.of(memberRoom));
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
@@ -213,9 +214,9 @@ public class RoomServiceTest {
         // mock
         when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
         when(roomRepository.findRoomById(anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
@@ -235,9 +236,9 @@ public class RoomServiceTest {
         // mock
         when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
         when(roomRepository.findRoomById(anyLong()))
-                .thenReturn(Room.builder().capacity(0).build());
+                .thenReturn(Optional.of(Room.builder().capacity(0).build()));
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
@@ -258,9 +259,9 @@ public class RoomServiceTest {
         // mock
         when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
         when(roomRepository.findRoomById(anyLong()))
-                .thenReturn(room1);
+                .thenReturn(Optional.of(room1));
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
@@ -280,7 +281,7 @@ public class RoomServiceTest {
         //given
         when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
 
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
@@ -294,7 +295,7 @@ public class RoomServiceTest {
         // given
         when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
         when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(Optional.of(memberRoom));
 
         // when
         GetRoomStateResponse roomState = target.getRoomState(currentUserDetails.getMember(), room1.getId());
@@ -332,7 +333,7 @@ public class RoomServiceTest {
 
         // when, then
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
 
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
@@ -350,7 +351,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom2);
+                .thenReturn(Optional.of(memberRoom2));
 
         RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
         RoomDetailResponse.RoomDetail roomDetail1 = roomDetail.getRoom();
@@ -375,7 +376,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom2);
+                .thenReturn(Optional.of(memberRoom2));
         when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
                 .thenReturn(Optional.empty());
 
@@ -395,7 +396,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom2);
+                .thenReturn(Optional.of(memberRoom2));
         when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
                 .thenReturn(Optional.of(room1.getRelations().get(0)));
         when(missionRepository.findIndividualMissionByDate(any(LocalDate.class), anyLong()))
@@ -419,7 +420,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom2);
+                .thenReturn(Optional.of(memberRoom2));
         when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
                 .thenReturn(Optional.of(room1.getRelations().get(0)));
         when(missionRepository.findIndividualMissionByDate(any(LocalDate.class), anyLong()))
@@ -455,7 +456,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom2);
+                .thenReturn(Optional.of(memberRoom2));
         when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
                 .thenReturn(Optional.of(room1.getRelations().get(0)));
         when(messageRepository.findUnreadMessageCount(any(UUID.class), anyLong()))
@@ -484,7 +485,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenReturn(Optional.empty());
 
         // then
         assertThatExceptionOfType(RoomNotParticipatingException.class)
@@ -505,7 +506,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(Optional.of(memberRoom));
 
         // then
         assertThatExceptionOfType(RoomUnAuthorizedException.class)
@@ -524,7 +525,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(Optional.of(memberRoom));
 
         // then
         assertThatExceptionOfType(RoomAlreadyStartedException.class)
@@ -543,7 +544,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(Optional.of(memberRoom));
 
 
         // then
@@ -567,7 +568,7 @@ public class RoomServiceTest {
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom);
+                .thenReturn(Optional.of(memberRoom));
         target.startAenitto(member1, roomId);
 
         // then

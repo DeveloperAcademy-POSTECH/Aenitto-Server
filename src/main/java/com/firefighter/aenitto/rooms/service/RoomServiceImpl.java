@@ -60,9 +60,7 @@ public class RoomServiceImpl implements RoomService {
         // Room invitation 생성 -> 존재하지 않는 random 코드 나올 때 까지.
         do {
             room.createInvitation();
-            try {
-                roomRepository.findByInvitation(room.getInvitation());
-            } catch (EmptyResultDataAccessException e) {
+            if (roomRepository.findByInvitation(room.getInvitation()).isEmpty()) {
                 break;
             }
         } while (true);
@@ -81,14 +79,10 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public VerifyInvitationResponse verifyInvitation(Member member, VerifyInvitationRequest verifyInvitationRequest) {
         final String invitation = verifyInvitationRequest.getInvitationCode();
-        Room findRoom;
 
         // 초대코드로 Room 조회 -> 결과가 없을 경우 throw
-        try {
-            findRoom = roomRepository.findByInvitation(invitation);
-        } catch (EmptyResultDataAccessException e) {
-            throw new InvitationNotFoundException();
-        }
+        Room findRoom = roomRepository.findByInvitation(invitation)
+                .orElseThrow(InvitationNotFoundException::new);
 
         // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
         throwExceptionIfParticipating(member.getId(), findRoom.getId());
@@ -106,12 +100,8 @@ public class RoomServiceImpl implements RoomService {
         throwExceptionIfParticipating(member.getId(), roomId);
 
         // roomId로 방 조회 -> 없을 경우 throw
-        Room findRoom;
-        try {
-            findRoom = roomRepository.findRoomById(roomId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new RoomNotFoundException();
-        }
+        Room findRoom = roomRepository.findRoomById(roomId)
+                .orElseThrow(RoomNotFoundException::new);
 
         // 방의 수용인원이 초과했을 경우 -> throw
         if (findRoom.unAcceptable()) throw new RoomCapacityExceededException();
@@ -125,13 +115,9 @@ public class RoomServiceImpl implements RoomService {
     public GetRoomStateResponse getRoomState(Member currentMember, Long roomId) {
         Member member = memberRepository.findByMemberId(currentMember.getId())
                 .orElseThrow(MemberNotFoundException::new);
-        MemberRoom memberRoom;
+
         // 참여 중인 방이 아닐 경우 -> throw
-        try {
-            memberRoom = roomRepository.findMemberRoomById(member.getId(), roomId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new RoomNotParticipatingException();
-        }
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
         return GetRoomStateResponse.of(memberRoom.getRoom());
     }
 
@@ -217,20 +203,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
-        try {
-            roomRepository.findMemberRoomById(memberId, roomId);
-            throw new RoomAlreadyParticipatingException();
-        } catch (EmptyResultDataAccessException e) {}
+        roomRepository.findMemberRoomById(memberId, roomId)
+                .ifPresent(memberRoom -> {
+                    throw new RoomAlreadyParticipatingException();
+                });
     }
 
     private MemberRoom throwExceptionIfNotParticipating(UUID memberId, Long roomId) {
-        final MemberRoom memberRoom;
-        try {
-            memberRoom = roomRepository.findMemberRoomById(memberId, roomId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new RoomNotParticipatingException();
-        }
-        return memberRoom;
+        return roomRepository.findMemberRoomById(memberId, roomId)
+                .orElseThrow(RoomNotParticipatingException::new);
     }
 
     private void throwExceptionIfNotAdmin(MemberRoom memberRoom) {

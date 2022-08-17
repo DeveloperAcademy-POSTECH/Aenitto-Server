@@ -13,9 +13,9 @@ import java.util.UUID;
 public interface RoomRepository {
     public Room saveRoom(Room room);
     public Room mergeRoom(Room room);
-    public Room findRoomById(Long id);
-    public Room findByInvitation(String invitation);
-    public MemberRoom findMemberRoomById(UUID memberId, Long roomId);
+    public Optional<Room> findRoomById(Long id);
+    public Optional<Room> findByInvitation(String invitation);
+    public Optional<MemberRoom> findMemberRoomById(UUID memberId, Long roomId);
     public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit);
 
     public List<Room> findAllParticipatingRooms(UUID memberId);
