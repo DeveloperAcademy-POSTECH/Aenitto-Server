@@ -39,7 +39,7 @@ public class RoomComparatorTest {
         ReflectionTestUtils.setField(room5, "id", 5L);
         ReflectionTestUtils.setField(room6, "id", 6L);
 
-        List<Room> rooms = Arrays.asList(room1, room2, room3, room4, room5, room6);
+        List<Room> rooms = Arrays.asList(room6, room5, room4, room3, room2, room1);
 
         // when
         List<Room> sortedRooms = RoomComparator.sortRooms(rooms);

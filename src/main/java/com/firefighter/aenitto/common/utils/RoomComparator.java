@@ -12,15 +12,15 @@ public class RoomComparator {
         return rooms.stream()
                 .sorted(Comparator
                         .comparing(Room::getState, RoomComparator::compareState)
-                        .thenComparing(Room::getId, RoomComparator::compareId)
+//                        .thenComparing(Room::getId, RoomComparator::compareId)
                 ).collect(Collectors.toList());
     }
 
-    public static int compareState(RoomState o1, RoomState o2) {
+    private static int compareState(RoomState o1, RoomState o2) {
         return o1.getPriority() - o2.getPriority();
     }
 
-    public static int compareId(Long o1, Long o2) {
+    private static int compareId(Long o1, Long o2) {
         return o2.compareTo(o1);
     }
 }
