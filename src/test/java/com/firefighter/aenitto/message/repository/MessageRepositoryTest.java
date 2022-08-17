@@ -93,4 +93,20 @@ public class MessageRepositoryTest {
         assertThat(unreadMessageCount2).isEqualTo(5);
     }
 
+    @DisplayName("메시지 보내기 - 성공")
+    @Test
+    void sendMessage_success(){
+        //given
+        messageRepository.saveMessage(message1);
+        em.flush();
+
+        //when
+        Message result = em.find(Message.class, message1.getId());
+
+        //then
+        assertThat(result.getId()).isNotNull();
+        assertThat(result.getContent()).isNotNull();
+        assertThat(result.getImgUrl()).isNotNull();
+    }
+
 }
