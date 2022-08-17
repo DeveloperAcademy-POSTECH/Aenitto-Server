@@ -18,4 +18,5 @@ public class ChangeNicknameRequest {
     public ChangeNicknameRequest(String nickname) {
         this.nickname = nickname;
     }
+
 }

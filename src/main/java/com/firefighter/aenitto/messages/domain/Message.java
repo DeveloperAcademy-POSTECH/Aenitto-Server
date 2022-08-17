@@ -3,15 +3,13 @@ package com.firefighter.aenitto.messages.domain;
 import com.firefighter.aenitto.common.baseEntities.CreationLog;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.members.domain.Member;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
 @Entity
+@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message extends CreationLog {

@@ -1,6 +1,8 @@
 spring:
   profiles:
-    active: test
+    active: test # 활성화시킬 프로필
+    group: # 포함시킬 하위 프로필명
+      develop: test, awss3
 
   sql:
     init:
