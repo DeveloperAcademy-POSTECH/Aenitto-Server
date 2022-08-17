@@ -1,9 +1,0 @@
-cloud:
-  aws:
-    region:
-      static: ap-northeast-2
-    s3:
-      bucket: bucket
-    credentials:
-      access-key: AKIAZXX66E6WXW3WBQ6S
-      secret-key: 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
