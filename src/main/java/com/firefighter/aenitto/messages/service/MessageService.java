@@ -5,5 +5,5 @@ import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
-    public long sendMessage(Member currentMember, SendMessageRequest request, MultipartFile image);
+    public long sendMessage(Member currentMember, Long roomId, SendMessageRequest request, MultipartFile image);
 }

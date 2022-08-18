@@ -4,12 +4,17 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.message.FileUploadException;
 import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
+import com.firefighter.aenitto.common.exception.message.NotManitteeException;
 import com.firefighter.aenitto.common.exception.message.RecieverNotFoundException;
+import com.firefighter.aenitto.common.exception.room.RoomNotFoundException;
+import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
+import com.firefighter.aenitto.rooms.domain.Relation;
+import com.firefighter.aenitto.rooms.repository.RelationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,9 @@ public class MessageServiceImpl implements MessageService{
     @Qualifier("memberRepositoryImpl")
     private final MemberRepository memberRepository;
 
+    @Qualifier("relationRepositoryImpl")
+    private final RelationRepository relationRepository;
+
     @Qualifier("messageRepositoryImpl")
     private final MessageRepository messageRepository;
 
@@ -36,11 +44,18 @@ public class MessageServiceImpl implements MessageService{
     private final StorageService storageService;
 
     @Override
-    public long sendMessage(Member currentMember, SendMessageRequest request, MultipartFile image){
-        memberRepository.findByMemberId(UUID.fromString(request.getRecieverId()))
-                .orElseThrow(RecieverNotFoundException::new);
+    public long sendMessage(Member currentMember, Long roomId,
+                            SendMessageRequest request, MultipartFile image){
+
+        Relation relation = relationRepository.findByRoomIdAndMemberId(roomId, currentMember.getId())
+                .orElseThrow(RoomNotParticipatingException::new);
+
+        if(!Objects.equals(relation.getManittee().getId(), UUID.fromString(request.getRecieverId()))){
+            throw new NotManitteeException();
+        }
 
         Message message = Message.builder().content(request.getMessageContent()).build();
+        message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
 
         if(!image.isEmpty()){
             String renameImageName  = getRenameImage(image);
