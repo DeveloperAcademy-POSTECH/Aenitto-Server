@@ -368,10 +368,10 @@ class RoomControllerTest {
                 .andDo(document("참여 중인 방 조회",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        requestParameters(
-                                parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
-                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
-                        ),
+//                        requestParameters(
+//                                parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
+//                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
+//                        ),
                         requestHeaders(
                           headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
