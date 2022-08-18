@@ -15,6 +15,7 @@ import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
@@ -519,5 +520,54 @@ class RoomControllerTest {
                                 parameterWithName("roomId").description("방 id")
                         )
                 ));
+    }
+
+    @DisplayName("방 수정 - 실패 (Binding Exception)")
+    @Test
+    void roomUpdate_fail() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+        final UpdateRoomRequest request = UpdateRoomRequest.builder()
+                .title("123456789")
+                .build();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.put(url, roomId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+        verify(roomService, times(0)).updateRoom(any(Member.class), anyLong(), any(UpdateRoomRequest.class));
+    }
+
+    @DisplayName("방 수정 - 성공")
+    @Test
+    void roomUpdate_success() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+        final UpdateRoomRequest request = UpdateRoomRequest.builder()
+                .title("제목")
+                .capacity(10)
+                .build();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.put(url, roomId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent());
+        verify(roomService, times(1)).updateRoom(any(Member.class), anyLong(), any(UpdateRoomRequest.class));
     }
 }
