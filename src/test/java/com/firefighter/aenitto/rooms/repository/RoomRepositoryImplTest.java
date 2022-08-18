@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.repository;
 
+import com.firefighter.aenitto.common.exception.room.InvitationNotFoundException;
 import com.firefighter.aenitto.members.MemberFixture;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.RoomFixture;
@@ -23,6 +24,7 @@ import javax.persistence.NoResultException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -80,7 +82,8 @@ class RoomRepositoryImplTest {
 
         Room merge = roomRepository.mergeRoom(room);
 
-        Room roomById = roomRepository.findRoomById(merge.getId());
+        Room roomById = roomRepository.findRoomById(merge.getId())
+                .orElseThrow();
 
         // then
         assertThat(roomById).isNotNull();
@@ -116,7 +119,8 @@ class RoomRepositoryImplTest {
         em.flush();
 
         // when
-        Room roomById = roomRepository.findRoomById(room.getId());
+        Room roomById = roomRepository.findRoomById(room.getId())
+                .orElseThrow();
 
         // then
         assertThat(room).isEqualTo(roomById);
@@ -130,7 +134,8 @@ class RoomRepositoryImplTest {
         em.flush();
 
         // when
-        Room byInvitation = roomRepository.findByInvitation("123456");
+        Room byInvitation = roomRepository.findByInvitation("123456")
+                .orElseThrow();
 
         // then
         assertThat(byInvitation).isEqualTo(room);
@@ -146,9 +151,10 @@ class RoomRepositoryImplTest {
 
         // exception throw
         assertThatThrownBy(() -> {
-            Room byInvitation = roomRepository.findByInvitation("123466");
+            Room byInvitation = roomRepository.findByInvitation("123466")
+                    .orElseThrow(InvitationNotFoundException::new);
         })
-                .isInstanceOf(EmptyResultDataAccessException.class);
+                .isInstanceOf(InvitationNotFoundException.class);
 
     }
 
@@ -177,10 +183,10 @@ class RoomRepositoryImplTest {
     @Test
     void findMemberRoomById_fail_not_exist() {
         // given, when, then
-        assertThatExceptionOfType(EmptyResultDataAccessException.class)
-                .isThrownBy(() -> {
-                    roomRepository.findMemberRoomById(UUID.randomUUID(), 1L);
-                });
+//        assertThatExceptionOfType(EmptyResultDataAccessException.class)
+//                .isThrownBy(() -> {
+        assertThat(roomRepository.findMemberRoomById(UUID.randomUUID(), 1L).isEmpty()).isTrue();
+//                });
     }
 
     @DisplayName("roomId, memberId로 MemberRoom 검색 - 성공")
@@ -195,7 +201,8 @@ class RoomRepositoryImplTest {
         em.clear();
 
         // when
-        MemberRoom memberRoomById = roomRepository.findMemberRoomById(member.getId(), room.getId());
+        MemberRoom memberRoomById = roomRepository.findMemberRoomById(member.getId(), room.getId())
+                .orElseThrow();
 
         // then
         assertThat(memberRoomById).isNotNull();

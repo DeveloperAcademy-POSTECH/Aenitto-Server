@@ -31,22 +31,23 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     @Override
-    public Room findRoomById(Long id) {
-        return em.find(Room.class, id);
+    public Optional<Room> findRoomById(Long id) {
+        return Optional.ofNullable(em.find(Room.class, id));
     }
 
     @Override
-    public Room findByInvitation(String invitation) {
+    public Optional<Room> findByInvitation(String invitation) {
         return em.createQuery(
                         "SELECT r" +
                                 " FROM Room r" +
                                 " WHERE r.invitation = :invitation", Room.class)
                 .setParameter("invitation", invitation)
-                .getSingleResult();
+                .getResultStream()
+                .findFirst();
     }
 
     @Override
-    public MemberRoom findMemberRoomById(UUID memberId, Long roomId) {
+    public Optional<MemberRoom> findMemberRoomById(UUID memberId, Long roomId) {
         return em.createQuery(
                         "SELECT mr" +
                                 " FROM MemberRoom mr" +
@@ -54,7 +55,8 @@ public class RoomRepositoryImpl implements RoomRepository {
                                 " AND mr.room.id = :roomId", MemberRoom.class)
                 .setParameter("memberId", memberId)
                 .setParameter("roomId", roomId)
-                .getSingleResult();
+                .getResultStream()
+                .findFirst();
     }
 
     @Override
