@@ -667,6 +667,7 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v1/rooms/1/state HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -712,6 +713,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms/1/state HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -963,6 +965,7 @@ Content-Length: 601
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/v1/rooms HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Content-Length: 164
 Host: localhost:8080
 
@@ -1066,6 +1069,7 @@ Location: /api/v1/rooms/1</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/v1/rooms/1/participants HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Content-Length: 20
 Host: localhost:8080
 
@@ -1256,6 +1260,7 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1360,6 +1365,7 @@ Content-Length: 402
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/v1/invitations/verification HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer testAccessToken
 Content-Length: 33
 Host: localhost:8080
 
