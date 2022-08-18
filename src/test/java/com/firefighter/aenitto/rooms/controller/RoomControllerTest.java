@@ -45,7 +45,6 @@ import java.util.List;
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
@@ -567,7 +566,21 @@ class RoomControllerTest {
         // then
         perform
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document(
+                        "방 수정하기",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("title").description("수정할 방 제목"),
+                                fieldWithPath("capacity").description("수정할 방 수용인원"),
+                                fieldWithPath("startDate").description("수정할 방 시작일자"),
+                                fieldWithPath("endDate").description("수정할 방 종료일자")
+                        ),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        )
+                ));
         verify(roomService, times(1)).updateRoom(any(Member.class), anyLong(), any(UpdateRoomRequest.class));
     }
 }

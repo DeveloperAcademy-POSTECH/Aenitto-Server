@@ -39,8 +39,14 @@ operation::방 생성[snippets='http-request,request-fields,http-response']
 == 방 참여
 operation::방 참여[snippets='path-parameters,http-request,request-fields,http-response']
 
+== 방 삭제
+operation::방 삭제[snippets='path-parameters,http-request,http-response']
+
+== 방 수정
+operation::방 수정하기[snippets='path-parameters,http-request,request-fields,http-response']
+
 == 참여 중인 방 조회
-operation::참여 중인 방 조회[snippets='request-parameters,http-request,http-response,response-fields']
+operation::참여 중인 방 조회[snippets='http-request,http-response,response-fields']
 
 == 초대코드 검증
 operation::초대코드 검증[snippets='http-request,request-fields,http-response,response-fields']
