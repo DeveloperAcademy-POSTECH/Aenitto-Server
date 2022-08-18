@@ -4,6 +4,7 @@ import com.firefighter.aenitto.members.MemberFixture;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.RoomFixture;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +19,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -362,5 +365,48 @@ class RoomRepositoryImplTest {
         assertThat(roomsPre).hasSize(1);
         assertThat(roomsProcessing.get(0).getMemberRooms()).hasSize(2);
         assertThat(roomsPre.get(0).getMemberRooms()).hasSize(3);
+    }
+
+    @DisplayName("Manitto 멤버 id, room id로 Relation 조회 - 실패")
+    @Test
+    void findRelationByManittoId_fail() {
+        assertThat(roomRepository.findRelationByManittoId(UUID.randomUUID(), 1L).isEmpty()).isTrue();
+    }
+
+    @DisplayName("Manitto 멤버 id, room id로 Relation 조회 - 성공")
+    @Test
+    void findRelationByManittoId_success() {
+        // given
+        Room room1 = RoomFixture.transientRoomFixture(1, 10, 10);
+
+        Member member1 = MemberFixture.transientMemberFixture(1);
+        Member member2 = MemberFixture.transientMemberFixture(2);
+
+        MemberRoom memberRoom1 = RoomFixture.transientMemberRoomFixture(1);
+        MemberRoom memberRoom2 = RoomFixture.transientMemberRoomFixture(2);
+
+        memberRoom1.setMemberRoom(member1, room1);
+        memberRoom2.setMemberRoom(member2, room1);
+
+        em.persist(room1);
+        em.persist(member1);
+        em.persist(member2);
+
+        Relation.createRelations(room1.getMemberRooms(), room1);
+
+        em.flush();
+        em.clear();
+
+        // when
+        Relation relation = roomRepository.findRelationByManittoId(memberRoom1.getMember().getId(), room1.getId())
+                .orElseThrow(NoResultException::new);
+        Relation relation1 = roomRepository.findRelationByManittoId(memberRoom2.getMember().getId(), room1.getId())
+                .orElseThrow(NoResultException::new);
+
+        // then
+        assertThat(relation.getManitto().getId()).isEqualTo(member1.getId());
+        assertThat(relation.getManittee().getId()).isEqualTo(member2.getId());
+        assertThat(relation1.getManitto().getId()).isEqualTo(member2.getId());
+        assertThat(relation1.getManittee().getId()).isEqualTo(member1.getId());
     }
 }

@@ -21,7 +21,7 @@ public interface RoomService {
 
     public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit);
 
-    public RoomDetailResponse getRoomDetail(Member member, Long roomId, RoomState state);
+    public RoomDetailResponse getRoomDetail(Member member, Long roomId);
 
     public void startAenitto(Member member, Long roomId);
 }

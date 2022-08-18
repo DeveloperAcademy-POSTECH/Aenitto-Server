@@ -1,9 +1,14 @@
 package com.firefighter.aenitto.rooms.service;
 
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
+import com.firefighter.aenitto.common.exception.mission.MissionEmptyException;
+import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
+import com.firefighter.aenitto.messages.repository.MessageRepository;
+import com.firefighter.aenitto.missions.domain.IndividualMission;
+import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -22,6 +27,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,9 +39,13 @@ public class RoomServiceImpl implements RoomService {
 
     @Qualifier("roomRepositoryImpl")
     private final RoomRepository roomRepository;
-
     @Qualifier("memberRepositoryImpl")
     private final MemberRepository memberRepository;
+    @Qualifier("missionRepositoryImpl")
+    private final MissionRepository missionRepository;
+    @Qualifier("messageRepositoryImpl")
+    private final MessageRepository messageRepository;
+
 
 
     @Override
@@ -126,17 +136,44 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public RoomDetailResponse getRoomDetail(Member member, Long roomId, RoomState state) {
+    public RoomDetailResponse getRoomDetail(Member member, Long roomId) {
         final MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
         final Room room = memberRoom.getRoom();
 
         switch (room.getState()) {
             case PRE:
-                return RoomDetailResponse.buildPreResponse(room);
-            case PROCESSING:
-                return null;
-            case POST:
-                return null;
+                return RoomDetailResponse.buildPreResponse(room, memberRoom);
+            case PROCESSING: {
+                // 마니띠, 룰렛 봤는지, admin 인지, 미션, 읽지 않은 메시지 수
+                Relation relation = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                        .orElseThrow(RelationNotFoundException::new);
+                IndividualMission individualMission = missionRepository.findIndividualMissionByDate(LocalDate.now(), memberRoom.getId())
+                        .orElseThrow(MissionNotFoundException::new);
+                int unreadMessageCount = messageRepository.findUnreadMessageCount(member.getId(), roomId);
+                boolean didView = memberRoom.didViewManitto();
+                if (!didView) {
+                    memberRoom.setViewManito();
+                }
+                return RoomDetailResponse.buildProcessingResponse(
+                        room,
+                        relation,
+                        memberRoom,
+                        didView,
+                        individualMission.getMission(),
+                        unreadMessageCount
+                );
+            }
+            case POST: {
+                Relation relation = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                        .orElseThrow(RelationNotFoundException::new);
+                int unreadMessageCount = messageRepository.findUnreadMessageCount(member.getId(), roomId);
+                return RoomDetailResponse.buildPostResponse(
+                        room,
+                        relation,
+                        memberRoom,
+                        unreadMessageCount
+                );
+            }
             default:
                 // RoomState 가 올바르지 않음 Exception 던짐.
                 return null;

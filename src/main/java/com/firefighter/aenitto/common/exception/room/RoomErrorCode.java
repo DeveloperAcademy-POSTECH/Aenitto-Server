@@ -19,6 +19,7 @@ public enum RoomErrorCode implements ErrorCode {
 
     INVITATION_NOT_FOUND(NOT_FOUND, "초대코드가 존재하지 않습니다."),
     ROOM_NOT_FOUND(NOT_FOUND, "방이 존재하지 않습니다."),
+    RELATION_NOT_FOUND(NOT_FOUND, "마니또-마니띠 관계가 설정되지 않았습니다."),
 
     ROOM_ALREADY_PARTICIPATING(CONFLICT, "이미 참여 중인 방입니다."),
     ;

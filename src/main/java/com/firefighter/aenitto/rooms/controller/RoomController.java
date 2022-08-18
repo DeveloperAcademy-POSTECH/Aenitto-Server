@@ -7,6 +7,7 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
+import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -60,6 +59,14 @@ public class RoomController {
             @PathVariable final Long roomId
     ) {
         return ResponseEntity.ok(roomService.getRoomState(currentMember, roomId));
+    }
+
+    @GetMapping("/rooms/{roomId}")
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId
+    ) {
+        return ResponseEntity.ok(roomService.getRoomDetail(member, roomId));
     }
 
     // TODO: RoomAPI 메타데이터 Response Header 에 넣기 (22.08.07)

@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.rooms.repository;
 
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -77,5 +79,18 @@ public class RoomRepositoryImpl implements RoomRepository {
                                 " WHERE r.state = :roomState", Room.class)
                 .setParameter("roomState", state)
                 .getResultList();
+    }
+
+    @Override
+    public Optional<Relation> findRelationByManittoId(UUID memberId, Long roomId) {
+        return em.createQuery(
+                        "SELECT r" +
+                                " FROM Relation r" +
+                                " WHERE r.manitto.id = :memberId" +
+                                " AND r.room.id = :roomId", Relation.class)
+                .setParameter("memberId", memberId)
+                .setParameter("roomId", roomId)
+                .getResultStream()
+                .findFirst();
     }
 }

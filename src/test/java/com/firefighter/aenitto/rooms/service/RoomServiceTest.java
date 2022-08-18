@@ -1,11 +1,19 @@
 package com.firefighter.aenitto.rooms.service;
 
 import com.firefighter.aenitto.auth.token.CurrentUserDetails;
+import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepositoryImpl;
+import com.firefighter.aenitto.messages.repository.MessageRepository;
+import com.firefighter.aenitto.missions.IndividualMissionFixture;
+import com.firefighter.aenitto.missions.MissionFixture;
+import com.firefighter.aenitto.missions.domain.IndividualMission;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.missions.repository.MissionRepositoryImpl;
 import com.firefighter.aenitto.rooms.RoomFixture;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
@@ -27,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,25 +44,23 @@ import java.util.UUID;
 import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER_DETAILS;
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
+import static com.firefighter.aenitto.missions.IndividualMissionFixture.*;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTest {
 
-    @InjectMocks
-    private RoomServiceImpl target;
-
-    @Mock
-    private RoomRepositoryImpl roomRepository;
-
-    @Mock
-    private MemberRepositoryImpl memberRepository;
+    @InjectMocks private RoomServiceImpl target;
+    @Mock private RoomRepositoryImpl roomRepository;
+    @Mock private MemberRepositoryImpl memberRepository;
+    @Mock private MissionRepositoryImpl missionRepository;
+    @Mock private MessageRepository messageRepository;
 
     // Fixtures
     private Room room1;
     private Room room2;
-    private Member member;
+    private Member member1;
     private Member member2;
     private Member member3;
     private Member member4;
@@ -66,17 +73,26 @@ public class RoomServiceTest {
     private MemberRoom memberRoom4;
     private MemberRoom memberRoom5;
 
+    Mission mission1;
+    IndividualMission individualMission1;
+
     @BeforeEach
     void setup() {
         room1 = roomFixture1();
         room2 = roomFixture2();
-        member = memberFixture();
-        currentUserDetails = CURRENT_USER_DETAILS;
+
+        member1 = memberFixture();
         member2 = memberFixture2();
         member3 = memberFixture3();
         member4 = memberFixture4();
         member5 = memberFixture5();
-        memberRoom = memberRoomFixture1(member, room1);
+
+        memberRoom = memberRoomFixture1(member1, room1);
+
+        mission1 = MissionFixture.missionFixture2_Individual();
+        individualMission1 = individualMissionFixture1();
+
+        currentUserDetails = CURRENT_USER_DETAILS;
     }
 
     @DisplayName("방 생성 성공")
@@ -121,7 +137,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(InvitationNotFoundException.class)
                 .isThrownBy(() -> {
-                    target.verifyInvitation(member, request);
+                    target.verifyInvitation(member1, request);
                 });
         verify(roomRepository, times(1)).findByInvitation(anyString());
     }
@@ -141,7 +157,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.verifyInvitation(member, verifyInvitationRequest);
+                    target.verifyInvitation(member1, verifyInvitationRequest);
                 });
         verify(roomRepository, times(1)).findByInvitation(anyString());
         verify(roomRepository, times(1)).findMemberRoomById(any(), anyLong());
@@ -153,14 +169,14 @@ public class RoomServiceTest {
         // mock
         when(roomRepository.findByInvitation(anyString()))
                 .thenReturn(room1);
-        when(roomRepository.findMemberRoomById(eq(member.getId()), anyLong()))
+        when(roomRepository.findMemberRoomById(eq(member1.getId()), anyLong()))
                 .thenThrow(EmptyResultDataAccessException.class);
 
         // given
         final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
 
         // when
-        VerifyInvitationResponse response = target.verifyInvitation(member, verifyInvitationRequest);
+        VerifyInvitationResponse response = target.verifyInvitation(member1, verifyInvitationRequest);
 
         // then
         assertThat(response.getCapacity()).isEqualTo(room1.getCapacity());
@@ -183,7 +199,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.participateRoom(member, room1.getId(), request);
+                    target.participateRoom(member1, room1.getId(), request);
                 });
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
     }
@@ -204,7 +220,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(RoomNotFoundException.class)
                 .isThrownBy(() -> {
-                    target.participateRoom(member, room1.getId(), request);
+                    target.participateRoom(member1, room1.getId(), request);
                 });
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
@@ -226,7 +242,7 @@ public class RoomServiceTest {
         // when, then
         assertThatExceptionOfType(RoomCapacityExceededException.class)
                 .isThrownBy(() -> {
-                    target.participateRoom(member, room1.getId(), request);
+                    target.participateRoom(member1, room1.getId(), request);
                 });
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
@@ -247,7 +263,7 @@ public class RoomServiceTest {
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
 
         // when
-        Long roomId = target.participateRoom(member, room1.getId(), request);
+        Long roomId = target.participateRoom(member1, room1.getId(), request);
 
         // then
         assertThat(roomId).isEqualTo(room1.getId());
@@ -297,7 +313,7 @@ public class RoomServiceTest {
                 .thenReturn(roomList);
 
         // when
-        ParticipatingRoomsResponse participatingRooms = target.getParticipatingRooms(member, 1L, 3);
+        ParticipatingRoomsResponse participatingRooms = target.getParticipatingRooms(member1, 1L, 3);
 
         // then
         assertThat(participatingRooms.getParticipatingRooms().size()).isEqualTo(2);
@@ -317,7 +333,7 @@ public class RoomServiceTest {
 
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.getRoomDetail(member, roomId, state);
+                    target.getRoomDetail(member1, roomId);
                 });
     }
 
@@ -327,17 +343,17 @@ public class RoomServiceTest {
         // given
         final Long roomId = 1L;
         final RoomState state = RoomState.PRE;
-        memberRoom2 = memberRoomFixture2(member, room2);
+        memberRoom2 = memberRoomFixture2(member1, room2);
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
                 .thenReturn(memberRoom2);
 
-        RoomDetailResponse roomDetail = target.getRoomDetail(member, roomId, state);
+        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
         RoomDetailResponse.RoomDetail roomDetail1 = roomDetail.getRoom();
 
         // then
-        assertThat(roomDetail.getAdmin()).isNull();
+        assertThat(roomDetail.getAdmin()).isEqualTo(false);
         assertThat(roomDetail.getDidViewRoulette()).isNull();
         assertThat(roomDetail.getManittee()).isNull();
         assertThat(roomDetail.getMessages()).isNull();
@@ -345,6 +361,117 @@ public class RoomServiceTest {
         assertThat(roomDetail1.getState()).isEqualTo("PRE");
         assertThat(roomDetail1.getTitle()).isEqualTo("방제목2");
     }
+
+    @DisplayName("방 상세 정보 조회 (PROCESSING) - 실패 (마니또-마니띠 관계 x)")
+    @Test
+    void getRoomDetail_PROCESSING_fail_no_matching_relation() {
+        // given
+        final Long roomId = 1L;
+        final RoomState state = RoomState.PROCESSING;
+        memberRoom2 = memberRoomFixture2(member1, room1);
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(memberRoom2);
+        when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(RelationNotFoundException.class)
+                .isThrownBy(() -> {
+                    target.getRoomDetail(member1, roomId);
+                });
+    }
+
+    @DisplayName("방 상세 정보 조회 (PROCESSING) - 실패 (개별 미션 x)")
+    @Test
+    void getRoomDetail_PROCESSING_fail_no_individualmission() {
+        final Long roomId = 1L;
+        final RoomState state = RoomState.PROCESSING;
+        memberRoom2 = memberRoomFixture2(member2, room1);
+        Relation.createRelations(room1.getMemberRooms(), room1);
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(memberRoom2);
+        when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(room1.getRelations().get(0)));
+        when(missionRepository.findIndividualMissionByDate(any(LocalDate.class), anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(MissionNotFoundException.class)
+                .isThrownBy(() -> {
+                    target.getRoomDetail(member1, roomId);
+                });
+    }
+
+    @DisplayName("방 상세 정보 조회 (PROCESSING) - 성공")
+    @Test
+    void getRoomDetail_PROCESSING_success() {
+        // given
+        final Long roomId = 1L;
+        final RoomState state = RoomState.PROCESSING;
+        memberRoom2 = memberRoomFixture2(member2, room1);
+        Relation.createRelations(room1.getMemberRooms(), room1);
+        ReflectionTestUtils.setField(individualMission1, "mission", mission1);
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(memberRoom2);
+        when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(room1.getRelations().get(0)));
+        when(missionRepository.findIndividualMissionByDate(any(LocalDate.class), anyLong()))
+                .thenReturn(Optional.of(individualMission1));
+        when(messageRepository.findUnreadMessageCount(any(UUID.class), anyLong()))
+                .thenReturn(3);
+
+        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
+        RoomDetailResponse.RoomDetail room = roomDetail.getRoom();
+        RoomDetailResponse.ManitteeInfo manittee = roomDetail.getManittee();
+        RoomDetailResponse.MessageInfo messages = roomDetail.getMessages();
+        RoomDetailResponse.MissionInfo mission = roomDetail.getMission();
+
+        // then
+        assertThat(room.getTitle()).isEqualTo(room1.getTitle());
+        assertThat(room.getState()).isEqualTo("PROCESSING");
+        assertThat(room.getId()).isEqualTo(room1.getId());
+        assertThat(manittee.getNickname()).isNotNull();
+        assertThat(messages.getCount()).isEqualTo(3);
+        assertThat(mission.getContent()).isEqualTo(individualMission1.getMission().getContent());
+    }
+
+    @DisplayName("방 상세 정보 조회 (POST) - 성공")
+    @Test
+    void getRoomDetail_POST_success() {
+        // given
+        final Long roomId = 1L;
+        final RoomState state = RoomState.POST;
+        memberRoom2 = memberRoomFixture2(member2, room1);
+        Relation.createRelations(room1.getMemberRooms(), room1);
+        room1.setState(state);
+        ReflectionTestUtils.setField(individualMission1, "mission", mission1);
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(memberRoom2);
+        when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(room1.getRelations().get(0)));
+        when(messageRepository.findUnreadMessageCount(any(UUID.class), anyLong()))
+                .thenReturn(3);
+
+        RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
+        RoomDetailResponse.RoomDetail room = roomDetail.getRoom();
+        RoomDetailResponse.ManitteeInfo manittee = roomDetail.getManittee();
+        RoomDetailResponse.MessageInfo messages = roomDetail.getMessages();
+
+        // then
+        assertThat(room.getTitle()).isEqualTo(room1.getTitle());
+        assertThat(room.getState()).isEqualTo("POST");
+        assertThat(room.getId()).isEqualTo(room1.getId());
+        assertThat(manittee.getNickname()).isNotNull();
+        assertThat(messages.getCount()).isEqualTo(3);
+        assertThat(roomDetail.getMission()).isNull();
+    }
+
 
     @DisplayName("게임 시작 - 실패 (참여 중인 방이 아님)")
     @Test
@@ -359,7 +486,7 @@ public class RoomServiceTest {
         // then
         assertThatExceptionOfType(RoomNotParticipatingException.class)
                 .isThrownBy(() -> {
-                    target.startAenitto(member, roomId);
+                    target.startAenitto(member1, roomId);
                 });
 
 
@@ -380,7 +507,7 @@ public class RoomServiceTest {
         // then
         assertThatExceptionOfType(RoomUnAuthorizedException.class)
                 .isThrownBy(() -> {
-                    target.startAenitto(member, roomId);
+                    target.startAenitto(member1, roomId);
                 });
     }
 
@@ -399,7 +526,7 @@ public class RoomServiceTest {
         // then
         assertThatExceptionOfType(RoomAlreadyStartedException.class)
                 .isThrownBy(() -> {
-                    target.startAenitto(member, roomId);
+                    target.startAenitto(member1, roomId);
                 });
     }
 
@@ -419,7 +546,7 @@ public class RoomServiceTest {
         // then
         assertThatExceptionOfType(RoomInsufficientParticipantsException.class)
                 .isThrownBy(() -> {
-                    target.startAenitto(member, roomId);
+                    target.startAenitto(member1, roomId);
                 });
     }
 
@@ -438,7 +565,7 @@ public class RoomServiceTest {
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
                 .thenReturn(memberRoom);
-        target.startAenitto(member, roomId);
+        target.startAenitto(member1, roomId);
 
         // then
         assertThat(room1.getRelations().size()).isEqualTo(5);
