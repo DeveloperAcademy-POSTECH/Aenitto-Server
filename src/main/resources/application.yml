@@ -6,6 +6,9 @@ spring:
     init:
       mode: never
       encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: 2MB
 
   profiles:
     active: develop # 활성화시킬 프로필

@@ -95,7 +95,7 @@ public class MessageServiceImplTest {
         doReturn(Optional.of(relation)).when(relationRepository)
                 .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
-                .recieverId(manittee.getId().toString()).build();
+                .manitteeId(manittee.getId().toString()).build();
         MockMultipartFile notExtensionFile = new MockMultipartFile("1", "1".getBytes());
 
         //when, then
@@ -116,7 +116,7 @@ public class MessageServiceImplTest {
         doReturn(Optional.empty()).when(relationRepository)
                 .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
-                .recieverId(manittee.getId().toString()).build();
+                .manitteeId(manittee.getId().toString()).build();
 
         //when, then
         assertThatExceptionOfType(RoomNotParticipatingException.class)
@@ -136,7 +136,7 @@ public class MessageServiceImplTest {
         doReturn(Optional.of(relation)).when(relationRepository)
                 .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
-                .recieverId(manittee.getId().toString()).build();
+                .manitteeId(manittee.getId().toString()).build();
 
         doThrow(FileUploadException.class).when(storageS3Service).upload(any(), any(), any());
 
@@ -159,7 +159,7 @@ public class MessageServiceImplTest {
         doReturn(Optional.of(relation)).when(relationRepository)
                 .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
-                .recieverId(UUID.randomUUID().toString()).build();
+                .manitteeId(UUID.randomUUID().toString()).build();
 
         //when, then
         assertThatExceptionOfType(NotManitteeException.class)
@@ -171,7 +171,7 @@ public class MessageServiceImplTest {
     }
 
 
-    @DisplayName("메세지 생성 - 성공 / 이미지만 저장")
+    @DisplayName("메세지 생성 - 성공")
     @Test
     void create_message_success() {
         //given
@@ -183,7 +183,7 @@ public class MessageServiceImplTest {
 
         SendMessageRequest request = SendMessageRequest.builder()
                 .messageContent("message")
-                .recieverId(manittee.getId().toString()).build();
+                .manitteeId(manittee.getId().toString()).build();
 
         //when
         Long messageId = target.sendMessage(manitto, roomId, request, image);

@@ -64,6 +64,7 @@ public class MemberControllerTest {
 
         objectMapper = new ObjectMapper();
     }
+
     @DisplayName("닉네임 변경 - 성공")
     @Test
     void set_nickname_success() throws Exception{
@@ -83,7 +84,7 @@ public class MemberControllerTest {
         perform.andDo(print())
                 .andExpect(status().isNoContent())
                 .andDo(document("change-nickname",
-                        preprocessRequest(prettyPrint()),   // (2)
+                        preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("nickname").description("닉네임")
@@ -93,7 +94,7 @@ public class MemberControllerTest {
 
     @DisplayName("닉네임 변경 실패 - 제약조건을 지키지 않은 경우")
     @Test
-    void set_nickname_fail_nickname_not_blank() throws Exception {
+    void set_nickname_fail_nickname_blank() throws Exception {
         //given
         final String uri = "/api/v1/members/nickname";
 
@@ -140,6 +141,4 @@ public class MemberControllerTest {
                         .andExpect(jsonPath("$.timestamp").exists())
                         .andExpect(jsonPath("$.errors").exists());
     }
-
-
 }

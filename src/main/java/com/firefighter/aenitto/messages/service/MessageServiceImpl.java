@@ -1,12 +1,9 @@
 package com.firefighter.aenitto.messages.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.message.FileUploadException;
 import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
 import com.firefighter.aenitto.common.exception.message.NotManitteeException;
-import com.firefighter.aenitto.common.exception.message.RecieverNotFoundException;
-import com.firefighter.aenitto.common.exception.room.RoomNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -50,7 +47,7 @@ public class MessageServiceImpl implements MessageService{
         Relation relation = relationRepository.findByRoomIdAndMemberId(roomId, currentMember.getId())
                 .orElseThrow(RoomNotParticipatingException::new);
 
-        if(!Objects.equals(relation.getManittee().getId(), UUID.fromString(request.getRecieverId()))){
+        if(!Objects.equals(relation.getManittee().getId(), UUID.fromString(request.getManitteeId()))){
             throw new NotManitteeException();
         }
 

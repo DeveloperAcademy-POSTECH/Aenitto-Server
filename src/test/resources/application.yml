@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 128KB
+
   profiles:
     active: test # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
@@ -31,6 +35,10 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
     generate-ddl: true
     show-sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 128KB
 ---
 # POSTGRES LOCAL TEST
 spring:
