@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -56,6 +57,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs
 class RoomControllerTest {
+    public static final String AUTHTOKEN = "Bearer testAccessToken";
     @InjectMocks
     RoomController roomController;
 
@@ -97,6 +99,7 @@ class RoomControllerTest {
         // when
         final ResultActions perform = mockMvc.perform(
                 MockMvcRequestBuilders.post(uri)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .content(objectMapper.writeValueAsString(RoomRequestDtoBuilder.createRoomRequest()))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -113,7 +116,11 @@ class RoomControllerTest {
                                 fieldWithPath("room.startDate").description("시작일").optional(),
                                 fieldWithPath("room.endDate").description("마지막일"),
                                 fieldWithPath("member.colorIdx").description("참여자 색상 index")
-                        ), responseHeaders(
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),
+                        responseHeaders(
                                 headerWithName("Location").description("생성된 방의 위치")
                         )
                 ));
@@ -168,6 +175,7 @@ class RoomControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 MockMvcRequestBuilders.post(url)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .content(objectMapper.writeValueAsString(
                                 VerifyInvitationRequest.builder()
                                         .invitationCode("A1B2C3")
@@ -186,7 +194,11 @@ class RoomControllerTest {
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("invitationCode").description("초대코드")
-                        ), responseFields(
+                        ),
+                        requestHeaders(
+                          headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),
+                        responseFields(
                                 fieldWithPath("id").description("멤버 id"),
                                 fieldWithPath("title").description("방 제목"),
                                 fieldWithPath("capacity").description("수용 가능 인원"),
@@ -230,6 +242,7 @@ class RoomControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.post(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -247,6 +260,9 @@ class RoomControllerTest {
                         ),
                         requestFields(
                         fieldWithPath("colorIdx").description("참여할 캐릭터의 색상 인덱스")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
                         responseHeaders(
                                 headerWithName("Location").description("방 위치")
@@ -290,6 +306,7 @@ class RoomControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.get(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -302,6 +319,9 @@ class RoomControllerTest {
                         preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰 ")
                         ),
                         responseFields(
                                 fieldWithPath("state").description("방 상태")
@@ -327,6 +347,7 @@ class RoomControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 MockMvcRequestBuilders.get(url)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -339,6 +360,9 @@ class RoomControllerTest {
                         requestParameters(
                                 parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
                                 parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
+                        ),
+                        requestHeaders(
+                          headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
                         responseFields(
                         fieldWithPath("participatingRooms").description("참여 중인 방"),
@@ -411,6 +435,7 @@ class RoomControllerTest {
         doNothing().when(roomService).startAenitto(any(Member.class), anyLong());
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.patch(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -424,7 +449,11 @@ class RoomControllerTest {
                         preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
-                        )));
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        )
+                ));
 
         verify(roomService, times(1)).startAenitto(any(Member.class), anyLong());
     }
