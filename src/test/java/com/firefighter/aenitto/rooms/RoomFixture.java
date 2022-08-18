@@ -17,6 +17,18 @@ public class RoomFixture {
         return baseRoomFixture(2, 10, 20, RoomState.PRE);
     }
 
+    public static Room roomFixture3() {
+        return baseRoomFixture(3, 10, 20, RoomState.POST);
+    }
+
+    public static Room roomFixture4() {
+        return baseRoomFixture(4, 10, 20, RoomState.PRE);
+    }
+
+    public static Room roomFixture5() {
+        return baseRoomFixture(5, 10, 20, RoomState.POST);
+    }
+
     public static MemberRoom memberRoomFixture1(Member member, Room room) {
         MemberRoom memberRoom = baseMemberRoomFixture(1);
         memberRoom.setMemberRoom(member, room);

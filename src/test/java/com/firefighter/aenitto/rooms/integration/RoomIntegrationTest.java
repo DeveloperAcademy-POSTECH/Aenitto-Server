@@ -13,10 +13,12 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.support.IntegrationTest;
 import com.firefighter.aenitto.support.security.WithMockCustomMember;
+import org.apache.coyote.Request;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -295,5 +297,28 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.mission.id").doesNotExist())
                 .andExpect(jsonPath("$.mission.content").doesNotExist())
                 .andExpect(jsonPath("$.messages.count").exists());
+    }
+
+    @Sql("classpath:room-getParticipatingRooms.sql")
+    @DisplayName("참여 중인 방 조회 - 성공")
+    @Test
+    void findParticipatingRooms_success() throws Exception {
+        // given
+        final String url = "/api/v1/rooms";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.participatingRooms[0].id", is(4)))
+                .andExpect(jsonPath("$.participatingRooms[1].id", is(3)))
+                .andExpect(jsonPath("$.participatingRooms[2].id", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[3].id", is(5)))
+                .andExpect(jsonPath("$.participatingRooms[4].id", is(2)));
     }
 }

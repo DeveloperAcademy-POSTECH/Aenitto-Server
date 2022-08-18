@@ -36,10 +36,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER_DETAILS;
 import static com.firefighter.aenitto.members.MemberFixture.*;
@@ -58,20 +55,23 @@ public class RoomServiceTest {
     @Mock private MessageRepository messageRepository;
 
     // Fixtures
-    private Room room1;
-    private Room room2;
-    private Member member1;
-    private Member member2;
-    private Member member3;
-    private Member member4;
-    private Member member5;
-    private MemberRoom memberRoom;
+    Room room1;
+    Room room2;
+    Room room3;
+    Room room4;
+    Room room5;
+    Member member1;
+    Member member2;
+    Member member3;
+    Member member4;
+    Member member5;
+    MemberRoom memberRoom;
+    MemberRoom memberRoom2;
+    MemberRoom memberRoom3;
+    MemberRoom memberRoom4;
+    MemberRoom memberRoom5;
 
-    private CurrentUserDetails currentUserDetails;
-    private MemberRoom memberRoom2;
-    private MemberRoom memberRoom3;
-    private MemberRoom memberRoom4;
-    private MemberRoom memberRoom5;
+    CurrentUserDetails currentUserDetails;
 
     Mission mission1;
     IndividualMission individualMission1;
@@ -80,6 +80,9 @@ public class RoomServiceTest {
     void setup() {
         room1 = roomFixture1();
         room2 = roomFixture2();
+        room3 = roomFixture3();
+        room4 = roomFixture4();
+        room5 = roomFixture5();
 
         member1 = memberFixture();
         member2 = memberFixture2();
@@ -574,5 +577,28 @@ public class RoomServiceTest {
         assertThat(room1.getRelations().get(2).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(3).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(4).getManittee()).isNotNull();
+    }
+
+    @DisplayName("참여 중인 방 조회 - 성공")
+    @Test
+    void getParticipatingRooms_success() {
+        memberRoom2 = memberRoomFixture2(member1, room2);
+        memberRoom3 = memberRoomFixture3(member1, room3);
+        memberRoom4 = memberRoomFixture4(member1, room4);
+        memberRoom5 = memberRoomFixture5(member1, room5);
+
+        when(roomRepository.findAllParticipatingRooms(any(UUID.class)))
+                .thenReturn(Arrays.asList(room5, room4, room3, room2, room1));
+
+        ParticipatingRoomsResponse participatingRooms = target.getParticipatingRooms(member1);
+        List<ParticipatingRoomsResponse.ParticipatingRoom> participatingRooms1 = participatingRooms.getParticipatingRooms();
+
+        // then
+        assertThat(participatingRooms1).hasSize(5);
+        assertThat(participatingRooms1.get(0).getId()).isEqualTo(4L);
+        assertThat(participatingRooms1.get(1).getId()).isEqualTo(2L);
+        assertThat(participatingRooms1.get(2).getId()).isEqualTo(1L);
+        assertThat(participatingRooms1.get(3).getId()).isEqualTo(5L);
+        assertThat(participatingRooms1.get(4).getId()).isEqualTo(3L);
     }
 }

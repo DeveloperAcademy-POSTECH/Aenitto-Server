@@ -1,9 +1,13 @@
 package com.firefighter.aenitto.rooms.domain;
 
-public enum RoomState {
-    PRE, PROCESSING, POST
+import lombok.Getter;
+
+@Getter
+public enum RoomState implements Comparable<RoomState> {
+    PRE(1), PROCESSING(1), POST(2)
     ;
 
+    private int priority;
     public String toString() {
         switch (this) {
             case PRE:
@@ -15,5 +19,8 @@ public enum RoomState {
             default:
                 return null;
         }
+    }
+    RoomState(int priority) {
+        this.priority = priority;
     }
 }

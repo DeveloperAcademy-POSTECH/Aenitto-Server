@@ -344,15 +344,15 @@ class RoomControllerTest {
     @DisplayName("참여 중인 방 조회 - 성공")
     @Test
     void participatingRoom_success() throws Exception {
-        final Long cursor = 0L;
-        final int count = 3;
+//        final Long cursor = 0L;
+//        final int count = 3;
 
         List<Room> rooms = new ArrayList<>();
         rooms.add(room1);
         rooms.add(room2);
 
-        final String url = "/api/v1/rooms?cursor=" + cursor + "&count=" + count;
-        when(roomService.getParticipatingRooms(any(Member.class), anyLong(), anyInt()))
+        final String url = "/api/v1/rooms";
+        when(roomService.getParticipatingRooms(any(Member.class)))
                 .thenReturn(RoomResponseDtoBuilder.participatingRoomsResponse(rooms));
 
         // when
@@ -368,10 +368,10 @@ class RoomControllerTest {
                 .andDo(document("참여 중인 방 조회",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        requestParameters(
-                                parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
-                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
-                        ),
+//                        requestParameters(
+//                                parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
+//                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
+//                        ),
                         requestHeaders(
                           headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
@@ -386,7 +386,7 @@ class RoomControllerTest {
                         fieldWithPath("participatingRooms[0].endDate").description("종료일")
                 )));
 
-        verify(roomService, times(1)).getParticipatingRooms(any(Member.class), anyLong(), anyInt());
+        verify(roomService, times(1)).getParticipatingRooms(any(Member.class));
     }
 
     @DisplayName("게임 시작 - 실패 (참여 중인 방이 아님) ")
