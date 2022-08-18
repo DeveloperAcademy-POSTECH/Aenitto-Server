@@ -16,6 +16,7 @@ import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
@@ -209,6 +210,15 @@ public class RoomServiceImpl implements RoomService {
         throwExceptionIfNotAdmin(memberRoom);
 
         memberRoom.getRoom().delete();
+    }
+
+    @Override
+    @Transactional
+    public void updateRoom(Member member, Long roomId, UpdateRoomRequest request) {
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        throwExceptionIfNotAdmin(memberRoom);
+
+        memberRoom.getRoom().updateRoom(request);
     }
 
 

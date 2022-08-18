@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.domain;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.common.utils.DateConverter;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -81,6 +82,22 @@ public class Room extends CreationModificationLog {
     }
     public boolean unAcceptable() {
         return (capacity <= memberRooms.size());
+    }
+
+    public Room updateRoom(UpdateRoomRequest request) {
+        if (request.getTitle() != null) {
+            this.title = request.getTitle();
+        }
+        if (request.getCapacity() != null) {
+            this.capacity = request.getCapacity();
+        }
+        if (request.getStartDate() != null) {
+            this.startDate = DateConverter.stringToLocalDate(request.getStartDate());
+        }
+        if (request.getEndDate() != null) {
+            this.endDate = DateConverter.stringToLocalDate(request.getEndDate());
+        }
+        return this;
     }
 
     private String randomSixNumUpperString() {
