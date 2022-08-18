@@ -40,7 +40,8 @@ public class RoomRepositoryImpl implements RoomRepository {
         return em.createQuery(
                         "SELECT r" +
                                 " FROM Room r" +
-                                " WHERE r.invitation = :invitation", Room.class)
+                                " WHERE r.invitation = :invitation" +
+                                " AND r.deleted = FALSE", Room.class)
                 .setParameter("invitation", invitation)
                 .getResultStream()
                 .findFirst();
@@ -52,7 +53,8 @@ public class RoomRepositoryImpl implements RoomRepository {
                         "SELECT mr" +
                                 " FROM MemberRoom mr" +
                                 " WHERE mr.member.id = :memberId" +
-                                " AND mr.room.id = :roomId", MemberRoom.class)
+                                " AND mr.room.id = :roomId" +
+                                " AND mr.room.deleted = FALSE", MemberRoom.class)
                 .setParameter("memberId", memberId)
                 .setParameter("roomId", roomId)
                 .getResultStream()
@@ -78,6 +80,7 @@ public class RoomRepositoryImpl implements RoomRepository {
                         "SELECT mr.room" +
                                 " FROM MemberRoom mr" +
                                 " WHERE mr.member.id = :memberId" +
+                                " AND mr.room.deleted = FALSE" +
                                 " ORDER BY mr.room.id DESC", Room.class)
                 .setParameter("memberId", memberId)
                 .getResultList();
@@ -88,7 +91,8 @@ public class RoomRepositoryImpl implements RoomRepository {
                         "SELECT DISTINCT r" +
                                 " FROM Room r" +
                                 " JOIN FETCH r.memberRooms" +
-                                " WHERE r.state = :roomState", Room.class)
+                                " WHERE r.state = :roomState" +
+                                " AND r.deleted = FALSE", Room.class)
                 .setParameter("roomState", state)
                 .getResultList();
     }
@@ -99,7 +103,8 @@ public class RoomRepositoryImpl implements RoomRepository {
                         "SELECT r" +
                                 " FROM Relation r" +
                                 " WHERE r.manitto.id = :memberId" +
-                                " AND r.room.id = :roomId", Relation.class)
+                                " AND r.room.id = :roomId" +
+                                " AND r.room.deleted = FALSE", Relation.class)
                 .setParameter("memberId", memberId)
                 .setParameter("roomId", roomId)
                 .getResultStream()

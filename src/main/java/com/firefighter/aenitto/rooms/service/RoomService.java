@@ -26,4 +26,7 @@ public interface RoomService {
     public RoomDetailResponse getRoomDetail(Member member, Long roomId);
 
     public void startAenitto(Member member, Long roomId);
+
+    public void deleteRoom(Member member, Long roomId);
+
 }

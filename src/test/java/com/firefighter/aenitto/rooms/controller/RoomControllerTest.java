@@ -520,4 +520,33 @@ class RoomControllerTest {
                         )
                 ));
     }
+
+    @DisplayName("방 삭제 - 성공")
+    @Test
+    void deleteRoomTest() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        doNothing().when(roomService).deleteRoom(any(Member.class), anyLong());
+
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document(
+                        "방 삭제",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        )
+                ));
+    }
 }

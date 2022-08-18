@@ -602,4 +602,47 @@ public class RoomServiceTest {
         assertThat(participatingRooms1.get(3).getId()).isEqualTo(5L);
         assertThat(participatingRooms1.get(4).getId()).isEqualTo(3L);
     }
+
+    @DisplayName("방 삭제 - 실패 (참여 중 x)")
+    @Test
+    void deleteRoom_fail_not_participating() {
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.empty());
+
+        // then
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.deleteRoom(member1, room1.getId());
+                });
+    }
+
+    @DisplayName("방 삭제 - 실패 (방장 x)")
+    @Test
+    void deleteRoom_fail_unauthorized() {
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom));
+
+        // then
+        assertThatExceptionOfType(RoomUnAuthorizedException.class)
+                .isThrownBy(() -> {
+                    target.deleteRoom(member1, room1.getId());
+                });
+    }
+
+    @DisplayName("방 삭제 - 성공")
+    @Test
+    void deleteRoom_success() {
+        // given
+        ReflectionTestUtils.setField(memberRoom, "admin", true);
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom));
+        target.deleteRoom(member1, room1.getId());
+
+        // then
+        assertThat(room1.isDeleted()).isTrue();
+    }
 }

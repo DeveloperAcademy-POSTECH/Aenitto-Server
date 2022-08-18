@@ -202,6 +202,16 @@ public class RoomServiceImpl implements RoomService {
         room.setState(RoomState.PROCESSING);
     }
 
+    @Override
+    @Transactional
+    public void deleteRoom(Member member, Long roomId) {
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        throwExceptionIfNotAdmin(memberRoom);
+
+        memberRoom.getRoom().delete();
+    }
+
+
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
         roomRepository.findMemberRoomById(memberId, roomId)
                 .ifPresent(memberRoom -> {

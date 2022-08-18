@@ -60,6 +60,10 @@ public class Room extends CreationModificationLog {
         this.state = state;
     }
 
+    public void delete() {
+        this.deleted = true;
+    }
+
     public String getStartDateValue() {
         return DateConverter.localDateToString(this.startDate);
     }

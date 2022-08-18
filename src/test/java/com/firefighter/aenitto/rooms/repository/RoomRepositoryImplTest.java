@@ -325,6 +325,49 @@ class RoomRepositoryImplTest {
         assertThat(res.get(1).getTitle()).isEqualTo("방 제목1");
     }
 
+    @DisplayName("참여 중인 방 조회 (삭제된 애들 제외) - 성공")
+    @Test
+    void findParticipatinRoom_success() {
+        // given
+        Member member1 = MemberFixture.transientMemberFixture(1);
+        Room room1 = RoomFixture.transientRoomFixture(1, 10, 10);
+        Room room2 = RoomFixture.transientRoomFixture(2, 10, 10);
+        Room room3 = RoomFixture.transientRoomFixture(3, 10, 10);
+        Room room4 = RoomFixture.transientRoomFixture(4, 10, 10);
+        Room room5 = RoomFixture.transientRoomFixture(5, 10, 10);
+
+        MemberRoom memberRoom1 = RoomFixture.transientMemberRoomFixture(1);
+        MemberRoom memberRoom2 = RoomFixture.transientMemberRoomFixture(2);
+        MemberRoom memberRoom3 = RoomFixture.transientMemberRoomFixture(3);
+        MemberRoom memberRoom4 = RoomFixture.transientMemberRoomFixture(4);
+        MemberRoom memberRoom5 = RoomFixture.transientMemberRoomFixture(5);
+
+        memberRoom1.setMemberRoom(member1, room1);
+        memberRoom2.setMemberRoom(member1, room2);
+        memberRoom3.setMemberRoom(member1, room3);
+        memberRoom4.setMemberRoom(member1, room4);
+        memberRoom5.setMemberRoom(member1, room5);
+
+        room1.delete();
+        room3.delete();
+
+        em.persist(member1);
+        em.persist(room1);
+        em.persist(room2);
+        em.persist(room3);
+        em.persist(room4);
+        em.persist(room5);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Room> allParticipatingRooms = roomRepository.findAllParticipatingRooms(member1.getId());
+
+        // then
+        assertThat(allParticipatingRooms).hasSize(3);
+    }
+
     @DisplayName("진행 상황 기준으로 방 가져오기 - 성공")
     @Test
     void findRoomsByState_success() {
