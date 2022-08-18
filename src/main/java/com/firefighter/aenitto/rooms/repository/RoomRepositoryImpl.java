@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.repository;
 
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.domain.RoomState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -64,6 +65,17 @@ public class RoomRepositoryImpl implements RoomRepository {
                                 " ORDER BY mr.room.id DESC", Room.class)
                 .setParameter("memberId", memberId)
                 .setMaxResults(limit)
+                .getResultList();
+    }
+
+    @Override
+    public List<Room> findRoomsByState(RoomState state) {
+        return em.createQuery(
+                        "SELECT DISTINCT r" +
+                                " FROM Room r" +
+                                " JOIN FETCH r.memberRooms" +
+                                " WHERE r.state = :roomState", Room.class)
+                .setParameter("roomState", state)
                 .getResultList();
     }
 }

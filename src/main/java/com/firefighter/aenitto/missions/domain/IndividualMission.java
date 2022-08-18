@@ -39,5 +39,22 @@ public class IndividualMission {
     public IndividualMission(LocalDate date) {
         this.date = date;
     }
+
+    private IndividualMission(LocalDate date, Mission mission) {
+        this.date = date;
+        this.mission = mission;
+    }
+
+    public boolean didSet(LocalDate date) {
+        return (this.date.isEqual(date));
+    }
+
+    public void setMemberRoom(MemberRoom memberRoom) {
+        this.memberRoom = memberRoom;
+    }
+
+    public static IndividualMission of(Mission mission, LocalDate date) {
+        return new IndividualMission(date, mission);
+    }
 }
 
