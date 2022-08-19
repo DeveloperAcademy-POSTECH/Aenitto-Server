@@ -24,9 +24,9 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository{
 
     @Override
     public Optional<RefreshToken> findByMemberId(UUID memberId) {
-        return Optional.ofNullable(em.createQuery("SELECT r FROM RefreshToken r WHERE r.memberId = :memberId", RefreshToken.class)
+        return em.createQuery("SELECT r FROM RefreshToken r WHERE r.memberId = :memberId", RefreshToken.class)
                 .setParameter("memberId" , memberId)
-                .getSingleResult());
+                .getResultList().stream().findFirst();
     }
 
     @Override

@@ -6,10 +6,7 @@ import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
-import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
-import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
+import com.firefighter.aenitto.rooms.dto.response.*;
 
 public interface RoomService {
     public Long createRoom(Member member, CreateRoomRequest createRoomRequest);
@@ -27,6 +24,9 @@ public interface RoomService {
     public RoomDetailResponse getRoomDetail(Member member, Long roomId);
 
     public void startAenitto(Member member, Long roomId);
+
+
+    public RoomParticipantsResponse getRoomParticipants(Member currentMember, Long roomId);
 
     public void deleteRoom(Member member, Long roomId);
 
