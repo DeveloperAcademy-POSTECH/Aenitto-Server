@@ -15,6 +15,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.dto.request.ChangeNicknameRequest;
 import com.firefighter.aenitto.members.service.MemberService;
 import com.firefighter.aenitto.message.MessageFixture;
+import com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile;
 import com.firefighter.aenitto.messages.controller.MessageController;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.service.MessageService;
@@ -42,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
 import static com.firefighter.aenitto.message.MessageFixture.messageFixture1;
+import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
@@ -176,10 +178,11 @@ public class MessageControllerTest {
 
     }
 
+//    TODO: 이미지 용량 체크
 //    @DisplayName("메세지 생성 - 실패 / 이미지 파일 용량 초과")
 //    @Test
 //    void send_message_fail_image_size() throws Exception {
-//        //given
+//        //givente
 //        final String uri = "/api/v1/rooms/{roomId}/messages";
 //
 //        byte[] bytes = new byte[1024 * 1024 * 10];
@@ -222,13 +225,5 @@ public class MessageControllerTest {
                 .andExpect(jsonPath("$.message", "입력 조건에 대한 예외입니다").exists())
                 .andExpect(jsonPath("$.errors[0].field", "manitteeId").exists());
 
-    }
-
-    public MockMultipartFile requestMultipartFile() throws JsonProcessingException {
-        SendMessageRequest request = SendMessageRequest.builder()
-                .manitteeId("f383cdb3-a871-4410-b146-fb1f7b447b9e").messageContent("adslfajf").build();
-        String requestJson = objectMapper.writeValueAsString(request);
-        MockMultipartFile requestMultipartfile = new MockMultipartFile("sendMessageRequest", "sendMessageRequest", "application/json", requestJson.getBytes());
-        return requestMultipartfile;
     }
 }
