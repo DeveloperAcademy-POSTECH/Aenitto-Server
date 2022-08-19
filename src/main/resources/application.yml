@@ -19,24 +19,24 @@ spring:
 
 ---
 ## Test Profile
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    driver-class-name: org.h2.Driver
-    url:  jdbc:h2:tcp://localhost/~/test
-    username: sa
+# spring:
+#   config:
+#     activate:
+#       on-profile: test
+#   datasource:
+#     driver-class-name: org.h2.Driver
+#     url:  jdbc:h2:tcp://localhost/~/test
+#     username: sa
 
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
-    generate-ddl: true
-    show-sql: true
+#   jpa:
+#     hibernate:
+#       ddl-auto: create
+#     properties:
+#       hibernate:
+#         format_sql: true
+#         dialect: org.hibernate.dialect.H2Dialect
+#     generate-ddl: true
+#     show-sql: true
 
 ---
 ## Develop Profile
