@@ -22,6 +22,8 @@ public class CustomDateValidator implements ConstraintValidator<CustomDate, Stri
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null) { return true; }
+
         HibernateConstraintValidatorContext hibernateContext = context.unwrap(HibernateConstraintValidatorContext.class);
         hibernateContext.disableDefaultConstraintViolation();
 
