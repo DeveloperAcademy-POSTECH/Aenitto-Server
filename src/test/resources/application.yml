@@ -6,7 +6,7 @@ spring:
   profiles:
     active: test # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      test: test, awss3
+      test: testdb, awss3
 
   sql:
     init:
@@ -20,7 +20,7 @@ spring:
 spring:
   config:
     activate:
-      on-profile: test
+      on-profile: testdb
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;MODE=LEGACY
@@ -36,9 +36,6 @@ spring:
     generate-ddl: true
     show-sql: true
 
-  servlet:
-    multipart:
-      max-file-size: 128KB
 ---
 # POSTGRES LOCAL TEST
 spring:
