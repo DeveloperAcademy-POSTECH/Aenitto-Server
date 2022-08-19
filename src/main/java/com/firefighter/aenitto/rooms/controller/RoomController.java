@@ -7,6 +7,7 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
+import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
 import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
@@ -85,6 +86,16 @@ public class RoomController {
     ) {
         roomService.startAenitto(member, roomId);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/rooms/{roomId}/participants")
+    public ResponseEntity<RoomParticipantsResponse> getRoomParticipants(
+            @CurrentMember Member currentMember,
+            @PathVariable Long roomId
+    ) {
+        RoomParticipantsResponse roomParticipantsResponse = roomService.getRoomParticipants(currentMember, roomId);
+        return ResponseEntity.ok(roomParticipantsResponse);
     }
 
     @DeleteMapping("/rooms/{roomId}")

@@ -20,10 +20,7 @@ import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
-import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
-import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
+import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,16 +58,19 @@ public class RoomServiceTest {
     Room room3;
     Room room4;
     Room room5;
+    Member member;
     Member member1;
     Member member2;
     Member member3;
     Member member4;
     Member member5;
     MemberRoom memberRoom;
+    MemberRoom memberRoom1;
     MemberRoom memberRoom2;
     MemberRoom memberRoom3;
     MemberRoom memberRoom4;
     MemberRoom memberRoom5;
+
 
     CurrentUserDetails currentUserDetails;
 
@@ -81,6 +81,11 @@ public class RoomServiceTest {
     void setup() {
         room1 = roomFixture1();
         room2 = roomFixture2();
+
+        room3 = roomFixture2();
+        member = memberFixture();
+        currentUserDetails = CURRENT_USER_DETAILS;
+
         room3 = roomFixture3();
         room4 = roomFixture4();
         room5 = roomFixture5();
@@ -91,12 +96,19 @@ public class RoomServiceTest {
         member4 = memberFixture4();
         member5 = memberFixture5();
 
+        memberRoom = memberRoomFixture1(member, room1);
+        memberRoom1 = memberRoomFixture1(member, room3);
+        memberRoom2 = memberRoomFixture2(member2, room3);
+        memberRoom3 = memberRoomFixture3(member3, room3);
+
+
         memberRoom = memberRoomFixture1(member1, room1);
 
         mission1 = MissionFixture.missionFixture2_Individual();
         individualMission1 = individualMissionFixture1();
 
         currentUserDetails = CURRENT_USER_DETAILS;
+
     }
 
     @DisplayName("방 생성 성공")
@@ -572,12 +584,49 @@ public class RoomServiceTest {
         target.startAenitto(member1, roomId);
 
         // then
-        assertThat(room1.getRelations().size()).isEqualTo(5);
+        assertThat(room1.getRelations().size()).isEqualTo(6);
         assertThat(room1.getRelations().get(0).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(1).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(2).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(3).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(4).getManittee()).isNotNull();
+    }
+
+
+    @DisplayName("방 멤버 조회 - 실패(참여하지 않은 방)")
+    @Test
+    void find_roomParticipants_fail_not_participating() {
+        //given
+        final Long roomId = 1L;
+
+        //when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenThrow(RoomNotParticipatingException.class);
+
+        //then
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(()-> {
+                    target.getRoomParticipants(member, roomId);
+                });
+    }
+
+    @DisplayName("방 멤버 조회 - 성공")
+    @Test
+    void find_roomParticipants_success() {
+        //given
+        final Long roomId = 1L;
+        List<MemberRoom> memberRooms;
+
+        //when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.ofNullable(memberRoom1));
+        RoomParticipantsResponse roomParticipantsResponse = target.getRoomParticipants(member, room1.getId());
+
+        //then
+        assertThat(roomParticipantsResponse.getCount()).isEqualTo(3);
+        assertThat(roomParticipantsResponse.getMembers().get(0).getNickname()).isNotNull();
+        assertThat(roomParticipantsResponse.getMembers().get(1).getNickname()).isNotNull();
+        assertThat(roomParticipantsResponse.getMembers().get(2).getNickname()).isNotNull();
     }
 
     @DisplayName("참여 중인 방 조회 - 성공")
