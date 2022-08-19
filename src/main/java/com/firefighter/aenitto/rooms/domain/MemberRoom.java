@@ -4,6 +4,7 @@ import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.common.exception.room.RoomAlreadyParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
+import com.firefighter.aenitto.missions.domain.Mission;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class MemberRoom extends CreationModificationLog {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToMany(mappedBy = "memberRoom")
+    @OneToMany(mappedBy = "memberRoom", cascade = CascadeType.ALL)
     private List<IndividualMission> individualMissions = new ArrayList<>();
 
     private boolean admin;
@@ -60,6 +62,19 @@ public class MemberRoom extends CreationModificationLog {
 
     public void setViewManito() {
         viewManitto = true;
+    }
+
+    public Boolean didSetDailyIndividualMission(LocalDate date) {
+        if (this.getIndividualMissions().size() == 0) {
+            return false;
+        }
+        return this.getIndividualMissions().get(this.getIndividualMissions().size() - 1).didSet(date);
+    }
+
+    public void addIndividualMission(Mission mission, LocalDate date) {
+        IndividualMission individualMission = IndividualMission.of(mission, date);
+        individualMissions.add(individualMission);
+        individualMission.setMemberRoom(this);
     }
 
     public void setMemberRoom(Member member, Room room) {

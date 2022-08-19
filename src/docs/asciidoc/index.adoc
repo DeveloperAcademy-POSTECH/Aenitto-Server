@@ -14,6 +14,7 @@
 
 operation::change-nickname[snippets='http-request,http-response,request-fields']
 
+<<<<<<< HEAD
 [[Main-API]]
 == Main API
 
@@ -26,6 +27,16 @@ operation::함께하는 친구들 리스트[snippets='http-request,http-response
 === 방 상태 조회
 
 operation::방 상태 조회[snippets='path-parameters,http-request,http-response,response-fields']
+=======
+== 마니또 시작하기
+operation::마니또 시작하기[snippets='path-parameters,request-headers,http-request,http-response']
+
+== 방 상태 조회
+operation::방 상태 조회[snippets='path-parameters,request-headers,http-request,http-response,response-fields']
+
+== 방 정보 조회
+operation::방 정보 조회[snippets='path-parameters,http-request,http-response,response-fields']
+>>>>>>> develop
 
 == 마니또 시작하기
 
@@ -33,6 +44,7 @@ operation::마니또 시작하기[snippets='path-parameters,http-request,http-re
 
 
 == 방 생성
+<<<<<<< HEAD
 
 operation::방 생성[snippets='http-request,request-fields,http-response']
 
@@ -47,3 +59,15 @@ operation::참여 중인 방 조회[snippets='request-parameters,http-request,ht
 == 초대코드 검증
 
 operation::초대코드 검증[snippets='http-request,request-fields,http-response,response-fields']
+=======
+operation::방 생성[snippets='request-headers,http-request,request-fields,http-response']
+
+== 방 참여
+operation::방 참여[snippets='path-parameters,request-headers,http-request,request-fields,http-response']
+
+== 참여 중인 방 조회
+operation::참여 중인 방 조회[snippets='request-parameters,request-headers,http-request,http-response,response-fields']
+
+== 초대코드 검증
+operation::초대코드 검증[snippets='request-headers,http-request,request-fields,http-response,response-fields']
+>>>>>>> develop

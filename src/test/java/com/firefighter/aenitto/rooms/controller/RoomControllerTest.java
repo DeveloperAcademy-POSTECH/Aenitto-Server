@@ -7,7 +7,10 @@ import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
 import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.missions.MissionFixture;
+import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
@@ -43,7 +46,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
 import static com.firefighter.aenitto.members.MemberFixture.*;
+=======
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
+>>>>>>> develop
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
@@ -61,6 +69,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs
 class RoomControllerTest {
+    public static final String AUTHTOKEN = "Bearer testAccessToken";
     @InjectMocks
     RoomController roomController;
 
@@ -72,6 +81,7 @@ class RoomControllerTest {
     private ObjectMapper objectMapper;
 
     // Fixture
+<<<<<<< HEAD
     private Member member;
     private Member member2;
     private Member member3;
@@ -84,6 +94,15 @@ class RoomControllerTest {
     private MemberRoom memberRoom2;
     private MemberRoom memberRoom3;
 
+=======
+    Member member;
+    Member member2;
+    Room room1;
+    Room room2;
+    MemberRoom memberRoom;
+    MemberRoom memberRoom2;
+    Mission mission1;
+>>>>>>> develop
 
     @BeforeEach
     void init(RestDocumentationContextProvider restDocumentation) {
@@ -97,11 +116,18 @@ class RoomControllerTest {
         room3 = roomFixture2();
         member = memberFixture();
         member2 = memberFixture2();
+<<<<<<< HEAD
         member3 = memberFixture3();
         memberRoom = memberRoomFixture1(member, room1);
         memberRoom1 = memberRoomFixture1(member, room3);
         memberRoom2 = memberRoomFixture2(member2, room3);
         memberRoom3 = memberRoomFixture3(member3, room3);
+=======
+        memberRoom = memberRoomFixture1(member, room1);
+        memberRoom2 = memberRoomFixture2(member2, room1);
+
+        mission1 = MissionFixture.missionFixture2_Individual();
+>>>>>>> develop
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -116,6 +142,7 @@ class RoomControllerTest {
         // when
         final ResultActions perform = mockMvc.perform(
                 MockMvcRequestBuilders.post(uri)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .content(objectMapper.writeValueAsString(RoomRequestDtoBuilder.createRoomRequest()))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -132,7 +159,11 @@ class RoomControllerTest {
                                 fieldWithPath("room.startDate").description("시작일").optional(),
                                 fieldWithPath("room.endDate").description("마지막일"),
                                 fieldWithPath("member.colorIdx").description("참여자 색상 index")
-                        ), responseHeaders(
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),
+                        responseHeaders(
                                 headerWithName("Location").description("생성된 방의 위치")
                         )
                 ));
@@ -187,6 +218,7 @@ class RoomControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 MockMvcRequestBuilders.post(url)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .content(objectMapper.writeValueAsString(
                                 VerifyInvitationRequest.builder()
                                         .invitationCode("A1B2C3")
@@ -199,13 +231,17 @@ class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
-                .andExpect(jsonPath("$.participatingCount", is(1)))
+                .andExpect(jsonPath("$.participatingCount", is(2)))
                 .andDo(document("초대코드 검증",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("invitationCode").description("초대코드")
-                        ), responseFields(
+                        ),
+                        requestHeaders(
+                          headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),
+                        responseFields(
                                 fieldWithPath("id").description("멤버 id"),
                                 fieldWithPath("title").description("방 제목"),
                                 fieldWithPath("capacity").description("수용 가능 인원"),
@@ -249,6 +285,7 @@ class RoomControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.post(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -266,6 +303,9 @@ class RoomControllerTest {
                         ),
                         requestFields(
                         fieldWithPath("colorIdx").description("참여할 캐릭터의 색상 인덱스")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
                         responseHeaders(
                                 headerWithName("Location").description("방 위치")
@@ -309,6 +349,7 @@ class RoomControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.get(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -322,6 +363,9 @@ class RoomControllerTest {
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
                         ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰 ")
+                        ),
                         responseFields(
                                 fieldWithPath("state").description("방 상태")
                         )
@@ -332,20 +376,21 @@ class RoomControllerTest {
     @DisplayName("참여 중인 방 조회 - 성공")
     @Test
     void participatingRoom_success() throws Exception {
-        final Long cursor = 0L;
-        final int count = 3;
+//        final Long cursor = 0L;
+//        final int count = 3;
 
         List<Room> rooms = new ArrayList<>();
         rooms.add(room1);
         rooms.add(room2);
 
-        final String url = "/api/v1/rooms?cursor=" + cursor + "&count=" + count;
-        when(roomService.getParticipatingRooms(any(Member.class), anyLong(), anyInt()))
+        final String url = "/api/v1/rooms";
+        when(roomService.getParticipatingRooms(any(Member.class)))
                 .thenReturn(RoomResponseDtoBuilder.participatingRoomsResponse(rooms));
 
         // when
         ResultActions perform = mockMvc.perform(
                 MockMvcRequestBuilders.get(url)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -355,9 +400,12 @@ class RoomControllerTest {
                 .andDo(document("참여 중인 방 조회",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        requestParameters(
-                                parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
-                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
+//                        requestParameters(
+//                                parameterWithName("cursor").description("현재 페이지의 가장 방의 id. 첫 번째 페이지를 불러오고 싶다면 cursor 를 기입하지 않는다."),
+//                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
+//                        ),
+                        requestHeaders(
+                          headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
                         responseFields(
                         fieldWithPath("participatingRooms").description("참여 중인 방"),
@@ -370,7 +418,7 @@ class RoomControllerTest {
                         fieldWithPath("participatingRooms[0].endDate").description("종료일")
                 )));
 
-        verify(roomService, times(1)).getParticipatingRooms(any(Member.class), anyLong(), anyInt());
+        verify(roomService, times(1)).getParticipatingRooms(any(Member.class));
     }
 
     @DisplayName("게임 시작 - 실패 (참여 중인 방이 아님) ")
@@ -430,6 +478,7 @@ class RoomControllerTest {
         doNothing().when(roomService).startAenitto(any(Member.class), anyLong());
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.patch(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -443,11 +492,16 @@ class RoomControllerTest {
                         preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
-                        )));
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        )
+                ));
 
         verify(roomService, times(1)).startAenitto(any(Member.class), anyLong());
     }
 
+<<<<<<< HEAD
     @DisplayName("방에 참여중인 멤버 조회하기 - 실패 (참여중인 방이 아님)")
     @Test
     void find_room_participants_fail_not_participating() throws Exception{
@@ -501,10 +555,37 @@ class RoomControllerTest {
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
                         ),
+=======
+    @DisplayName("방 정보 조회 - 성공")
+    @Test
+    void roomDetail_PRE() throws Exception {
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+        Relation.createRelations(room1.getMemberRooms(), room1);
+
+        // when
+        when(roomService.getRoomDetail(any(Member.class), anyLong()))
+                .thenReturn(RoomResponseDtoBuilder.roomDetailResponse(room1, room1.getRelations().get(0), mission1));
+
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document(
+                        "방 정보 조회",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+>>>>>>> develop
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
                         ),
                         responseFields(
+<<<<<<< HEAD
                                 fieldWithPath("count").description("방에 함께 있는 친구 수"),
                                 fieldWithPath("members[].nickname").description("친구 닉네임"),
                                 fieldWithPath("members[].colorIdx").description("참여자 색상 index")
@@ -513,4 +594,58 @@ class RoomControllerTest {
 
     }
 
+=======
+                                fieldWithPath("room").description("방 정보"),
+                                fieldWithPath("room.id").description("방 id"),
+                                fieldWithPath("room.title").description("방 제목"),
+                                fieldWithPath("room.startDate").description("시작 일자"),
+                                fieldWithPath("room.endDate").description("종료 일자"),
+                                fieldWithPath("room.state").description("방 상태"),
+                                fieldWithPath("participants").description("방 참여자 정보"),
+                                fieldWithPath("participants.count").description("참여자 수"),
+                                fieldWithPath("participants.members").description("방 참여자들"),
+                                fieldWithPath("participants.members[0].id").description("참여자 id"),
+                                fieldWithPath("participants.members[0].nickname").description("참여자 닉네임"),
+                                fieldWithPath("manittee").description("마니띠 정보"),
+                                fieldWithPath("manittee.nickname").description("마니띠 닉네임"),
+                                fieldWithPath("mission").description("개별 미션 정보"),
+                                fieldWithPath("mission.id").description("미션 id"),
+                                fieldWithPath("mission.content").description("미션 내용"),
+                                fieldWithPath("didViewRoulette").description("룰렛 돌리는 화면 시청 여부"),
+                                fieldWithPath("admin").description("방장 여부"),
+                                fieldWithPath("messages").description("읽지 않은 메시지 정보"),
+                                fieldWithPath("messages.count").description("읽지 않은 메시지 개수")
+                        )
+                ));
+    }
+
+    @DisplayName("방 삭제 - 성공")
+    @Test
+    void deleteRoomTest() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        doNothing().when(roomService).deleteRoom(any(Member.class), anyLong());
+
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document(
+                        "방 삭제",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        )
+                ));
+    }
+>>>>>>> develop
 }
