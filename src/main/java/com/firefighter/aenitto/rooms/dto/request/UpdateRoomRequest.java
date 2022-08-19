@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.dto.request;
 
+import com.firefighter.aenitto.common.annotation.validation.CustomDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,10 @@ public class UpdateRoomRequest {
 
     @Min(5) @Max(15)
     private final Integer capacity;
+
+    @CustomDate
     private final String startDate;
+
+    @CustomDate
     private final String endDate;
 }

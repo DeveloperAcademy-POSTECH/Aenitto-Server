@@ -151,6 +151,31 @@ class RoomControllerTest {
                 ));
     }
 
+    @DisplayName("방 생성 - 실패 (invalid CustomDate)")
+    @Test
+    void createRoom_fail_invalid_customDate() throws Exception {
+        // given
+        final String url = "/api/v1/rooms";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(objectMapper.writeValueAsString(
+                                CreateRoomRequest.builder()
+                                        .title("1234567")
+                                        .capacity(13)
+                                        .startDate("1999.10.01")
+                                        .endDate("2022.2.31")
+                                        .colorIdx(1)
+                                        .build()
+                        )).contentType(MediaType.APPLICATION_JSON)
+        );
+
+        perform
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
     @DisplayName("방 생성 -> 실패")
     @Test
     void createRoomFail() throws Exception {
