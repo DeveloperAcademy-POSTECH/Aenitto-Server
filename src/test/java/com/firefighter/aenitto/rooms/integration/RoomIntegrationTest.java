@@ -1,37 +1,32 @@
 package com.firefighter.aenitto.rooms.integration;
 
 
-import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
+import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
+import com.firefighter.aenitto.common.utils.SqlPath;
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
-import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.support.IntegrationTest;
 import com.firefighter.aenitto.support.security.WithMockCustomMember;
+import org.apache.coyote.Request;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WithMockCustomMember
-@ActiveProfiles("testdb")
 public class RoomIntegrationTest extends IntegrationTest {
     private Room room;
 
@@ -109,5 +104,268 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.participatingRooms[0].state", is("PRE")))
                 .andExpect(jsonPath("$.participatingRooms[0].participatingCount", is(1)))
                 .andExpect(jsonPath("$.participatingRooms[0].capacity", is(13)));
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PRE
+    })
+    @DisplayName("방 정보 조회 (PRE) - 실패 (참여 중x)")
+    @Test
+    void getRoomDetail_fail_not_participating() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM
+    })
+    @DisplayName("방 정보 조회 (PROCESSING) - 실패 (Relation x)")
+    @Test
+    void getRoomDetail_fail_no_relation() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.RELATION_NOT_FOUND.getMessage())));
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.RELATION
+    })
+    @DisplayName("방 정보 조회 (PROCESSING) - 실패 (금일의 개별 미션 설정 x)")
+    @Test
+    void getRoomDetail_fail_no_mission() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(MissionErrorCode.MISSION_NOT_FOUND.getMessage())));
+    }
+
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PRE,
+            SqlPath.MEMBER_ROOM
+    })
+    @DisplayName("방 정보 조회 (PRE) - 성공")
+    @Test
+    void getRoomDetail_PRE_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.room.id").exists())
+                .andExpect(jsonPath("$.room.title").exists())
+                .andExpect(jsonPath("$.room.startDate").exists())
+                .andExpect(jsonPath("$.room.endDate").exists())
+                .andExpect(jsonPath("$.room.state", is("PRE")))
+                .andExpect(jsonPath("$.participants").exists())
+                .andExpect(jsonPath("$.admin").exists())
+                .andExpect(jsonPath("$.didViewRoulette").doesNotExist())
+                .andExpect(jsonPath("$.manittee.nickname").doesNotExist())
+                .andExpect(jsonPath("$.mission.id").doesNotExist())
+                .andExpect(jsonPath("$.mission.content").doesNotExist())
+                .andExpect(jsonPath("$.messages.count").doesNotExist());
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.MESSAGE,
+            SqlPath.RELATION,
+            SqlPath.MISSION
+    })
+    @DisplayName("방 정보 조회 (PROCESSING) - 성공")
+    @Test
+    void getRoomDetail_PROCESSING_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        MemberRoom findMemberRoom1 = em.find(MemberRoom.class, 1L);
+        assertThat(findMemberRoom1.didViewManitto()).isFalse();
+        flushAndClear();
+
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.room.id").exists())
+                .andExpect(jsonPath("$.room.title").exists())
+                .andExpect(jsonPath("$.room.startDate").exists())
+                .andExpect(jsonPath("$.room.endDate").exists())
+                .andExpect(jsonPath("$.room.state", is("PROCESSING")))
+                .andExpect(jsonPath("$.participants").doesNotExist())
+                .andExpect(jsonPath("$.admin").exists())
+                .andExpect(jsonPath("$.didViewRoulette").exists())
+                .andExpect(jsonPath("$.manittee.nickname").exists())
+                .andExpect(jsonPath("$.mission.id").exists())
+                .andExpect(jsonPath("$.mission.content").exists())
+                .andExpect(jsonPath("$.messages.count").exists());
+
+        MemberRoom findMemberRoom2 = em.find(MemberRoom.class, 1L);
+        assertThat(findMemberRoom2.didViewManitto()).isTrue();
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_POST,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.MESSAGE,
+            SqlPath.RELATION
+    })
+    @DisplayName("방 정보 조회 (POST) - 성공")
+    @Test
+    void getRoomDetail_POST_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.room.id").exists())
+                .andExpect(jsonPath("$.room.title").exists())
+                .andExpect(jsonPath("$.room.startDate").exists())
+                .andExpect(jsonPath("$.room.endDate").exists())
+                .andExpect(jsonPath("$.room.state", is("POST")))
+                .andExpect(jsonPath("$.participants").doesNotExist())
+                .andExpect(jsonPath("$.admin").exists())
+                .andExpect(jsonPath("$.didViewRoulette").doesNotExist())
+                .andExpect(jsonPath("$.manittee.nickname").exists())
+                .andExpect(jsonPath("$.mission.id").doesNotExist())
+                .andExpect(jsonPath("$.mission.content").doesNotExist())
+                .andExpect(jsonPath("$.messages.count").exists());
+    }
+
+    @Sql(SqlPath.ROOM_GET_PARTICIPATING_ROOMS)
+    @DisplayName("참여 중인 방 조회 - 성공")
+    @Test
+    void findParticipatingRooms_success() throws Exception {
+        // given
+        final String url = "/api/v1/rooms";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.participatingRooms[0].id", is(4)))
+                .andExpect(jsonPath("$.participatingRooms[1].id", is(3)))
+                .andExpect(jsonPath("$.participatingRooms[2].id", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[3].id", is(5)))
+                .andExpect(jsonPath("$.participatingRooms[4].id", is(2)));
+    }
+
+    @Sql({
+            SqlPath.ROOM_GET_PARTICIPATING_ROOMS
+    })
+    @DisplayName("방 삭제 - 실패 (방장이 아님)")
+    @Test
+    void deleteRoom_fail_not_admin() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_UNAUTHORIZED.getMessage())));
+    }
+
+    @Sql({
+            SqlPath.ROOM_GET_PARTICIPATING_ROOMS
+    })
+    @DisplayName("방 삭제 - 성공")
+    @Test
+    void deleteRoom_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+
+        Room beforeDelete = em.find(Room.class, roomId);
+        assertThat(beforeDelete.isDeleted()).isFalse();
+        flushAndClear();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isNoContent());
+
+        Room afterDelete = em.find(Room.class, roomId);
+        assertThat(afterDelete.isDeleted()).isTrue();
     }
 }

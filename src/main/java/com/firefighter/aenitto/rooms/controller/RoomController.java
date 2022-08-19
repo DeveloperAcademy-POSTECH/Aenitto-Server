@@ -7,6 +7,7 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
+import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,7 +27,7 @@ public class RoomController {
 
     @PostMapping("/rooms")
     public ResponseEntity createRoom(
-            @CurrentMember Member currentMember,
+            @CurrentMember final Member currentMember,
             @Valid@RequestBody final CreateRoomRequest createRoomRequest
     ) {
         final Long roomId = roomService.createRoom(currentMember, createRoomRequest);
@@ -37,7 +36,7 @@ public class RoomController {
 
     @PostMapping("/invitations/verification")
     public ResponseEntity verifyInvitation(
-            @CurrentMember Member currentMember,
+            @CurrentMember final Member currentMember,
             @Valid @RequestBody final VerifyInvitationRequest request
     ) {
         final VerifyInvitationResponse response = roomService.verifyInvitation(currentMember, request);
@@ -56,29 +55,44 @@ public class RoomController {
 
     @GetMapping("/rooms/{roomId}/state")
     public ResponseEntity<GetRoomStateResponse> getRoomState(
-            @CurrentMember Member currentMember,
+            @CurrentMember final Member currentMember,
             @PathVariable final Long roomId
     ) {
         return ResponseEntity.ok(roomService.getRoomState(currentMember, roomId));
     }
 
-    // TODO: RoomAPI 메타데이터 Response Header 에 넣기 (22.08.07)
+    @GetMapping("/rooms/{roomId}")
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId
+    ) {
+        return ResponseEntity.ok(roomService.getRoomDetail(member, roomId));
+    }
+
     @GetMapping("/rooms")
     public ResponseEntity<ParticipatingRoomsResponse> findParticipatingRooms(
-            @CurrentMember Member currentMember,
-            @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "3") int limit
+            @CurrentMember final Member currentMember
+//            @RequestParam(required = false) Long cursor,
+//            @RequestParam(defaultValue = "3") int limit
     ) {
-        // cursor 있으면, next 가 있어야 함.
-        return ResponseEntity.ok(roomService.getParticipatingRooms(currentMember, cursor, limit));
+        return ResponseEntity.ok(roomService.getParticipatingRooms(currentMember));
     }
 
     @PatchMapping("/rooms/{roomId}/state")
     public ResponseEntity startAenitto(
-            @CurrentMember Member member,
-            @PathVariable Long roomId
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId
     ) {
         roomService.startAenitto(member, roomId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/rooms/{roomId}")
+    public ResponseEntity deleteRoom(
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId
+    ) {
+        roomService.deleteRoom(member, roomId);
         return ResponseEntity.noContent().build();
     }
 }

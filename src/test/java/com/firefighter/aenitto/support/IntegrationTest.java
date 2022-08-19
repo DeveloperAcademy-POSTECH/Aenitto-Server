@@ -16,6 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @ActiveProfiles("test")
 public class IntegrationTest {
     @Autowired
-    private EntityManager entityManager;
+    protected EntityManager em;
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
@@ -43,8 +44,8 @@ public class IntegrationTest {
     }
 
     protected void flushAndClear() {
-        entityManager.flush();
-        entityManager.clear();
+        em.flush();
+        em.clear();
     }
 
     protected MockMultipartFile createJsonFile(Object request) throws JsonProcessingException {

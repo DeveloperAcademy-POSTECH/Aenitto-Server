@@ -26,4 +26,12 @@ public class CommonMission {
     public CommonMission(LocalDate date) {
         this.date = date;
     }
+    private CommonMission(LocalDate date, Mission mission) {
+        this.date = date;
+        this.mission = mission;
+    }
+
+    public static CommonMission createCommonMission(LocalDate date, Mission mission) {
+        return new CommonMission(date, mission);
+    }
 }
