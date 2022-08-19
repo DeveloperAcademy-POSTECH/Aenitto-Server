@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.dto.request;
 
+import com.firefighter.aenitto.common.annotation.validation.CustomDate;
 import com.firefighter.aenitto.common.utils.DateConverter;
 import com.firefighter.aenitto.rooms.domain.Room;
 
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -46,6 +48,7 @@ public class CreateRoomRequest {
 
     @Getter
     @NoArgsConstructor(force = true)
+    @GroupSequence({ RoomRequest.class, RoomRequest.SubOrderedConstraints.class })
     public static class RoomRequest {
         @NotNull
         @Size(min = 1, max = 8)
@@ -54,8 +57,11 @@ public class CreateRoomRequest {
         @Min(5) @Max(15)
         private final int capacity;
         @NotNull
+        @CustomDate(groups = SubOrderedConstraints.class)
         private final String startDate;
+
         @NotNull
+        @CustomDate(groups = SubOrderedConstraints.class)
         private final String endDate;
 
         @Builder
@@ -65,8 +71,8 @@ public class CreateRoomRequest {
             this.startDate = startDate;
             this.endDate = endDate;
         }
+        private interface SubOrderedConstraints {}
     }
-
     @Getter
     @NoArgsConstructor(force = true)
     @AllArgsConstructor
