@@ -18,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithMockCustomMember
-@ActiveProfiles({"test","awss3"})
 public class MessageIntegrationTest extends IntegrationTest {
 
     @DisplayName("메시지 보내기 -> 성공")

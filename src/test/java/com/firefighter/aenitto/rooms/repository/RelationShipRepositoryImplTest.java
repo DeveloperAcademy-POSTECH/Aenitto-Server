@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Transactional
-@ActiveProfiles({"test", "awss3"})
 public class RelationShipRepositoryImplTest {
     @Autowired
     EntityManager em;

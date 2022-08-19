@@ -216,7 +216,7 @@ public class MessageControllerTest {
 
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")
-                        .file(requestMultipartFile())
+                        .file(requestMultipartfile)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
