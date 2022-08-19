@@ -36,7 +36,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public Token saveRefreshToken(Member member){
-        System.out.println(member.getSocialId());
         Token token  = tokenService.generateToken(member.getSocialId(), "USER");
 
         final RefreshToken result = refreshTokenRepository

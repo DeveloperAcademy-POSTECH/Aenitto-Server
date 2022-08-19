@@ -33,8 +33,8 @@ public class MemberRepositoryImpl implements MemberRepository {
 
     @Override
     public Optional<Member> findBySocialId(String socialId) {
-        return Optional.ofNullable(em.createQuery("SELECT m FROM Member m WHERE m.socialId = :socialId", Member.class)
-                .setParameter("socialId" , socialId)
-                .getSingleResult());
+        return em.createQuery("SELECT m FROM Member m WHERE m.socialId = :socialId", Member.class)
+                .setParameter("socialId", socialId)
+                .getResultList().stream().findFirst();
     }
 }
