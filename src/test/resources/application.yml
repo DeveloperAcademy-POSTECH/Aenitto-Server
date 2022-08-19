@@ -28,8 +28,8 @@ cloud:
     s3:
       bucket: aenitto-message-image
     credentials:
-      access-key: ${{ secrets.AWS_IMAGE_ACCESS_KEY_ID }}
-      secret-key: ${{ secrets.AWS_IMAGE_SECRET_ACCESS_KEY }}
+      access-key: ${IMAGE_ACCESS_KEY}
+      secret-key: ${IMAGE_SECRET_KEY}
 
 ---
 # H2 IN MEMORY TEST
