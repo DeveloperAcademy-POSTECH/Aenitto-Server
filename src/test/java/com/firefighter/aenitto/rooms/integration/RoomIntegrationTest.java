@@ -9,6 +9,7 @@ import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.support.IntegrationTest;
 import com.firefighter.aenitto.support.security.WithMockCustomMember;
@@ -23,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.Matchers.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -382,5 +384,46 @@ public class RoomIntegrationTest extends IntegrationTest {
 
         Room afterDelete = em.find(Room.class, roomId);
         assertThat(afterDelete.isDeleted()).isTrue();
+    }
+
+
+    @Sql({
+            SqlPath.ROOM_GET_PARTICIPATING_ROOMS
+    })
+    @DisplayName("방 수정 - 성공")
+    @Test
+    void updateRoom_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}";
+        final UpdateRoomRequest request = UpdateRoomRequest.builder()
+                .title("수정된제목")
+                .capacity(10)
+                .endDate("2022.10.21")
+                .build();
+
+        Room beforeRoom = em.find(Room.class, roomId);
+        assertThat(beforeRoom.getTitle()).isEqualTo("제목2");
+        assertThat(beforeRoom.getCapacity()).isEqualTo(13);
+        assertThat(beforeRoom.getStartDateValue()).isEqualTo("2022.10.09");
+        assertThat(beforeRoom.getEndDateValue()).isEqualTo("2022.10.20");
+        flushAndClear();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.put(url, roomId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isNoContent());
+
+        Room updatedRoom = em.find(Room.class, roomId);
+        assertThat(updatedRoom.getTitle()).isEqualTo(request.getTitle());
+        assertThat(updatedRoom.getCapacity()).isEqualTo(request.getCapacity());
+        assertThat(updatedRoom.getStartDateValue()).isEqualTo("2022.10.09");
+        assertThat(updatedRoom.getEndDateValue()).isEqualTo("2022.10.21");
     }
 }

@@ -2,7 +2,6 @@ package com.firefighter.aenitto.rooms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
-import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
@@ -16,6 +15,7 @@ import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
@@ -40,7 +40,6 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ import java.util.List;
 
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
@@ -89,7 +87,6 @@ class RoomControllerTest {
     MemberRoom memberRoom3;
     Mission mission1;
 
-
     @BeforeEach
     void init(RestDocumentationContextProvider restDocumentation) {
         mockMvc = MockMvcBuilders.standaloneSetup(roomController)
@@ -113,7 +110,6 @@ class RoomControllerTest {
         memberRoom2 = memberRoomFixture2(member2, room1);
 
         mission1 = MissionFixture.missionFixture2_Individual();
-
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -599,9 +595,7 @@ class RoomControllerTest {
                                 fieldWithPath("messages.count").description("읽지 않은 메시지 개수")
                         )
                 ));
-
     }
-
 
     @DisplayName("방 삭제 - 성공")
     @Test
@@ -630,5 +624,68 @@ class RoomControllerTest {
                                 parameterWithName("roomId").description("방 id")
                         )
                 ));
+    }
+
+    @DisplayName("방 수정 - 실패 (Binding Exception)")
+    @Test
+    void roomUpdate_fail() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+        final UpdateRoomRequest request = UpdateRoomRequest.builder()
+                .title("123456789")
+                .build();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.put(url, roomId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+        verify(roomService, times(0)).updateRoom(any(Member.class), anyLong(), any(UpdateRoomRequest.class));
+    }
+
+    @DisplayName("방 수정 - 성공")
+    @Test
+    void roomUpdate_success() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}";
+        final UpdateRoomRequest request = UpdateRoomRequest.builder()
+                .title("제목")
+                .capacity(10)
+                .build();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.put(url, roomId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document(
+                        "방 수정하기",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("title").description("수정할 방 제목"),
+                                fieldWithPath("capacity").description("수정할 방 수용인원"),
+                                fieldWithPath("startDate").description("수정할 방 시작일자"),
+                                fieldWithPath("endDate").description("수정할 방 종료일자")
+                        ),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        )
+                ));
+        verify(roomService, times(1)).updateRoom(any(Member.class), anyLong(), any(UpdateRoomRequest.class));
     }
 }

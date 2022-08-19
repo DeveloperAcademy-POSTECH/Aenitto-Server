@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.dto;
 
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 
 public class RoomRequestDtoBuilder {
@@ -25,6 +26,15 @@ public class RoomRequestDtoBuilder {
     public static ParticipateRoomRequest participateRoomRequest() {
         return ParticipateRoomRequest.builder()
                 .colorIdx(1)
+                .build();
+    }
+
+    public static UpdateRoomRequest updateRoomRequest() {
+        return UpdateRoomRequest.builder()
+                .title("제목 1")
+                .capacity(10)
+                .startDate("2022.08.10")
+                .endDate("2022.08.20")
                 .build();
     }
 }

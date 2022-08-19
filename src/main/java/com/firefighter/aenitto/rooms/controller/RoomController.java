@@ -4,6 +4,7 @@ import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
@@ -29,7 +30,7 @@ public class RoomController {
     @PostMapping("/rooms")
     public ResponseEntity createRoom(
             @CurrentMember final Member currentMember,
-            @Valid@RequestBody final CreateRoomRequest createRoomRequest
+            @Valid @RequestBody final CreateRoomRequest createRoomRequest
     ) {
         final Long roomId = roomService.createRoom(currentMember, createRoomRequest);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId)).build();
@@ -104,6 +105,16 @@ public class RoomController {
             @PathVariable final Long roomId
     ) {
         roomService.deleteRoom(member, roomId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/rooms/{roomId}")
+    public ResponseEntity updateRoom(
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId,
+            @Valid @RequestBody UpdateRoomRequest request
+    ) {
+        roomService.updateRoom(member, roomId, request);
         return ResponseEntity.noContent().build();
     }
 }
