@@ -66,6 +66,9 @@ jobs:
         run: |
           cd ./src/test/resources/
           touch ./application.yml
+          echo $IMAGE_ACCESS_KEY >> ./application.yml
+          echo $IMAGE_SECRET_KEY >> ./application.yml
+          cat application.yml
         shell: bash
         env:
           IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY_ID }}
