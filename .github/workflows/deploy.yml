@@ -29,7 +29,48 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+        
+#         - name: make email_pwd.properties
+#         if: contains(github.ref, 'main')
+#         run: |
+#           echo "ls -a . & pwd"
+#           pwd
+#           ls -a .
+#           echo "mkdir & touch"
+#           mkdir -p ./src/main/resources 
+#           cd ./src/main/resources
+#           touch ./email_pwd.properties
+#           pwd
+#           ls -a .
+#           echo "copy properties"
+#           echo $DEV_PROP >> ./email_pwd.properties
+#           cat email_pwd.properties
+#         shell: bash
+#         env:
+#           DEV_PROP: ${{ secrets.EMAIL_PASSWORD }}
+# 출처: https://determination.tistory.com/entry/Github-Actions로-properties-파일-만들어서-배포하기 [내삶발전기록용:티스토리] 
 
+
+#   - name: Restore gradle.properties
+#     env:
+#       GRADLE_PROPERTIES: ${{ secrets.GRADLE_PROPERTIES }}
+#     shell: bash
+#     run: |
+#       mkdir -p ~/.gradle/
+#       echo "::set-env name=GRADLE_USER_HOME::$HOME/.gradle"
+#       echo ${GRADLE_PROPERTIES} > ~/.gradle/gradle.properties
+      
+      
+      # properties파일에 secret key넣기
+      - name: get secret key for properties file
+        run: |
+          cd ./src/test/resources/
+          touch ./application.yml
+        shell: bash
+        env:
+          IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY_ID }}
+          IMAGE_SECRET_KEY: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
+          
       # Build
       - name: Build with Gradle
         run: ./gradlew clean build --info
