@@ -71,7 +71,7 @@ jobs:
           cat application.yml
         shell: bash
         env:
-          IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY_ID }}
+          IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
           IMAGE_SECRET_KEY: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
           
       # Build
