@@ -6,7 +6,7 @@ spring:
   profiles:
     active: test # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      test: test, awss3
+      test: test, test-awss3
 
   sql:
     init:
@@ -15,6 +15,22 @@ spring:
 
   jpa:
     defer-datasource-initialization: true
+---
+spring:
+  config:
+    activate:
+      on-profile: test-awss3
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: aenitto-message-image
+    credentials:
+      access-key: ${{ secrets.AWS_IMAGE_ACCESS_KEY_ID }}
+      secret-key: ${{ secrets.AWS_IMAGE_SECRET_ACCESS_KEY }}
+
 ---
 # H2 IN MEMORY TEST
 spring:
