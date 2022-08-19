@@ -74,6 +74,7 @@ public class RoomRepositoryImpl implements RoomRepository {
                 .getResultList();
     }
 
+
     @Override
     public List<Room> findAllParticipatingRooms(UUID memberId) {
         return em.createQuery(

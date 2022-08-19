@@ -1,7 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
-import com.firefighter.aenitto.common.exception.mission.MissionEmptyException;
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.common.utils.RoomComparator;
@@ -17,14 +16,10 @@ import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
-import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
-import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
+import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -203,6 +198,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public RoomParticipantsResponse getRoomParticipants(Member currentMember, Long roomId){
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+        return RoomParticipantsResponse.of(memberRoom.getRoom().getMemberRooms());
+    }
+
     @Transactional
     public void deleteRoom(Member member, Long roomId) {
         MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
@@ -210,7 +210,6 @@ public class RoomServiceImpl implements RoomService {
 
         memberRoom.getRoom().delete();
     }
-
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
         roomRepository.findMemberRoomById(memberId, roomId)

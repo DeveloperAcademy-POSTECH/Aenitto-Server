@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
@@ -16,8 +17,10 @@ import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
+import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
+import com.firefighter.aenitto.support.security.WithMockCustomMember;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,13 +40,14 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
+
+import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
@@ -75,11 +79,16 @@ class RoomControllerTest {
     // Fixture
     Member member;
     Member member2;
+    Member member3;
     Room room1;
     Room room2;
+    Room room3;
     MemberRoom memberRoom;
+    MemberRoom memberRoom1;
     MemberRoom memberRoom2;
+    MemberRoom memberRoom3;
     Mission mission1;
+
 
     @BeforeEach
     void init(RestDocumentationContextProvider restDocumentation) {
@@ -90,12 +99,21 @@ class RoomControllerTest {
         objectMapper = new ObjectMapper();
         room1 = roomFixture1();
         room2 = roomFixture2();
+        room3 = roomFixture2();
         member = memberFixture();
         member2 = memberFixture2();
+
+        member3 = memberFixture3();
+        memberRoom = memberRoomFixture1(member, room1);
+        memberRoom1 = memberRoomFixture1(member, room3);
+        memberRoom2 = memberRoomFixture2(member2, room3);
+        memberRoom3 = memberRoomFixture3(member3, room3);
+
         memberRoom = memberRoomFixture1(member, room1);
         memberRoom2 = memberRoomFixture2(member2, room1);
 
         mission1 = MissionFixture.missionFixture2_Individual();
+
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -199,7 +217,7 @@ class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
-                .andExpect(jsonPath("$.participatingCount", is(2)))
+                .andExpect(jsonPath("$.participatingCount", is(3)))
                 .andDo(document("초대코드 검증",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -469,6 +487,68 @@ class RoomControllerTest {
         verify(roomService, times(1)).startAenitto(any(Member.class), anyLong());
     }
 
+
+    @DisplayName("방에 참여중인 멤버 조회하기 - 실패 (참여중인 방이 아님)")
+    @Test
+    void find_room_participants_fail_not_participating() throws Exception{
+        //given
+        final long id = 10L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+        doThrow(new RoomNotParticipatingException()).when(roomService)
+                .getRoomParticipants(any(Member.class), anyLong());
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(url, id)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer TestToken")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+
+    }
+
+    @DisplayName("방에 참여중인 멤버 조회하기 - 성공")
+    @Test
+    @WithMockCustomMember
+    void find_room_participants_success() throws Exception {
+        //given
+        final long id = 1L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        List<MemberRoom> memberRooms = new ArrayList<>();
+        memberRooms.add(memberRoom1);
+        memberRooms.add(memberRoom2);
+        memberRooms.add(memberRoom3);
+
+        RoomParticipantsResponse response = RoomResponseDtoBuilder.roomParticipantsResponse(memberRooms);
+        when(roomService.getRoomParticipants(any(Member.class), anyLong()))
+                .thenReturn(response);
+
+        //when, then, docs
+        mockMvc.perform(RestDocumentationRequestBuilders.get(url, id)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer TestToken")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count", is(response.getCount())))
+                .andExpect(jsonPath("$.members[0].nickname", is(response.getMembers().get(0).getNickname())))
+                .andExpect(jsonPath("$.members[0].colorIdx", is(response.getMembers().get(0).getColorIdx())))
+                .andDo(print())
+                .andDo(document("함께하는 친구들 리스트",
+                        preprocessRequest(prettyPrint()),   // (2)
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
+                        ),
+                        responseFields(
+                                fieldWithPath("count").description("방에 참여중인 사람 수"),
+                                fieldWithPath("members[0].nickname").description("멤버 닉네임"),
+                                fieldWithPath("members[0].colorIdx").description("멤버 지정 색 인덱스")
+                        )
+                ));
+    }
+
     @DisplayName("방 정보 조회 - 성공")
     @Test
     void roomDetail_PRE() throws Exception {
@@ -519,7 +599,9 @@ class RoomControllerTest {
                                 fieldWithPath("messages.count").description("읽지 않은 메시지 개수")
                         )
                 ));
+
     }
+
 
     @DisplayName("방 삭제 - 성공")
     @Test
