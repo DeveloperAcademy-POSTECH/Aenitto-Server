@@ -1,11 +1,13 @@
 package com.firefighter.aenitto.rooms.service;
 
 import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
+import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 
 public interface RoomService {
@@ -18,5 +20,13 @@ public interface RoomService {
     public GetRoomStateResponse getRoomState(Member member, Long roomId);
 
     public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit);
+
+    public ParticipatingRoomsResponse getParticipatingRooms(Member member);
+
+    public RoomDetailResponse getRoomDetail(Member member, Long roomId);
+
+    public void startAenitto(Member member, Long roomId);
+
+    public void deleteRoom(Member member, Long roomId);
 
 }

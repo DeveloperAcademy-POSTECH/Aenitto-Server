@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: testdb
+    active: test
 
   sql:
     init:
@@ -14,10 +14,10 @@ spring:
 spring:
   config:
     activate:
-      on-profile: testdb
+      on-profile: test
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=LEGACY
     username: sa
 
   jpa:

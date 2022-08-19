@@ -18,7 +18,7 @@ import java.util.Random;
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends CreationModificationLog {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id")
     private Long id;
 
@@ -56,6 +56,14 @@ public class Room extends CreationModificationLog {
         this.invitation = randomSixNumUpperString();
     }
 
+    public void setState(RoomState state) {
+        this.state = state;
+    }
+
+    public void delete() {
+        this.deleted = true;
+    }
+
     public String getStartDateValue() {
         return DateConverter.localDateToString(this.startDate);
     }
@@ -64,6 +72,13 @@ public class Room extends CreationModificationLog {
         return DateConverter.localDateToString(this.endDate);
     }
 
+    public int participantsCount() {
+        return memberRooms.size();
+    }
+
+    public boolean cannotStart() {
+        return (5 > participantsCount());
+    }
     public boolean unAcceptable() {
         return (capacity <= memberRooms.size());
     }

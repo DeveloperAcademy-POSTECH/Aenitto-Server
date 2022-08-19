@@ -28,8 +28,7 @@ public class Member extends CreationModificationLog {
     private List<MemberRoom> memberRooms = new ArrayList<>();
 
     @Builder
-    public Member(UUID id, String nickname, String socialId) {
-        this.id = id;
+    public Member(String nickname, String socialId) {
         this.nickname = nickname;
         this.socialId = socialId;
     }

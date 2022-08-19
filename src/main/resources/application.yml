@@ -6,12 +6,17 @@ spring:
     init:
       mode: never
       encoding: UTF-8
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
   profiles:
     active: develop # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
       develop: develop, developdb
 
-  defer-datasource-initialization: truw
+  defer-datasource-initialization: true
 
 ---
 ## Test Profile

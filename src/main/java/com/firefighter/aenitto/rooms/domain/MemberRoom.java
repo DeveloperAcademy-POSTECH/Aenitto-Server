@@ -4,6 +4,7 @@ import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.common.exception.room.RoomAlreadyParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
+import com.firefighter.aenitto.missions.domain.Mission;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberRoom extends CreationModificationLog {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_room_id")
     private Long id;
 
@@ -30,7 +32,7 @@ public class MemberRoom extends CreationModificationLog {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToMany(mappedBy = "memberRoom")
+    @OneToMany(mappedBy = "memberRoom", cascade = CascadeType.ALL)
     private List<IndividualMission> individualMissions = new ArrayList<>();
 
     private boolean admin;
@@ -62,14 +64,27 @@ public class MemberRoom extends CreationModificationLog {
         viewManitto = true;
     }
 
+    public Boolean didSetDailyIndividualMission(LocalDate date) {
+        if (this.getIndividualMissions().size() == 0) {
+            return false;
+        }
+        return this.getIndividualMissions().get(this.getIndividualMissions().size() - 1).didSet(date);
+    }
+
+    public void addIndividualMission(Mission mission, LocalDate date) {
+        IndividualMission individualMission = IndividualMission.of(mission, date);
+        individualMissions.add(individualMission);
+        individualMission.setMemberRoom(this);
+    }
+
     public void setMemberRoom(Member member, Room room) {
         if (this.member != null || this.room != null) {
             throw new RoomAlreadyParticipatingException();
         }
         this.member = member;
         this.room = room;
-        member.getMemberRooms().add(this);
         room.getMemberRooms().add(this);
+        member.getMemberRooms().add(this);
     }
 }
 
