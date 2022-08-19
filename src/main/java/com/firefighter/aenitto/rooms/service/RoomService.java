@@ -24,10 +24,9 @@ public interface RoomService {
 
     public void startAenitto(Member member, Long roomId);
 
-<<<<<<< HEAD
+
     public RoomParticipantsResponse getRoomParticipants(Member currentMember, Long roomId);
-=======
+
     public void deleteRoom(Member member, Long roomId);
 
->>>>>>> develop
 }

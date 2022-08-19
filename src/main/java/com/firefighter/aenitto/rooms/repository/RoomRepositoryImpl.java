@@ -1,6 +1,5 @@
 package com.firefighter.aenitto.rooms.repository;
 
-import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -75,8 +74,7 @@ public class RoomRepositoryImpl implements RoomRepository {
                 .getResultList();
     }
 
-<<<<<<< HEAD
-=======
+
     @Override
     public List<Room> findAllParticipatingRooms(UUID memberId) {
         return em.createQuery(
@@ -113,5 +111,4 @@ public class RoomRepositoryImpl implements RoomRepository {
                 .getResultStream()
                 .findFirst();
     }
->>>>>>> develop
 }

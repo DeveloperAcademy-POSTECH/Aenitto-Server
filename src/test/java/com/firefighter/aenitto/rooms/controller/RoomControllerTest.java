@@ -46,12 +46,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD
+
 import static com.firefighter.aenitto.members.MemberFixture.*;
-=======
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
->>>>>>> develop
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.is;
@@ -81,28 +77,18 @@ class RoomControllerTest {
     private ObjectMapper objectMapper;
 
     // Fixture
-<<<<<<< HEAD
-    private Member member;
-    private Member member2;
-    private Member member3;
-    private Room room1;
-    private Room room2;
-
-    private Room room3;
-    private MemberRoom memberRoom;
-    private MemberRoom memberRoom1;
-    private MemberRoom memberRoom2;
-    private MemberRoom memberRoom3;
-
-=======
     Member member;
     Member member2;
+    Member member3;
     Room room1;
     Room room2;
+    Room room3;
     MemberRoom memberRoom;
+    MemberRoom memberRoom1;
     MemberRoom memberRoom2;
+    MemberRoom memberRoom3;
     Mission mission1;
->>>>>>> develop
+
 
     @BeforeEach
     void init(RestDocumentationContextProvider restDocumentation) {
@@ -116,18 +102,18 @@ class RoomControllerTest {
         room3 = roomFixture2();
         member = memberFixture();
         member2 = memberFixture2();
-<<<<<<< HEAD
+
         member3 = memberFixture3();
         memberRoom = memberRoomFixture1(member, room1);
         memberRoom1 = memberRoomFixture1(member, room3);
         memberRoom2 = memberRoomFixture2(member2, room3);
         memberRoom3 = memberRoomFixture3(member3, room3);
-=======
+
         memberRoom = memberRoomFixture1(member, room1);
         memberRoom2 = memberRoomFixture2(member2, room1);
 
         mission1 = MissionFixture.missionFixture2_Individual();
->>>>>>> develop
+
     }
 
     @DisplayName("방 생성 -> 성공")
@@ -231,7 +217,7 @@ class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
-                .andExpect(jsonPath("$.participatingCount", is(2)))
+                .andExpect(jsonPath("$.participatingCount", is(3)))
                 .andDo(document("초대코드 검증",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -501,7 +487,7 @@ class RoomControllerTest {
         verify(roomService, times(1)).startAenitto(any(Member.class), anyLong());
     }
 
-<<<<<<< HEAD
+
     @DisplayName("방에 참여중인 멤버 조회하기 - 실패 (참여중인 방이 아님)")
     @Test
     void find_room_participants_fail_not_participating() throws Exception{
@@ -526,7 +512,7 @@ class RoomControllerTest {
     @DisplayName("방에 참여중인 멤버 조회하기 - 성공")
     @Test
     @WithMockCustomMember
-    void find_room_participants_success() throws Exception{
+    void find_room_participants_success() throws Exception {
         //given
         final long id = 1L;
         final String url = "/api/v1/rooms/{roomId}/participants";
@@ -555,7 +541,14 @@ class RoomControllerTest {
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
                         ),
-=======
+                        responseFields(
+                                fieldWithPath("count").description("방에 참여중인 사람 수"),
+                                fieldWithPath("members[0].nickname").description("멤버 닉네임"),
+                                fieldWithPath("members[0].colorIdx").description("멤버 지정 색 인덱스")
+                        )
+                ));
+    }
+
     @DisplayName("방 정보 조회 - 성공")
     @Test
     void roomDetail_PRE() throws Exception {
@@ -580,21 +573,10 @@ class RoomControllerTest {
                         "방 정보 조회",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
->>>>>>> develop
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
                         ),
                         responseFields(
-<<<<<<< HEAD
-                                fieldWithPath("count").description("방에 함께 있는 친구 수"),
-                                fieldWithPath("members[].nickname").description("친구 닉네임"),
-                                fieldWithPath("members[].colorIdx").description("참여자 색상 index")
-                        )
-                ));
-
-    }
-
-=======
                                 fieldWithPath("room").description("방 정보"),
                                 fieldWithPath("room.id").description("방 id"),
                                 fieldWithPath("room.title").description("방 제목"),
@@ -617,7 +599,9 @@ class RoomControllerTest {
                                 fieldWithPath("messages.count").description("읽지 않은 메시지 개수")
                         )
                 ));
+
     }
+
 
     @DisplayName("방 삭제 - 성공")
     @Test
@@ -647,5 +631,4 @@ class RoomControllerTest {
                         )
                 ));
     }
->>>>>>> develop
 }

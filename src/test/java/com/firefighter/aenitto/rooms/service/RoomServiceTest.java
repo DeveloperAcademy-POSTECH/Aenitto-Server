@@ -53,34 +53,24 @@ public class RoomServiceTest {
     @Mock private MessageRepository messageRepository;
 
     // Fixtures
-<<<<<<< HEAD
-    private Room room1;
-    private Room room2;
-    private Room room3;
-    private Member member;
-    private Member member2;
-    private Member member3;
-    private Member member4;
-    private Member member5;
-    private MemberRoom memberRoom;
-    private MemberRoom memberRoom1;
-=======
     Room room1;
     Room room2;
     Room room3;
     Room room4;
     Room room5;
+    Member member;
     Member member1;
     Member member2;
     Member member3;
     Member member4;
     Member member5;
     MemberRoom memberRoom;
+    MemberRoom memberRoom1;
     MemberRoom memberRoom2;
     MemberRoom memberRoom3;
     MemberRoom memberRoom4;
     MemberRoom memberRoom5;
->>>>>>> develop
+
 
     CurrentUserDetails currentUserDetails;
 
@@ -91,27 +81,26 @@ public class RoomServiceTest {
     void setup() {
         room1 = roomFixture1();
         room2 = roomFixture2();
-<<<<<<< HEAD
+
         room3 = roomFixture2();
         member = memberFixture();
         currentUserDetails = CURRENT_USER_DETAILS;
-=======
+
         room3 = roomFixture3();
         room4 = roomFixture4();
         room5 = roomFixture5();
 
         member1 = memberFixture();
->>>>>>> develop
         member2 = memberFixture2();
         member3 = memberFixture3();
         member4 = memberFixture4();
         member5 = memberFixture5();
-<<<<<<< HEAD
+
         memberRoom = memberRoomFixture1(member, room1);
         memberRoom1 = memberRoomFixture1(member, room3);
         memberRoom2 = memberRoomFixture2(member2, room3);
         memberRoom3 = memberRoomFixture3(member3, room3);
-=======
+
 
         memberRoom = memberRoomFixture1(member1, room1);
 
@@ -119,7 +108,7 @@ public class RoomServiceTest {
         individualMission1 = individualMissionFixture1();
 
         currentUserDetails = CURRENT_USER_DETAILS;
->>>>>>> develop
+
     }
 
     @DisplayName("방 생성 성공")
@@ -595,7 +584,7 @@ public class RoomServiceTest {
         target.startAenitto(member1, roomId);
 
         // then
-        assertThat(room1.getRelations().size()).isEqualTo(5);
+        assertThat(room1.getRelations().size()).isEqualTo(6);
         assertThat(room1.getRelations().get(0).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(1).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(2).getManittee()).isNotNull();
@@ -603,7 +592,7 @@ public class RoomServiceTest {
         assertThat(room1.getRelations().get(4).getManittee()).isNotNull();
     }
 
-<<<<<<< HEAD
+
     @DisplayName("방 멤버 조회 - 실패(참여하지 않은 방)")
     @Test
     void find_roomParticipants_fail_not_participating() {
@@ -612,7 +601,7 @@ public class RoomServiceTest {
 
         //when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenThrow(EmptyResultDataAccessException.class);
+                .thenThrow(RoomNotParticipatingException.class);
 
         //then
         assertThatExceptionOfType(RoomNotParticipatingException.class)
@@ -630,7 +619,7 @@ public class RoomServiceTest {
 
         //when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(memberRoom1);
+                .thenReturn(Optional.ofNullable(memberRoom1));
         RoomParticipantsResponse roomParticipantsResponse = target.getRoomParticipants(member, room1.getId());
 
         //then
@@ -638,7 +627,8 @@ public class RoomServiceTest {
         assertThat(roomParticipantsResponse.getMembers().get(0).getNickname()).isNotNull();
         assertThat(roomParticipantsResponse.getMembers().get(1).getNickname()).isNotNull();
         assertThat(roomParticipantsResponse.getMembers().get(2).getNickname()).isNotNull();
-=======
+    }
+
     @DisplayName("참여 중인 방 조회 - 성공")
     @Test
     void getParticipatingRooms_success() {
@@ -703,6 +693,5 @@ public class RoomServiceTest {
 
         // then
         assertThat(room1.isDeleted()).isTrue();
->>>>>>> develop
     }
 }

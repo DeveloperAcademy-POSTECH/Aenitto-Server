@@ -7,11 +7,8 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
 import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
-<<<<<<< HEAD
 import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
-=======
 import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
->>>>>>> develop
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -91,15 +88,16 @@ public class RoomController {
         return ResponseEntity.noContent().build();
     }
 
-<<<<<<< HEAD
+
     @GetMapping("/rooms/{roomId}/participants")
     public ResponseEntity<RoomParticipantsResponse> getRoomParticipants(
             @CurrentMember Member currentMember,
             @PathVariable Long roomId
-    ){
+    ) {
         RoomParticipantsResponse roomParticipantsResponse = roomService.getRoomParticipants(currentMember, roomId);
         return ResponseEntity.ok(roomParticipantsResponse);
-=======
+    }
+
     @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity deleteRoom(
             @CurrentMember final Member member,
@@ -107,6 +105,5 @@ public class RoomController {
     ) {
         roomService.deleteRoom(member, roomId);
         return ResponseEntity.noContent().build();
->>>>>>> develop
     }
 }
