@@ -53,6 +53,7 @@ cloud:
     credentials:
       access-key: $IMAGE_ACCESS_KEY
       secret-key: $IMAGE_SECRET_KEY
+---      
 # POSTGRES LOCAL TEST
 spring:
   config:
