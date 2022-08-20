@@ -59,16 +59,25 @@ jobs:
 #       mkdir -p ~/.gradle/
 #       echo "::set-env name=GRADLE_USER_HOME::$HOME/.gradle"
 #       echo ${GRADLE_PROPERTIES} > ~/.gradle/gradle.properties
+
+# Github Repository Secrets를 통해 환경 변수 파일을 생성합니다.
+#       - name: Generate Environment Variables File for Production
+#         run: |
+#           echo "REACT_APP_DOMAIN=$REACT_APP_DOMAIN" >> .env.production
+#           echo "REACT_APP_DEBUG=$REACT_APP_DEBUG" >> .env.production
+#         env:
+#           REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
+#           REACT_APP_DEBUG: ${{ secrets.REACT_APP_DEBUG }}
       
       
       # properties파일에 secret key넣기
-      - name: get secret key for properties file
+      - name: Generate Environment Variables File for Production
         run: |
           cd ./src/test/resources/
-          touch ./application.yml
-          echo ${IMAGE_ACCESS_KEY} >> ./application.yml
-          echo ${IMAGE_SECRET_KEY} >> ./application.yml
-          cat application.yml
+          touch ./env.properties
+          echo "IMAGE_ACCESS_KEY=$IMAGE_ACCESS_KEY >> ./env.properties
+          echo "IMAGE_SECRET_KEY=$IMAGE_SECRET_KEY >> ./env.properties
+          cat env.properties
         shell: bash
         env:
           IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
