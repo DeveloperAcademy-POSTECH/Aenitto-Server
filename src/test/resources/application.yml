@@ -4,10 +4,9 @@ spring:
       max-file-size: 2MB
 
   profiles:
-    active: test-deploy # 활성화시킬 프로필
+    active: test # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      test: testdb, awss3
-      test-deploy: testdb, test-awss3, env
+      test: testdb, test-awss3, env
 
   sql:
     init:
