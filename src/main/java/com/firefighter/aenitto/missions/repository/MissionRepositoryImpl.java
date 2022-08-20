@@ -20,11 +20,6 @@ import java.util.Optional;
 public class MissionRepositoryImpl implements MissionRepository {
     private final EntityManager em;
 
-    @Override
-    public CommonMission saveCommonMission(CommonMission commonMission) {
-        em.persist(commonMission);
-        return commonMission;
-    }
 
     @Override
     public Optional<Mission> findRandomMission(MissionType missionType) {
@@ -34,17 +29,6 @@ public class MissionRepositoryImpl implements MissionRepository {
                                 " WHERE m.type = :missionType" +
                                 " ORDER BY random()", Mission.class)
                 .setParameter("missionType", missionType)
-                .getResultStream()
-                .findFirst();
-    }
-
-    @Override
-    public Optional<CommonMission> findCommonMissionByDate(LocalDate date) {
-        return em.createQuery(
-                        "SELECT c" +
-                                " FROM CommonMission c" +
-                                " WHERE c.date = :date", CommonMission.class)
-                .setParameter("date", date)
                 .getResultStream()
                 .findFirst();
     }

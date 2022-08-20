@@ -2,9 +2,12 @@ package com.firefighter.aenitto.missions.service;
 
 import com.firefighter.aenitto.common.exception.mission.MissionAlreadySetException;
 import com.firefighter.aenitto.common.exception.mission.MissionEmptyException;
+import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
+import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
+import com.firefighter.aenitto.missions.repository.CommonMissionRepository;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -30,11 +33,14 @@ public class MissionServiceImpl implements MissionService {
     @Qualifier("missionRepositoryImpl")
     private final MissionRepository missionRepository;
 
+    @Qualifier("commonMissionRepositoryImpl")
+    private final CommonMissionRepository commonMissionRepository;
+
     @Override
     @Transactional
     public Long setDailyCommonMission(LocalDate date) throws MissionAlreadySetException, MissionEmptyException {
         // 해당 일자에 CommonMission 이 이미 있다면 -> throw
-        missionRepository.findCommonMissionByDate(date)
+        commonMissionRepository.findCommonMissionByDate(date)
                 .ifPresent(m -> {
                     throw new MissionAlreadySetException();
                 });
@@ -43,7 +49,14 @@ public class MissionServiceImpl implements MissionService {
         Mission mission = missionRepository.findRandomMission(MissionType.COMMON)
                 .orElseThrow(MissionEmptyException::new);
 
-        return missionRepository.saveCommonMission(CommonMission.createCommonMission(date, mission)).getId();
+        return commonMissionRepository.saveCommonMission(CommonMission.createCommonMission(date, mission)).getId();
+    }
+
+    @Override
+    public DailyCommonMissionResponse getDailyCommonMission() throws MissionNotFoundException {
+        CommonMission commonMission = commonMissionRepository.findCommonMissionByDate(LocalDate.now())
+                .orElseThrow(MissionNotFoundException::new);
+        return DailyCommonMissionResponse.of(commonMission);
     }
 
     @Override
