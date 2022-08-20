@@ -20,6 +20,9 @@ operation::change-nickname[snippets='http-request,http-response,request-fields']
 === 함께하는 친구들 가져오기 API
 operation::함께하는 친구들 리스트[snippets='http-request,http-response,path-parameters,response-fields']
 
+=== 공통미션 가져오기
+operation::공통미션 가져오기[snippets='request-headers,http-response,response-fields']
+
 == 마니또 시작하기
 operation::마니또 시작하기[snippets='path-parameters,request-headers,http-request,http-response']
 

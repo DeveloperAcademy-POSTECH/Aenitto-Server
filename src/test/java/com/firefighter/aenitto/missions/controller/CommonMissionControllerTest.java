@@ -4,13 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
-import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
 import com.firefighter.aenitto.missions.service.MissionService;
-import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,20 +33,13 @@ import java.time.LocalDate;
 import static com.firefighter.aenitto.missions.CommonMissionFixture.commonMissionFixture1;
 import static com.firefighter.aenitto.missions.MissionFixture.missionFixture1_Common;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,10 +88,17 @@ public class CommonMissionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
-        //then
+        //then, docs
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.mission", is(commonMission
-                        .getMission().getContent())));
+                        .getMission().getContent()))
+                )
+                .andDo(document("공통미션 가져오기",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("mission").description("미션")
+                        )
+                ));
 
         verify(missionService, times(1)).getDailyCommonMission();
     }
