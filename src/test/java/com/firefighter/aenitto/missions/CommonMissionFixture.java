@@ -10,7 +10,6 @@ public class CommonMissionFixture {
         return baseCommonMissionFixture(1);
     }
 
-
     private static CommonMission baseCommonMissionFixture(int number) {
         CommonMission commonMission = transientCommonMissionFixture();
         ReflectionTestUtils.setField(commonMission, "id", number * 1L);

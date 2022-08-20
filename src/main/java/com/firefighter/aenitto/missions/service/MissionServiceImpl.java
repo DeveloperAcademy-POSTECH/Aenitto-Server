@@ -53,8 +53,8 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public DailyCommonMissionResponse getDailyCommonMission(LocalDate date) throws MissionNotFoundException {
-        CommonMission commonMission = commonMissionRepository.findCommonMissionByDate(date)
+    public DailyCommonMissionResponse getDailyCommonMission() throws MissionNotFoundException {
+        CommonMission commonMission = commonMissionRepository.findCommonMissionByDate(LocalDate.now())
                 .orElseThrow(MissionNotFoundException::new);
         return DailyCommonMissionResponse.of(commonMission);
     }

@@ -214,7 +214,7 @@ public class MissionServiceTest {
         when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
                 .thenReturn(Optional.of(commonMission1));
         DailyCommonMissionResponse result =
-                missionService.getDailyCommonMission(LocalDate.now());
+                missionService.getDailyCommonMission();
 
         //then
         assertThat(result.getMission()).isEqualTo(commonMission1.getMission().getContent());
@@ -232,7 +232,7 @@ public class MissionServiceTest {
         //then
         assertThatExceptionOfType(MissionNotFoundException.class)
                 .isThrownBy(() -> {
-                    missionService.getDailyCommonMission(LocalDate.now());
+                    missionService.getDailyCommonMission();
                 });
     }
 }
