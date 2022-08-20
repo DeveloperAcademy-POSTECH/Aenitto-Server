@@ -108,7 +108,7 @@ public class CommonMissionControllerTest {
 
     @DisplayName("해당 일자 공통미션 가져오기 - 실패 / 오늘의 공통미션 없음")
     @Test
-    void getCommonMission_failur_daily_common_mission_not_found() throws Exception {
+    void getCommonMission_failure_daily_common_mission_not_found() throws Exception {
         //given
         final String url = "/api/v1/missions/common";
         when(missionService.getDailyCommonMission())
