@@ -13,30 +13,26 @@ spring:
   profiles:
     active: develop # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      develop: develop, developdb, awss3
+      develop: develop, developdb, awss3, env
 
   defer-datasource-initialization: true
 
 ---
-## Test Profile
-# spring:
-#   config:
-#     activate:
-#       on-profile: test
-#   datasource:
-#     driver-class-name: org.h2.Driver
-#     url:  jdbc:h2:tcp://localhost/~/test
-#     username: sa
+# awss3
+spring:
+  config:
+    activate:
+      on-profile: awss3
 
-#   jpa:
-#     hibernate:
-#       ddl-auto: create
-#     properties:
-#       hibernate:
-#         format_sql: true
-#         dialect: org.hibernate.dialect.H2Dialect
-#     generate-ddl: true
-#     show-sql: true
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: aenitto-message-image
+    credentials:
+      access-key: $IMAGE_ACCESS_KEY
+      secret-key: $IMAGE_SECRET_KEY
 
 ---
 ## Develop Profile

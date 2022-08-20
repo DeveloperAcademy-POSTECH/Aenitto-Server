@@ -32,7 +32,7 @@ jobs:
      
       - name: env파일 생성     
         run: |
-          cd ./src/test/resources/
+          cd ./src/main/resources/
           touch ./env.properties
           echo "IMAGE_ACCESS_KEY=$IMAGE_ACCESS_KEY" >> ./env.properties
           echo "IMAGE_SECRET_KEY=$IMAGE_SECRET_KEY" >> ./env.properties

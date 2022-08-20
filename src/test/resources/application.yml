@@ -6,7 +6,7 @@ spring:
   profiles:
     active: test # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      test: testdb, test-awss3, env
+      test: testdb, awss3, env
 
   sql:
     init:
@@ -36,22 +36,6 @@ spring:
     generate-ddl: true
     show-sql: true
 
----
-# test환경 awss3
-spring:
-  config:
-    activate:
-      on-profile: test-awss3
-
-cloud:
-  aws:
-    region:
-      static: ap-northeast-2
-    s3:
-      bucket: aenitto-message-image
-    credentials:
-      access-key: $IMAGE_ACCESS_KEY
-      secret-key: $IMAGE_SECRET_KEY
 ---      
 # POSTGRES LOCAL TEST
 spring:
@@ -74,3 +58,19 @@ spring:
 
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+---
+# test환경 awss3
+spring:
+  config:
+    activate:
+      on-profile: awss3
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: aenitto-message-image
+    credentials:
+      access-key: $IMAGE_ACCESS_KEY
+      secret-key: $IMAGE_SECRET_KEY
