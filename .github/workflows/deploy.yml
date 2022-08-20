@@ -74,7 +74,7 @@ jobs:
       - name: Generate Environment Variables File for Production
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./src/test/resources/application.yml
+          files: './src/test/resources/application.yml'
         env:
           cloud.aws.credentials.access-key: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
           cloud.aws.credentials.secret-key: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
