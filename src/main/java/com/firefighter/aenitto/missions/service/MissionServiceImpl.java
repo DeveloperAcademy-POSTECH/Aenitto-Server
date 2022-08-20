@@ -2,9 +2,11 @@ package com.firefighter.aenitto.missions.service;
 
 import com.firefighter.aenitto.common.exception.mission.MissionAlreadySetException;
 import com.firefighter.aenitto.common.exception.mission.MissionEmptyException;
+import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
+import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
 import com.firefighter.aenitto.missions.repository.CommonMissionRepository;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
@@ -48,6 +50,13 @@ public class MissionServiceImpl implements MissionService {
                 .orElseThrow(MissionEmptyException::new);
 
         return commonMissionRepository.saveCommonMission(CommonMission.createCommonMission(date, mission)).getId();
+    }
+
+    @Override
+    public DailyCommonMissionResponse getDailyCommonMission(LocalDate date) throws MissionNotFoundException {
+        CommonMission commonMission = commonMissionRepository.findCommonMissionByDate(date)
+                .orElseThrow(MissionNotFoundException::new);
+        return DailyCommonMissionResponse.of(commonMission);
     }
 
     @Override
