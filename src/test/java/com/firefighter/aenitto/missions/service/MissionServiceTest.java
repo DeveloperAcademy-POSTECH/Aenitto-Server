@@ -8,6 +8,7 @@ import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
+import com.firefighter.aenitto.missions.repository.CommonMissionRepositoryImpl;
 import com.firefighter.aenitto.missions.repository.MissionRepositoryImpl;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -39,6 +40,9 @@ public class MissionServiceTest {
 
     @Mock
     private MissionRepositoryImpl missionRepository;
+
+    @Mock
+    private CommonMissionRepositoryImpl commonMissionRepository;
 
     @Mock
     private RoomRepositoryImpl roomRepository;
@@ -89,7 +93,7 @@ public class MissionServiceTest {
     @Test
     void setDailyCommonMission_fail_already_exist() {
         // when
-        when(missionRepository.findCommonMissionByDate(any(LocalDate.class)))
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
                 .thenReturn(Optional.of(commonMission1));
 
         // then
@@ -103,7 +107,7 @@ public class MissionServiceTest {
     @Test
     void setDailyCommonMission_fail_mission_empty() {
         // when
-        when(missionRepository.findCommonMissionByDate(any(LocalDate.class)))
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
                 .thenReturn(Optional.empty());
         when(missionRepository.findRandomMission(any(MissionType.class)))
                 .thenReturn(Optional.empty());
@@ -121,11 +125,11 @@ public class MissionServiceTest {
         // given
 
         // when
-        when(missionRepository.findCommonMissionByDate(any(LocalDate.class)))
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
                 .thenReturn(Optional.empty());
         when(missionRepository.findRandomMission(any(MissionType.class)))
                 .thenReturn(Optional.of(mission1_common));
-        when(missionRepository.saveCommonMission(any(CommonMission.class)))
+        when(commonMissionRepository.saveCommonMission(any(CommonMission.class)))
                 .thenReturn(commonMission1);
 
         Long commonMissionId = missionService.setDailyCommonMission(LocalDate.now());
