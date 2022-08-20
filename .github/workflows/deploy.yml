@@ -29,6 +29,18 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+     
+      - name: env파일 생성     
+        run: |
+          cd ./src/test/resources/
+          touch ./env.properties
+          echo "IMAGE_ACCESS_KEY=$IMAGE_ACCESS_KEY" >> ./env.properties
+          echo "IMAGE_SECRET_KEY=$IMAGE_SECRET_KEY" >> ./env.properties
+          cat env.properties
+        shell: bash
+        env:
+          IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
+          IMAGE_SECRET_KEY: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
 
       # Build
       - name: Build with Gradle
