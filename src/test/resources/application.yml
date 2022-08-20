@@ -1,12 +1,13 @@
 spring:
   servlet:
     multipart:
-      max-file-size: 128KB
+      max-file-size: 2MB
 
   profiles:
-    active: test # 활성화시킬 프로필
+    active: test-deploy # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
       test: testdb, awss3
+      test-deploy: testdb, test-awss3, env
 
   sql:
     init:
@@ -37,6 +38,21 @@ spring:
     show-sql: true
 
 ---
+# test환경 awss3
+spring:
+  config:
+    activate:
+      on-profile: test-awss3
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: aenitto-message-image
+    credentials:
+      access-key: ${IMAGE_ACCESS_KEY}
+      secret-key: ${IMAGE_SECRET_KEY}
 # POSTGRES LOCAL TEST
 spring:
   config:
