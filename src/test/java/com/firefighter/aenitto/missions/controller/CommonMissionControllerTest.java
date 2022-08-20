@@ -35,6 +35,8 @@ import static com.firefighter.aenitto.missions.MissionFixture.missionFixture1_Co
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -94,7 +96,12 @@ public class CommonMissionControllerTest {
                         .getMission().getContent()))
                 )
                 .andDo(document("공통미션 가져오기",
+                        preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
+                        )
+                        ,
                         responseFields(
                                 fieldWithPath("mission").description("미션")
                         )
