@@ -72,16 +72,24 @@ jobs:
       
       # properties파일에 secret key넣기
       - name: Generate Environment Variables File for Production
-        run: |
-          cd ./src/test/resources/
-          touch ./env.properties
-          echo "IMAGE_ACCESS_KEY=$IMAGE_ACCESS_KEY >> ./env.properties
-          echo "IMAGE_SECRET_KEY=$IMAGE_SECRET_KEY >> ./env.properties
-          cat env.properties
-        shell: bash
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ./src/test/resources/application.yml
         env:
-          IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
-          IMAGE_SECRET_KEY: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
+          cloud.aws.credentials.access-key: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
+          cloud.aws.credentials.secret-key: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
+        
+          
+#         run: |
+#           cd ./src/test/resources/
+#           touch ./application.yml
+# #          echo "IMAGE_ACCESS_KEY=$IMAGE_ACCESS_KEY >> ./env.properties
+# #          echo "IMAGE_SECRET_KEY=$IMAGE_SECRET_KEY >> ./env.properties
+# #          cat env.properties
+#         shell: bash
+#         env:
+#           IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
+#           IMAGE_SECRET_KEY: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
           
       # Build
       - name: Build with Gradle
