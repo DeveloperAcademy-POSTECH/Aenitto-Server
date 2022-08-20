@@ -6,7 +6,7 @@ spring:
   profiles:
     active: test # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      test: test, test-awss3
+      test: test, test-awss3, env
 
   sql:
     init:
