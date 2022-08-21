@@ -30,6 +30,7 @@ public class RoomParticipantsResponse {
         private final String nickname;
         private final int colorIdx;
 
+        // TODO: listOf 만들기
         public static RoomParticipants of(MemberRoom memberRoom){
             return RoomParticipants.builder()
                     .colorIdx(memberRoom.getColorIdx())
