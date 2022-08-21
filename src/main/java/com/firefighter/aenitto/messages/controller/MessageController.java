@@ -16,23 +16,31 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/rooms/{roomId}")
 @RequiredArgsConstructor
 public class MessageController {
 
     @Qualifier("messageServiceImpl")
     private final MessageService messageService;
 
-    @PostMapping("/rooms/{roomId}/messages")
+    @PostMapping("/messages")
     public ResponseEntity createRoom(
             @CurrentMember final Member currentMember,
             @PathVariable final Long roomId,
             @RequestPart @Nullable final MultipartFile image,
-            // TODO : request part에 valid 적용 가능 여부
             @Valid @RequestPart final SendMessageRequest sendMessageRequest
     ) {
         final Long messageId = messageService.sendMessage(currentMember, roomId,
                 sendMessageRequest, image);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId + "/messages/" + messageId)).build();
     }
+
+    @GetMapping("/messages-sent")
+    public ResponseEntity getSentMessages(
+            @CurrentMember Member currentMember,
+            @PathVariable final Long roomId
+    ) {
+        return ResponseEntity.ok(messageService.getSentMessages(currentMember, roomId));
+    }
+
 }

@@ -27,7 +27,7 @@ public class MessageIntegrationTest extends IntegrationTest {
         // given
         MockMultipartFile image = IMAGE;
 
-        //TODO createJson 사용해서 바꾸기
+        //TODO createJson 사용해서 바꾸기 - 다온
 
         // when, then
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/rooms/{roomId}/messages", 1L)
