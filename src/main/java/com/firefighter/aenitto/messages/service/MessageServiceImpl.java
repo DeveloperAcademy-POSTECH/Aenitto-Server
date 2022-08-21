@@ -52,6 +52,7 @@ public class MessageServiceImpl implements MessageService{
             throw new NotManitteeException();
         }
 
+        // TODO: 메시지 생성 메서드
         Message message = Message.builder().content(request.getMessageContent()).build();
         message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
 
