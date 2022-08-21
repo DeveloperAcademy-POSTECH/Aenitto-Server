@@ -31,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,7 +45,15 @@ import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFil
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -179,6 +188,7 @@ public class MessageControllerTest {
 
     }
 
+//     TODO: 문서화 진행 - 다온
     @DisplayName("메세지 생성 - 성공")
     @Test
     void send_message_success() throws Exception {
@@ -293,16 +303,35 @@ public class MessageControllerTest {
     void get_sent_message_success() throws Exception {
         //given
         final String uri = "/api/v1/rooms/{roomId}/messages-sent";
+        Long roomId = 1L;
         when(messageService.getSentMessages(any(Member.class), anyLong()))
                 .thenReturn(SentMessagesResponse.of(messages));
 
         //when, then, docs
-        mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
+        mockMvc.perform(RestDocumentationRequestBuilders.get(uri, roomId)
                         .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.count").exists())
-                .andExpect(jsonPath("$.messages[0].id").exists());
+                .andExpect(jsonPath("$.messages[0].id").exists())
+                .andDo(document("보낸 메시지 가져오기",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("count").description("총 메시지 수"),
+                                fieldWithPath("messages").description("보낸 메시지들"),
+                                fieldWithPath("messages[0].id").description("메세지 id"),
+                                fieldWithPath("messages[0].content").description("메세지 내용"),
+                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진")
+                        )
+                ));
+        ;
     }
 }
