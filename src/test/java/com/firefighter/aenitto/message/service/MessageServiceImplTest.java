@@ -135,10 +135,6 @@ public class MessageServiceImplTest {
                 .isThrownBy(() -> {
                     target.sendMessage(manitto, roomId, request, notExtensionFile);
                 });
-
-
-
-
     }
 
     @DisplayName("메세지 생성 - 실패 / 참여하고 있지 않은 방")
@@ -241,8 +237,6 @@ public class MessageServiceImplTest {
                 });
         verify(roomRepository, times(1))
                 .findMemberRoomById(manitto.getId(), room.getId());
-        verify(relationRepository, times(1))
-                .findByRoomIdAndMemberId(room.getId(), manitto.getId());
     }
 
     @DisplayName("보낸 메시지 가져오기 - 실패 / 마니띠가 존재하지 않습니다")

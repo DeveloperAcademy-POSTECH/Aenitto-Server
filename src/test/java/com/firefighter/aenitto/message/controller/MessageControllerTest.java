@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
 import static com.firefighter.aenitto.message.MessageFixture.*;
 import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
@@ -71,6 +72,8 @@ public class MessageControllerTest {
     private ObjectMapper objectMapper;
 
     private MockMultipartFile image;
+    private Member manitto;
+    private Member manittee;
 
     private Message message1;
     private Message message2;
@@ -95,6 +98,7 @@ public class MessageControllerTest {
 
         objectMapper = new ObjectMapper();
         image = IMAGE;
+        manittee = memberFixture2();
 
         message1 = messageFixture1();
         message2 = messageFixture2();
@@ -305,7 +309,7 @@ public class MessageControllerTest {
         final String uri = "/api/v1/rooms/{roomId}/messages-sent";
         Long roomId = 1L;
         when(messageService.getSentMessages(any(Member.class), anyLong()))
-                .thenReturn(SentMessagesResponse.of(messages));
+                .thenReturn(SentMessagesResponse.of(messages, manittee));
 
         //when, then, docs
         mockMvc.perform(RestDocumentationRequestBuilders.get(uri, roomId)
@@ -329,7 +333,10 @@ public class MessageControllerTest {
                                 fieldWithPath("messages").description("보낸 메시지들"),
                                 fieldWithPath("messages[0].id").description("메세지 id"),
                                 fieldWithPath("messages[0].content").description("메세지 내용"),
-                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진")
+                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진"),
+                                fieldWithPath("manittee").description("내 마니띠"),
+                                fieldWithPath("manittee.id").description("마니띠 id"),
+                                fieldWithPath("manittee.nickname").description("내 마니띠 닉네임")
                         )
                 ));
         ;

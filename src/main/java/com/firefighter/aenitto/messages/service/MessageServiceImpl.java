@@ -74,9 +74,9 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public SentMessagesResponse getSentMessages(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
-        throwExceptionIfRelationNotFound(currentMember.getId(), roomId);
+        Relation relation = throwExceptionIfRelationNotFound(currentMember.getId(), roomId);
         List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
-        return SentMessagesResponse.of(messages);
+        return SentMessagesResponse.of(messages, relation.getManittee());
     }
 
     private String getImageExtension(String originalImageName) {
