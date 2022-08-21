@@ -309,7 +309,7 @@ class RoomControllerTest {
                                 parameterWithName("roomId").description("방 id")
                         ),
                         requestFields(
-                        fieldWithPath("colorIdx").description("참여할 캐릭터의 색상 인덱스")
+                                fieldWithPath("colorIdx").description("참여할 캐릭터의 색상 인덱스")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")

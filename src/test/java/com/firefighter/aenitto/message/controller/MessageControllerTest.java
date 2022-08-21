@@ -1,23 +1,18 @@
 package com.firefighter.aenitto.message.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
-import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
-import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
 import com.firefighter.aenitto.common.exception.message.MessageErrorCode;
 import com.firefighter.aenitto.common.exception.message.NotManitteeException;
+import com.firefighter.aenitto.common.exception.room.RelationNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
-import com.firefighter.aenitto.members.controller.MemberController;
 import com.firefighter.aenitto.members.domain.Member;
-import com.firefighter.aenitto.members.dto.request.ChangeNicknameRequest;
-import com.firefighter.aenitto.members.service.MemberService;
-import com.firefighter.aenitto.message.MessageFixture;
-import com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile;
 import com.firefighter.aenitto.messages.controller.MessageController;
+import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.service.MessageService;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,18 +31,30 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
-import static com.firefighter.aenitto.message.MessageFixture.messageFixture1;
+import static com.firefighter.aenitto.message.MessageFixture.*;
 import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -65,6 +72,18 @@ public class MessageControllerTest {
     private ObjectMapper objectMapper;
 
     private MockMultipartFile image;
+    private Member manitto;
+    private Member manittee;
+
+    private Message message1;
+    private Message message2;
+    private Message message3;
+    private Message message4;
+    private Message message5;
+
+    private List<Message> messages = new ArrayList<>();
+
+    private final String ACCESS_TOKEN = "Bearer testAccessToken";
 
     @Mock
     @Qualifier("memberServiceImpl")
@@ -79,6 +98,19 @@ public class MessageControllerTest {
 
         objectMapper = new ObjectMapper();
         image = IMAGE;
+        manittee = memberFixture2();
+
+        message1 = messageFixture1();
+        message2 = messageFixture2();
+        message3 = messageFixture3();
+        message4 = messageFixture4();
+        message5 = messageFixture5();
+
+        messages.add(message1);
+        messages.add(message2);
+        messages.add(message3);
+        messages.add(message4);
+        messages.add(message5);
     }
 
     @DisplayName("메세지 생성 - 실패 / 잘못된 사진일 경우")
@@ -101,7 +133,7 @@ public class MessageControllerTest {
                         MockMvcRequestBuilders.multipart(uri, "1")
                                 .file(wrongImage)
                                 .file(requestMultipartFile())
-                                .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                                .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isUnsupportedMediaType())
@@ -125,7 +157,7 @@ public class MessageControllerTest {
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart(uri, "1")
                                 .file(requestMultipartFile())
-                                .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                                .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isForbidden())
@@ -149,7 +181,7 @@ public class MessageControllerTest {
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")
                         .file(requestMultipartFile())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -160,6 +192,7 @@ public class MessageControllerTest {
 
     }
 
+//     TODO: 문서화 진행 - 다온
     @DisplayName("메세지 생성 - 성공")
     @Test
     void send_message_success() throws Exception {
@@ -170,7 +203,7 @@ public class MessageControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")
                         .file(image)
                         .file(requestMultipartFile())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -178,7 +211,7 @@ public class MessageControllerTest {
 
     }
 
-//    TODO: 이미지 용량 체크
+//    TODO: 이미지 용량 체크 테스트 만들기 - 다온
 //    @DisplayName("메세지 생성 - 실패 / 이미지 파일 용량 초과")
 //    @Test
 //    void send_message_fail_image_size() throws Exception {
@@ -217,7 +250,7 @@ public class MessageControllerTest {
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")
                         .file(requestMultipartfile)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -225,5 +258,87 @@ public class MessageControllerTest {
                 .andExpect(jsonPath("$.message", "입력 조건에 대한 예외입니다").exists())
                 .andExpect(jsonPath("$.errors[0].field", "manitteeId").exists());
 
+    }
+
+    @DisplayName("보낸 메시지 가져오기 - 참여중인 방이 아님")
+    @Test
+    void get_sent_message_failure_not_participating_room() throws Exception {
+        //given
+        final String uri = "/api/v1/rooms/{roomId}/messages-sent";
+        doThrow(new RoomNotParticipatingException())
+                .when(messageService)
+                .getSentMessages(any(Member.class), anyLong());
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(uri, "4")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+    }
+
+    @DisplayName("보낸 메시지 가져오기 - 마니띠가 존재하지 않음")
+    @Test
+    void get_sent_message_failure_relation_not_found() throws Exception {
+        //given
+        final String uri = "/api/v1/rooms/{roomId}/messages-sent";
+        doThrow(new RelationNotFoundException())
+                .when(messageService)
+                .getSentMessages(any(Member.class), anyLong());
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", RoomErrorCode.RELATION_NOT_FOUND.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.RELATION_NOT_FOUND.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+    }
+
+    @DisplayName("보낸 메시지 가져오기 - 성공")
+    @Test
+    void get_sent_message_success() throws Exception {
+        //given
+        final String uri = "/api/v1/rooms/{roomId}/messages-sent";
+        Long roomId = 1L;
+        when(messageService.getSentMessages(any(Member.class), anyLong()))
+                .thenReturn(SentMessagesResponse.of(messages, manittee));
+
+        //when, then, docs
+        mockMvc.perform(RestDocumentationRequestBuilders.get(uri, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").exists())
+                .andExpect(jsonPath("$.messages[0].id").exists())
+                .andDo(document("보낸 메시지 가져오기",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("count").description("총 메시지 수"),
+                                fieldWithPath("messages").description("보낸 메시지들"),
+                                fieldWithPath("messages[0].id").description("메세지 id"),
+                                fieldWithPath("messages[0].content").description("메세지 내용"),
+                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진"),
+                                fieldWithPath("manittee").description("내 마니띠"),
+                                fieldWithPath("manittee.id").description("마니띠 id"),
+                                fieldWithPath("manittee.nickname").description("내 마니띠 닉네임")
+                        )
+                ));
+        ;
     }
 }

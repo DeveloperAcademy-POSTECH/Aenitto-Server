@@ -1,5 +1,8 @@
 package com.firefighter.aenitto.message.integration;
 
+import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
+import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
+import com.firefighter.aenitto.common.utils.SqlPath;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.support.IntegrationTest;
@@ -14,8 +17,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
 import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WithMockCustomMember
 public class MessageIntegrationTest extends IntegrationTest {
@@ -27,7 +31,7 @@ public class MessageIntegrationTest extends IntegrationTest {
         // given
         MockMultipartFile image = IMAGE;
 
-        //TODO createJson 사용해서 바꾸기
+        //TODO createJson 사용해서 바꾸기 - 다온
 
         // when, then
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/rooms/{roomId}/messages", 1L)
@@ -37,4 +41,55 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"));
     }
+
+    @DisplayName("받은 메시지 가져오기 - 성공")
+    @Sql("classpath:relation.sql")
+    @Test
+    void get_sent_messages_failure_room_not_participating() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/messages-sent", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 실패 / 마니또 존재 X")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM
+    })
+    @Test
+    void get_sent_messages_failure_manittee_not_exists() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/messages-sent", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.RELATION_NOT_FOUND.getMessage())));
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 성공 / 마니또 존재 X")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.RELATION,
+            SqlPath.SENT_MESSAGE
+    })
+    @Test
+    void get_sent_messages_success() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/messages-sent", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").exists())
+                .andExpect(jsonPath("$.messages[0].id").exists())
+                .andExpect(jsonPath("$.messages[0].content").exists())
+                .andExpect(jsonPath("$.messages[0].imageUrl").exists())
+        ;
+    }
+
 }

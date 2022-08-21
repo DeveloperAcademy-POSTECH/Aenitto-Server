@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.rooms.dto.response;
 
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Room;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,7 @@ public class RoomParticipantsResponse {
     public static RoomParticipantsResponse of(List<MemberRoom> memberRooms){
         return RoomParticipantsResponse.builder()
                 .count(memberRooms.size())
-                .members(memberRooms.stream().map(RoomParticipants::of)
-                        .collect(Collectors.toList())).build();
+                .members(RoomParticipants.listOf(memberRooms)).build();
     }
 
     @RequiredArgsConstructor
@@ -35,6 +35,11 @@ public class RoomParticipantsResponse {
                     .colorIdx(memberRoom.getColorIdx())
                     .nickname(memberRoom.getMember().getNickname())
                     .build();
+        }
+
+        public static List<RoomParticipants> listOf (List<MemberRoom> memberRooms){
+            return memberRooms.stream().map(RoomParticipants::of)
+                    .collect(Collectors.toList());
         }
     }
 
