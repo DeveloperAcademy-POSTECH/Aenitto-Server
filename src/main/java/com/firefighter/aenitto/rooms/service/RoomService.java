@@ -4,6 +4,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
 
@@ -28,5 +29,7 @@ public interface RoomService {
     public RoomParticipantsResponse getRoomParticipants(Member currentMember, Long roomId);
 
     public void deleteRoom(Member member, Long roomId);
+
+    public void updateRoom(Member member, Long roomId, UpdateRoomRequest request);
 
 }

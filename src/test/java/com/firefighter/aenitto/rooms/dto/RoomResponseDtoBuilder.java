@@ -10,7 +10,6 @@ import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 
 import java.util.List;

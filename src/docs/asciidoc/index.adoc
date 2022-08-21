@@ -20,8 +20,6 @@ operation::함께하는 친구들 리스트[snippets='http-request,http-response
 
 [[Room-API]]
 == Room API
-=== 방 상태 조회
-operation::방 상태 조회[snippets='path-parameters,http-request,http-response,response-fields']
 
 === 마니또 시작하기
 operation::마니또 시작하기[snippets='path-parameters,request-headers,http-request,http-response']
@@ -31,6 +29,12 @@ operation::방 상태 조회[snippets='path-parameters,request-headers,http-requ
 
 === 방 정보 조회
 operation::방 정보 조회[snippets='path-parameters,http-request,http-response,response-fields']
+
+=== 방 삭제
+operation::방 삭제[snippets='path-parameters,http-request,http-response']
+
+=== 방 수정
+operation::방 수정하기[snippets='path-parameters,http-request,request-fields,http-response']
 
 === 방 생성
 operation::방 생성[snippets='request-headers,http-request,request-fields,http-response']
@@ -48,3 +52,5 @@ operation::초대코드 검증[snippets='request-headers,http-request,request-fi
 == 메시지 API
 === 보낸 메시지 가져오기
 operation::보낸 메시지 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+
+

@@ -19,6 +19,7 @@ import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
@@ -71,7 +72,6 @@ public class RoomServiceTest {
     MemberRoom memberRoom4;
     MemberRoom memberRoom5;
 
-
     CurrentUserDetails currentUserDetails;
 
     Mission mission1;
@@ -108,7 +108,6 @@ public class RoomServiceTest {
         individualMission1 = individualMissionFixture1();
 
         currentUserDetails = CURRENT_USER_DETAILS;
-
     }
 
     @DisplayName("방 생성 성공")
@@ -693,5 +692,61 @@ public class RoomServiceTest {
 
         // then
         assertThat(room1.isDeleted()).isTrue();
+    }
+
+    @DisplayName("방 수정 - 실패 (방 참여 x)")
+    @Test
+    void updateRoom_fail_not_participating() {
+        //given
+        UpdateRoomRequest request = RoomRequestDtoBuilder.updateRoomRequest();
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.empty());
+
+        // then
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.updateRoom(member1, room1.getId(), request);
+                });
+    }
+
+    @DisplayName("방 수정 - 실패 (방장 x)")
+    @Test
+    void updateRoom_fail_not_admin() {
+        //given
+        memberRoom2 = memberRoomFixture2(member2, room2);
+        ReflectionTestUtils.setField(memberRoom2, "admin", false);
+        UpdateRoomRequest request = RoomRequestDtoBuilder.updateRoomRequest();
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom2));
+
+        // then
+        assertThatExceptionOfType(RoomUnAuthorizedException.class)
+                .isThrownBy(() -> {
+                    target.updateRoom(member1, room1.getId(), request);
+                });
+    }
+
+    @DisplayName("방 수정 - 성공")
+    @Test
+    void updateRoom_success() {
+        //given
+        memberRoom2 = memberRoomFixture2(member2, room2);
+        ReflectionTestUtils.setField(memberRoom2, "admin", true);
+        UpdateRoomRequest request = RoomRequestDtoBuilder.updateRoomRequest();
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom2));
+        target.updateRoom(member2, room2.getId(), request);
+
+        // then
+        assertThat(room2.getTitle()).isEqualTo(request.getTitle());
+        assertThat(room2.getCapacity()).isEqualTo(request.getCapacity());
+        assertThat(room2.getStartDateValue()).isEqualTo(request.getStartDate());
+        assertThat(room2.getEndDateValue()).isEqualTo(request.getEndDate());
     }
 }

@@ -15,6 +15,7 @@ import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
@@ -203,6 +204,7 @@ public class RoomServiceImpl implements RoomService {
         return RoomParticipantsResponse.of(memberRoom.getRoom().getMemberRooms());
     }
 
+    @Override
     @Transactional
     public void deleteRoom(Member member, Long roomId) {
         MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
@@ -210,6 +212,16 @@ public class RoomServiceImpl implements RoomService {
 
         memberRoom.getRoom().delete();
     }
+
+    @Override
+    @Transactional
+    public void updateRoom(Member member, Long roomId, UpdateRoomRequest request) {
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        throwExceptionIfNotAdmin(memberRoom);
+
+        memberRoom.getRoom().updateRoom(request);
+    }
+
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
         roomRepository.findMemberRoomById(memberId, roomId)
