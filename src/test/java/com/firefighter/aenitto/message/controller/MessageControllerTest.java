@@ -71,6 +71,8 @@ public class MessageControllerTest {
 
     private List<Message> messages = new ArrayList<>();
 
+    private final String ACCESS_TOKEN = "Bearer testAccessToken";
+
     @Mock
     @Qualifier("memberServiceImpl")
     private MessageService messageService;
@@ -118,7 +120,7 @@ public class MessageControllerTest {
                         MockMvcRequestBuilders.multipart(uri, "1")
                                 .file(wrongImage)
                                 .file(requestMultipartFile())
-                                .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                                .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isUnsupportedMediaType())
@@ -142,7 +144,7 @@ public class MessageControllerTest {
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart(uri, "1")
                                 .file(requestMultipartFile())
-                                .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                                .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isForbidden())
@@ -166,7 +168,7 @@ public class MessageControllerTest {
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")
                         .file(requestMultipartFile())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -187,7 +189,7 @@ public class MessageControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")
                         .file(image)
                         .file(requestMultipartFile())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -234,7 +236,7 @@ public class MessageControllerTest {
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")
                         .file(requestMultipartfile)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -255,7 +257,7 @@ public class MessageControllerTest {
 
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.get(uri, "4")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isForbidden())
@@ -276,7 +278,7 @@ public class MessageControllerTest {
 
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -296,7 +298,7 @@ public class MessageControllerTest {
 
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())

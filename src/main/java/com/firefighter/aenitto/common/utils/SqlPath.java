@@ -6,6 +6,7 @@ public class SqlPath {
     public static final String MEMBER = "classpath:sql/member/member.sql";
     public static final String MEMBER_ROOM = "classpath:sql/memberRoom/memberRoom.sql";
     public static final String MESSAGE = "classpath:sql/message/message.sql";
+    public static final String SENT_MESSAGE = "classpath:sql/message/sentMessage.sql";
     public static final String MISSION = "classpath:sql/mission/mission.sql";
     public static final String RELATION = "classpath:sql/relation/relation.sql";
     public static final String ROOM_PRE = "classpath:sql/room/room-pre.sql";
