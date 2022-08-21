@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.messages.repository;
 
+import com.firefighter.aenitto.messages.domain.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import java.util.UUID;
 @Repository
 @Qualifier(value = "messageRepositoryImpl")
 @RequiredArgsConstructor
-public class MessageRepositoryImpl implements MessageRepository{
+public class MessageRepositoryImpl implements MessageRepository {
     private final EntityManager em;
 
     @Override
@@ -28,5 +29,11 @@ public class MessageRepositoryImpl implements MessageRepository{
                 .setParameter("read", false)
                 .getSingleResult()
                 .intValue();
+    }
+
+    @Override
+    public Message saveMessage(Message message) {
+        em.persist(message);
+        return message;
     }
 }

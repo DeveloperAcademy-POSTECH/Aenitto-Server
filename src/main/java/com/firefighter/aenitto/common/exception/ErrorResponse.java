@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -28,6 +29,10 @@ public class ErrorResponse {
         return ResponseEntity.badRequest().body(new ErrorResponse((result)));
     }
 
+    public static ResponseEntity<ErrorResponse>toResponseEntity(MaxUploadSizeExceededException result) {
+        return ResponseEntity.badRequest().body(new ErrorResponse((result)));
+    }
+
     private ErrorResponse(ErrorCode errorCode) {
         this.status = errorCode.getStatus().value();
         this.message = errorCode.getMessage();
@@ -38,6 +43,12 @@ public class ErrorResponse {
         this.status = HttpStatus.BAD_REQUEST.value();
         this.message = "입력 조건에 대한 예외입니다";
         this.errors = FieldError.of(result);
+    }
+
+    private ErrorResponse(MaxUploadSizeExceededException result) {
+        this.status = HttpStatus.BAD_REQUEST.value();
+        this.message = "최대 2MB의 파일크기를 초과하였습니다";
+        this.errors = Collections.emptyList();
     }
 
     @Getter

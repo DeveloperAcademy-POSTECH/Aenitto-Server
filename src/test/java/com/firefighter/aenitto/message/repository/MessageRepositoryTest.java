@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,6 +92,22 @@ public class MessageRepositoryTest {
         // then
         assertThat(unreadMessageCount1).isEqualTo(0);
         assertThat(unreadMessageCount2).isEqualTo(5);
+    }
+
+    @DisplayName("메시지 보내기 - 성공")
+    @Test
+    void sendMessage_success(){
+        //given
+        messageRepository.saveMessage(message1);
+        em.flush();
+
+        //when
+        Message result = em.find(Message.class, message1.getId());
+
+        //then
+        assertThat(result.getId()).isNotNull();
+        assertThat(result.getContent()).isNotNull();
+        assertThat(result.getImgUrl()).isNotNull();
     }
 
 }
