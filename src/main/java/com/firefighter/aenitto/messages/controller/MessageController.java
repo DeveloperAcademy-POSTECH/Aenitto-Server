@@ -3,6 +3,7 @@ package com.firefighter.aenitto.messages.controller;
 import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.service.MessageService;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class MessageController {
     }
 
     @GetMapping("/messages-sent")
-    public ResponseEntity getSentMessages(
+    public ResponseEntity<SentMessagesResponse> getSentMessages(
             @CurrentMember Member currentMember,
             @PathVariable final Long roomId
     ) {
