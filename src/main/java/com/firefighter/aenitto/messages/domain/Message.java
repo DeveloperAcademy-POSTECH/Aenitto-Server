@@ -9,11 +9,11 @@ import org.hibernate.annotations.ColumnDefault;
 import javax.persistence.*;
 
 @Entity
-@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message extends CreationLog {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "message_id")
     private Long id;
 
@@ -49,6 +49,10 @@ public class Message extends CreationLog {
     @Builder
     public Message(String content, String imgUrl) {
         this.content = content;
+        this.imgUrl = imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
     }
 

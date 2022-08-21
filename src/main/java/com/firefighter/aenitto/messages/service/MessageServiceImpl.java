@@ -53,13 +53,14 @@ public class MessageServiceImpl implements MessageService{
 
         Message message = Message.builder().content(request.getMessageContent()).build();
         message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
-
+        
         if(image != null){
             String renameImageName  = getRenameImage(image);
             uploadToFileStorage(image, renameImageName);
             String imageUrl = storageService.getUrl(renameImageName);
             message.setImgUrl(imageUrl);
         }
+
         return messageRepository.saveMessage(message).getId();
     }
 
