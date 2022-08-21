@@ -49,6 +49,7 @@ public class MessageServiceImpl implements MessageService {
     private final StorageService storageService;
 
     @Override
+    @Transactional
     public long sendMessage(Member currentMember, Long roomId,
                             SendMessageRequest request, MultipartFile image) {
 
@@ -59,6 +60,7 @@ public class MessageServiceImpl implements MessageService {
             throw new NotManitteeException();
         }
 
+        // TODO: 메시지 생성 메서드
         Message message = Message.builder().content(request.getMessageContent()).build();
         message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
 
@@ -68,6 +70,7 @@ public class MessageServiceImpl implements MessageService {
             String imageUrl = storageService.getUrl(renameImageName);
             message.setImgUrl(imageUrl);
         }
+
         return messageRepository.saveMessage(message).getId();
     }
 

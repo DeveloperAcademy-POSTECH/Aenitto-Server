@@ -2,12 +2,15 @@ package com.firefighter.aenitto.missions.service;
 
 import com.firefighter.aenitto.common.exception.mission.MissionAlreadySetException;
 import com.firefighter.aenitto.common.exception.mission.MissionEmptyException;
+import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.members.MemberFixture;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
+import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
+import com.firefighter.aenitto.missions.repository.CommonMissionRepositoryImpl;
 import com.firefighter.aenitto.missions.repository.MissionRepositoryImpl;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -20,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,6 +43,9 @@ public class MissionServiceTest {
 
     @Mock
     private MissionRepositoryImpl missionRepository;
+
+    @Mock
+    private CommonMissionRepositoryImpl commonMissionRepository;
 
     @Mock
     private RoomRepositoryImpl roomRepository;
@@ -89,7 +96,7 @@ public class MissionServiceTest {
     @Test
     void setDailyCommonMission_fail_already_exist() {
         // when
-        when(missionRepository.findCommonMissionByDate(any(LocalDate.class)))
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
                 .thenReturn(Optional.of(commonMission1));
 
         // then
@@ -103,7 +110,7 @@ public class MissionServiceTest {
     @Test
     void setDailyCommonMission_fail_mission_empty() {
         // when
-        when(missionRepository.findCommonMissionByDate(any(LocalDate.class)))
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
                 .thenReturn(Optional.empty());
         when(missionRepository.findRandomMission(any(MissionType.class)))
                 .thenReturn(Optional.empty());
@@ -121,11 +128,11 @@ public class MissionServiceTest {
         // given
 
         // when
-        when(missionRepository.findCommonMissionByDate(any(LocalDate.class)))
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
                 .thenReturn(Optional.empty());
         when(missionRepository.findRandomMission(any(MissionType.class)))
                 .thenReturn(Optional.of(mission1_common));
-        when(missionRepository.saveCommonMission(any(CommonMission.class)))
+        when(commonMissionRepository.saveCommonMission(any(CommonMission.class)))
                 .thenReturn(commonMission1);
 
         Long commonMissionId = missionService.setDailyCommonMission(LocalDate.now());
@@ -196,4 +203,36 @@ public class MissionServiceTest {
         assertThat(memberRoom3.didSetDailyIndividualMission(LocalDate.now())).isTrue();
     }
 
+    @DisplayName("해당 일자의 공통 미션 가져오기 - 성공")
+    @Test
+    void getDailyCommonMission_success() {
+
+        //given
+        ReflectionTestUtils.setField(commonMission1, "mission", mission1_common);
+
+        //when
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
+                .thenReturn(Optional.of(commonMission1));
+        DailyCommonMissionResponse result =
+                missionService.getDailyCommonMission();
+
+        //then
+        assertThat(result.getMission()).isEqualTo(commonMission1.getMission().getContent());
+        verify(commonMissionRepository, times(1))
+                .findCommonMissionByDate(any(LocalDate.class));
+    }
+
+    @DisplayName("해당 일자의 공통 미션 가져오기 - 실패")
+    @Test
+    void getDailyCommonMission_fail_no_common_mission() {
+        //when
+        when(commonMissionRepository.findCommonMissionByDate(any(LocalDate.class)))
+                .thenReturn(Optional.empty());
+
+        //then
+        assertThatExceptionOfType(MissionNotFoundException.class)
+                .isThrownBy(() -> {
+                    missionService.getDailyCommonMission();
+                });
+    }
 }

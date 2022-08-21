@@ -114,32 +114,4 @@ public class MissionRepositoryTest {
         assertThat(randomMission.get()).isNotNull();
         assertThat(randomMission.get().getType()).isEqualTo(MissionType.INDIVIDUAL);
     }
-
-    @DisplayName("오늘 자 공통미션 찾기 - 실패")
-    @Test
-    void findTodayCommonMission_fail() {
-        assertThat(repository.findCommonMissionByDate(LocalDate.now()).isEmpty()).isTrue();
-    }
-
-    @DisplayName("오늘 자 공통미션 칮기 - 성공")
-    @Test
-    void findTodayCommonMission_success() {
-        // given
-        ReflectionTestUtils.setField(commonMission1, "date", LocalDate.now());
-        ReflectionTestUtils.setField(commonMission1, "mission", mission1);
-
-        em.persist(mission1);
-        em.persist(commonMission1);
-
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<CommonMission> todayCommonMission = repository.findCommonMissionByDate(LocalDate.now());
-
-        // then
-        assertThat(todayCommonMission.get().getId()).isEqualTo(commonMission1.getId());
-        assertThat(todayCommonMission.get().getMission().getType()).isEqualTo(MissionType.COMMON);
-        assertThat(todayCommonMission.get().getMission().getContent()).isEqualTo(mission1.getContent());
-    }
 }
