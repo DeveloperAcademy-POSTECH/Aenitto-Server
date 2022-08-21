@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class MessageServiceImpl implements MessageService{
 
     @Qualifier("memberRepositoryImpl")
@@ -41,6 +41,7 @@ public class MessageServiceImpl implements MessageService{
     private final StorageService storageService;
 
     @Override
+    @Transactional
     public long sendMessage(Member currentMember, Long roomId,
                             SendMessageRequest request, MultipartFile image){
 
@@ -53,7 +54,7 @@ public class MessageServiceImpl implements MessageService{
 
         Message message = Message.builder().content(request.getMessageContent()).build();
         message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
-        
+
         if(image != null){
             String renameImageName  = getRenameImage(image);
             uploadToFileStorage(image, renameImageName);
