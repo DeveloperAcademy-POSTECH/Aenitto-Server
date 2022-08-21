@@ -24,7 +24,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping("/rooms/{roomId}/messages")
-    public ResponseEntity createRoom(
+    public ResponseEntity sendMessage(
             @CurrentMember final Member currentMember,
             @PathVariable final Long roomId,
             @RequestPart @Nullable final MultipartFile image,
