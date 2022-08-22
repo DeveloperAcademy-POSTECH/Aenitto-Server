@@ -9,6 +9,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.messages.service.MessageServiceImpl;
@@ -244,7 +245,7 @@ public class MessageServiceImplTest {
         //given
         memberRoom = memberRoomFixture1(manitto, room);
         doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
-                        .findMemberRoomById(manitto.getId(), room.getId());
+                .findMemberRoomById(manitto.getId(), room.getId());
         doReturn(Optional.empty()).when(relationRepository)
                 .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
 
@@ -312,7 +313,7 @@ public class MessageServiceImplTest {
         doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
                 .findMemberRoomById(manittee.getId(), room.getId());
         doReturn(Optional.empty()).when(relationRepository)
-                .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
+                .findByRoomIdAndManitteeId(anyLong(), any(UUID.class));
 
         //when, then
         assertThatExceptionOfType(RelationNotFoundException.class)
@@ -322,11 +323,11 @@ public class MessageServiceImplTest {
         verify(roomRepository, times(1))
                 .findMemberRoomById(manittee.getId(), room.getId());
         verify(relationRepository, times(1))
-                .findByRoomIdAndManittoId(room.getId(), manittee.getId());
+                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
 
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 성공")
+    @DisplayName("받은 메시지 가져오기 - 성공")
     @Test
     void getReceivedMessages_success() {
         //given
@@ -334,12 +335,12 @@ public class MessageServiceImplTest {
         doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
                 .findMemberRoomById(manittee.getId(), room.getId());
         doReturn(Optional.ofNullable(relation)).when(relationRepository)
-                .findByRoomIdAndManittoId(room.getId(), manittee.getId());
+                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
         doReturn(messages).when(messageRepository)
                 .getReceivedMessages(manittee.getId(), room.getId());
 
         //when
-        SentMessagesResponse response = target.getReceivedMessages(manittee, room.getId());
+        ReceivedMessagesResponse response = target.getReceivedMessages(manittee, room.getId());
 
         //then
         assertThat(response.getCount()).isEqualTo(5);
@@ -349,7 +350,7 @@ public class MessageServiceImplTest {
         verify(roomRepository, times(1))
                 .findMemberRoomById(manittee.getId(), room.getId());
         verify(relationRepository, times(1))
-                .findByRoomIdAndManittoId(room.getId(), manittee.getId());
+                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
         verify(messageRepository, times(1))
                 .getReceivedMessages(manittee.getId(), room.getId());
     }

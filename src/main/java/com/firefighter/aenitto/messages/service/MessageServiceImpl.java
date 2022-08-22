@@ -10,6 +10,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
@@ -77,17 +78,17 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public SentMessagesResponse getSentMessages(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
-        Relation relation = throwExceptionIfRelationNotFound(currentMember.getId(), roomId);
+        Relation relation = throwExceptionIfManitteeNotFound(currentMember.getId(), roomId);
         List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
         return SentMessagesResponse.of(messages, relation.getManittee());
     }
 
     @Override
-    public SentMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
+    public ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
-        Relation relation = throwExceptionIfRelationNotFound(currentMember.getId(), roomId);
-        List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
-        return SentMessagesResponse.of(messages, relation.getManittee());
+        Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
+        List<Message> messages = messageRepository.getReceivedMessages(currentMember.getId(), roomId);
+        return ReceivedMessagesResponse.of(messages);
     }
 
     private String getImageExtension(String originalImageName) {
@@ -124,8 +125,13 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(RoomNotParticipatingException::new);
     }
 
-    private Relation throwExceptionIfRelationNotFound(UUID memberId, Long roomId) {
+    private Relation throwExceptionIfManitteeNotFound(UUID memberId, Long roomId) {
         return relationRepository.findByRoomIdAndManittoId(roomId, memberId)
+                .orElseThrow(RelationNotFoundException::new);
+    }
+
+    private Relation throwExceptionIfManittoNotFound(UUID memberId, Long roomId) {
+        return relationRepository.findByRoomIdAndManitteeId(roomId, memberId)
                 .orElseThrow(RelationNotFoundException::new);
     }
 }
