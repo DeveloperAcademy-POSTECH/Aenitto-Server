@@ -363,7 +363,7 @@ public class MessageControllerTest {
                 .andExpect(jsonPath("$.errors").exists());
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 마니또가 존재하지 않음")
+    @DisplayName("받은 메시지 가져오기 - 마니또가 존재하지 않음")
     @Test
     void get_received_message_failure_relation_not_found() throws Exception {
         //given
@@ -384,7 +384,7 @@ public class MessageControllerTest {
                 .andExpect(jsonPath("$.errors").exists());
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 성공")
+    @DisplayName("받은 메시지 가져오기 - 성공")
     @Test
     void get_received_message_success() throws Exception {
         //given
