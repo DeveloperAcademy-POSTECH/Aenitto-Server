@@ -111,6 +111,7 @@ public class MessageRepositoryTest {
         assertThat(result.getContent()).isNotNull();
         assertThat(result.getImgUrl()).isNotNull();
     }
+
     @DisplayName("보낸 메시지 가져오기 - 실패")
     @Test
     void getSentMessages_failure() {
@@ -136,6 +137,36 @@ public class MessageRepositoryTest {
 
         // when
         List<Message> result = messageRepository.getSentMessages(member1.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(7);
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 실패")
+    @Test
+    void getRecievedMessages_failure() {
+        assertThat(messageRepository.getSentMessages(UUID.randomUUID(), 1L).isEmpty()).isTrue();
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 성공")
+    @Test
+    void getRecievedMessages_success() {
+        // given
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository.getReceivedMessages(member2.getId(), room1.getId());
 
         // then
         assertThat(result.size()).isEqualTo(7);

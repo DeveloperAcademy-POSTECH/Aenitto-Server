@@ -9,4 +9,5 @@ public interface MessageRepository {
     Message saveMessage(Message message);
     int findUnreadMessageCount(UUID memberId, Long roomId);
     List<Message> getSentMessages (UUID memberId, Long roomId);
+    List<Message> getReceivedMessages (UUID receiverId, Long roomId);
 }
