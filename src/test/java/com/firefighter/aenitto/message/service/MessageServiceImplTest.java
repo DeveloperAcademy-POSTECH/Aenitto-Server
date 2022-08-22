@@ -9,6 +9,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.messages.service.MessageServiceImpl;
@@ -29,7 +30,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.channels.MulticastChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -125,7 +125,7 @@ public class MessageServiceImplTest {
         //given
         Long roomId = 1L;
         doReturn(Optional.of(relation)).when(relationRepository)
-                .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
+                .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
                 .manitteeId(manittee.getId().toString()).build();
         MockMultipartFile notExtensionFile = new MockMultipartFile("1", "1".getBytes());
@@ -143,7 +143,7 @@ public class MessageServiceImplTest {
         //given
         Long roomId = 1L;
         doReturn(Optional.empty()).when(relationRepository)
-                .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
+                .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
                 .manitteeId(manittee.getId().toString()).build();
 
@@ -154,7 +154,7 @@ public class MessageServiceImplTest {
                 });
 
         verify(relationRepository, times(1))
-                .findByRoomIdAndMemberId(roomId, manitto.getId());
+                .findByRoomIdAndManittoId(roomId, manitto.getId());
     }
 
     @DisplayName("메세지 생성 - 실패 / 사진 파일 업로드 중 예외 발생")
@@ -163,7 +163,7 @@ public class MessageServiceImplTest {
         //given
         Long roomId = 1L;
         doReturn(Optional.of(relation)).when(relationRepository)
-                .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
+                .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
                 .manitteeId(manittee.getId().toString()).build();
 
@@ -176,7 +176,7 @@ public class MessageServiceImplTest {
                 });
 
         verify(relationRepository, times(1))
-                .findByRoomIdAndMemberId(roomId, manitto.getId());
+                .findByRoomIdAndManittoId(roomId, manitto.getId());
     }
 
 
@@ -186,7 +186,7 @@ public class MessageServiceImplTest {
         //given
         Long roomId = 1L;
         doReturn(Optional.of(relation)).when(relationRepository)
-                .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
+                .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
         SendMessageRequest request = SendMessageRequest.builder()
                 .manitteeId(UUID.randomUUID().toString()).build();
 
@@ -196,7 +196,7 @@ public class MessageServiceImplTest {
                     target.sendMessage(manitto, roomId, request, image);
                 });
         verify(relationRepository, times(1))
-                .findByRoomIdAndMemberId(roomId, manitto.getId());
+                .findByRoomIdAndManittoId(roomId, manitto.getId());
     }
 
 
@@ -206,7 +206,7 @@ public class MessageServiceImplTest {
         //given
         Long roomId = 1L;
         doReturn(Optional.of(relation)).when(relationRepository)
-                .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
+                .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
         doReturn(message).when(messageRepository)
                 .saveMessage(any(Message.class));
 
@@ -219,7 +219,7 @@ public class MessageServiceImplTest {
 
         //then
         verify(relationRepository, times(1))
-                .findByRoomIdAndMemberId(roomId, manitto.getId());
+                .findByRoomIdAndManittoId(roomId, manitto.getId());
         verify(messageRepository, times(1)).saveMessage(any(Message.class));
     }
 
@@ -245,9 +245,9 @@ public class MessageServiceImplTest {
         //given
         memberRoom = memberRoomFixture1(manitto, room);
         doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
-                        .findMemberRoomById(manitto.getId(), room.getId());
+                .findMemberRoomById(manitto.getId(), room.getId());
         doReturn(Optional.empty()).when(relationRepository)
-                .findByRoomIdAndMemberId(anyLong(), any(UUID.class));
+                .findByRoomIdAndManittoId(anyLong(), any(UUID.class));
 
         //when, then
         assertThatExceptionOfType(RelationNotFoundException.class)
@@ -257,7 +257,7 @@ public class MessageServiceImplTest {
         verify(roomRepository, times(1))
                 .findMemberRoomById(manitto.getId(), room.getId());
         verify(relationRepository, times(1))
-                .findByRoomIdAndMemberId(room.getId(), manitto.getId());
+                .findByRoomIdAndManittoId(room.getId(), manitto.getId());
 
     }
 
@@ -269,7 +269,7 @@ public class MessageServiceImplTest {
         doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
                 .findMemberRoomById(manitto.getId(), room.getId());
         doReturn(Optional.ofNullable(relation)).when(relationRepository)
-                .findByRoomIdAndMemberId(room.getId(), manitto.getId());
+                .findByRoomIdAndManittoId(room.getId(), manitto.getId());
         doReturn(messages).when(messageRepository)
                 .getSentMessages(manitto.getId(), room.getId());
 
@@ -284,8 +284,74 @@ public class MessageServiceImplTest {
         verify(roomRepository, times(1))
                 .findMemberRoomById(manitto.getId(), room.getId());
         verify(relationRepository, times(1))
-                .findByRoomIdAndMemberId(room.getId(), manitto.getId());
+                .findByRoomIdAndManittoId(room.getId(), manitto.getId());
         verify(messageRepository, times(1))
                 .getSentMessages(manitto.getId(), room.getId());
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 실패 / 참여하고 있지 않은 방")
+    @Test
+    void getReceivedMessages_failure_not_participating_room() {
+        //given
+        doReturn(Optional.empty()).when(roomRepository)
+                .findMemberRoomById(any(UUID.class), anyLong());
+
+        //when
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.getReceivedMessages(manittee, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(manittee.getId(), room.getId());
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 실패 / 마니또가 존재하지 않습니다")
+    @Test
+    void getReceivedMessages_failure_manitto_not_exists() {
+        //given
+        memberRoom = memberRoomFixture1(manittee, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(manittee.getId(), room.getId());
+        doReturn(Optional.empty()).when(relationRepository)
+                .findByRoomIdAndManitteeId(anyLong(), any(UUID.class));
+
+        //when, then
+        assertThatExceptionOfType(RelationNotFoundException.class)
+                .isThrownBy(() -> {
+                    target.getReceivedMessages(manittee, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(manittee.getId(), room.getId());
+        verify(relationRepository, times(1))
+                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 성공")
+    @Test
+    void getReceivedMessages_success() {
+        //given
+        memberRoom = memberRoomFixture1(manittee, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(manittee.getId(), room.getId());
+        doReturn(Optional.ofNullable(relation)).when(relationRepository)
+                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+        doReturn(messages).when(messageRepository)
+                .getReceivedMessages(manittee.getId(), room.getId());
+
+        //when
+        ReceivedMessagesResponse response = target.getReceivedMessages(manittee, room.getId());
+
+        //then
+        assertThat(response.getCount()).isEqualTo(5);
+        assertThat(response.getMessages().size()).isEqualTo(5);
+        assertThat(response.getMessages().get(0).getId()).isEqualTo(1L);
+
+        verify(roomRepository, times(1))
+                .findMemberRoomById(manittee.getId(), room.getId());
+        verify(relationRepository, times(1))
+                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+        verify(messageRepository, times(1))
+                .getReceivedMessages(manittee.getId(), room.getId());
     }
 }

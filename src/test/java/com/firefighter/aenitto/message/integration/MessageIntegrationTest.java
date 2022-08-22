@@ -42,8 +42,7 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(header().exists("Location"));
     }
 
-    @DisplayName("받은 메시지 가져오기 - 성공")
-    @Sql("classpath:relation.sql")
+    @DisplayName("보낸 메시지 가져오기 - 실패 / 참여중인 방이 아님")
     @Test
     void get_sent_messages_failure_room_not_participating() throws Exception {
         // when, then
@@ -54,7 +53,7 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
     }
 
-    @DisplayName("받은 메시지 가져오기 - 실패 / 마니또 존재 X")
+    @DisplayName("보낸 메시지 가져오기 - 실패 / 마니또 존재 X")
     @Sql({
             SqlPath.MEMBER,
             SqlPath.ROOM_PROCESSING,
@@ -70,7 +69,7 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.message", is(RoomErrorCode.RELATION_NOT_FOUND.getMessage())));
     }
 
-    @DisplayName("받은 메시지 가져오기 - 성공 / 마니또 존재 X")
+    @DisplayName("보낸 메시지 가져오기 - 성공")
     @Sql({
             SqlPath.MEMBER,
             SqlPath.ROOM_PROCESSING,
@@ -92,4 +91,52 @@ public class MessageIntegrationTest extends IntegrationTest {
         ;
     }
 
+    @DisplayName("받은 메시지 가져오기 - 실패 / 참여중인 방이 아님")
+    @Test
+    void get_received_messages_failure_room_not_participating() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/messages-received", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 실패 / 마니또 존재 X")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM
+    })
+    @Test
+    void get_received_messages_failure_manittee_not_exists() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/messages-received", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.RELATION_NOT_FOUND.getMessage())));
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 성공")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.RELATION,
+            SqlPath.RECEIVED_MESSAGE
+    })
+    @Test
+    void get_received_messages_success() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/messages-received", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").exists())
+                .andExpect(jsonPath("$.messages[0].id").exists())
+                .andExpect(jsonPath("$.messages[0].content").exists())
+                .andExpect(jsonPath("$.messages[0].imageUrl").exists())
+        ;
+    }
 }
