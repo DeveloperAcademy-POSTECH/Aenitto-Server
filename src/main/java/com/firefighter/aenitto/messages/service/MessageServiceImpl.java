@@ -53,7 +53,7 @@ public class MessageServiceImpl implements MessageService {
     public long sendMessage(Member currentMember, Long roomId,
                             SendMessageRequest request, MultipartFile image) {
 
-        Relation relation = relationRepository.findByRoomIdAndMemberId(roomId, currentMember.getId())
+        Relation relation = relationRepository.findByRoomIdAndManittoId(roomId, currentMember.getId())
                 .orElseThrow(RoomNotParticipatingException::new);
 
         if (!Objects.equals(relation.getManittee().getId(), UUID.fromString(request.getManitteeId()))) {
@@ -76,6 +76,14 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public SentMessagesResponse getSentMessages(Member currentMember, Long roomId) {
+        throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+        Relation relation = throwExceptionIfRelationNotFound(currentMember.getId(), roomId);
+        List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
+        return SentMessagesResponse.of(messages, relation.getManittee());
+    }
+
+    @Override
+    public SentMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation relation = throwExceptionIfRelationNotFound(currentMember.getId(), roomId);
         List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
@@ -117,7 +125,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private Relation throwExceptionIfRelationNotFound(UUID memberId, Long roomId) {
-        return relationRepository.findByRoomIdAndMemberId(roomId, memberId)
+        return relationRepository.findByRoomIdAndManittoId(roomId, memberId)
                 .orElseThrow(RelationNotFoundException::new);
     }
 }
