@@ -91,5 +91,4 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.messages[0].imageUrl").exists())
         ;
     }
-
 }

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.firefighter.aenitto.message.MessageFixture.messageFixture1;
+import static com.firefighter.aenitto.message.MessageFixture.messageFixture8;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -111,11 +113,6 @@ public class MessageRepositoryTest {
         assertThat(result.getContent()).isNotNull();
         assertThat(result.getImgUrl()).isNotNull();
     }
-    @DisplayName("보낸 메시지 가져오기 - 실패")
-    @Test
-    void getSentMessages_failure() {
-        assertThat(messageRepository.getSentMessages(UUID.randomUUID(), 1L).isEmpty()).isTrue();
-    }
 
     @DisplayName("보낸 메시지 가져오기 - 성공")
     @Test
@@ -139,5 +136,31 @@ public class MessageRepositoryTest {
 
         // then
         assertThat(result.size()).isEqualTo(7);
+    }
+
+    @DisplayName("메세지 읽지 않은 메세지 가져오기 - 성공")
+    @Test
+    void findMessagesByManittoIdAndRoomIdAndStatus_success() {
+        // given
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+        message1.readMessage();
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository
+                .findMessagesByReceiverIdAndRoomIdAndStatus(member2.getId(), room1.getId(), false);
+
+        // then
+        assertThat(result.size()).isEqualTo(6);
     }
 }

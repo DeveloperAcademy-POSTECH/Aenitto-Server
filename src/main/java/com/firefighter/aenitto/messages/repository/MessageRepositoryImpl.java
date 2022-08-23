@@ -41,14 +41,28 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public List<Message> getSentMessages (UUID senderId, Long roomId) {
+    public List<Message> getSentMessages(UUID senderId, Long roomId) {
         return em.createQuery(
-                "SELECT m" +
-                        " FROM Message m" +
-                        " WHERE m.sender.id = :memberId" +
-                        " AND m.room.id = :roomId", Message.class)
+                        "SELECT m " +
+                                "FROM Message m " +
+                                "WHERE m.sender.id = :memberId " +
+                                "AND m.room.id = :roomId", Message.class)
                 .setParameter("memberId", senderId)
                 .setParameter("roomId", roomId)
+                .getResultList();
+    }
+
+    @Override
+    public List<Message> findMessagesByReceiverIdAndRoomIdAndStatus(UUID receiverId, Long roomId, boolean status) {
+        return em.createQuery(
+                        "SELECT m " +
+                                "FROM Message m " +
+                                "WHERE m.receiver.id = :receiverId " +
+                                "AND m.room.id = :roomId " +
+                                "AND m.read = :status", Message.class)
+                .setParameter("receiverId", receiverId)
+                .setParameter("roomId", roomId)
+                .setParameter("status", status)
                 .getResultList();
     }
 }
