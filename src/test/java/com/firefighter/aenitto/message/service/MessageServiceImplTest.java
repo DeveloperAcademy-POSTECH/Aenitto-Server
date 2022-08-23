@@ -288,4 +288,43 @@ public class MessageServiceImplTest {
         verify(messageRepository, times(1))
                 .getSentMessages(manitto.getId(), room.getId());
     }
+
+    @DisplayName("읽은 메세지 상태 변경 - 실패 / 참여하고 있지 않은 방")
+    @Test
+    void setReadMessagesStatus_failure_not_participating_room() {
+        //given
+        doReturn(Optional.empty()).when(roomRepository)
+                .findMemberRoomById(any(UUID.class), anyLong());
+
+        //when
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.setReadMessagesStatus(manitto, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(manitto.getId(), room.getId());
+    }
+
+    @DisplayName("읽은 메세지 상태 변경 - 성공")
+    @Test
+    void setReadMessagesStatus_success() {
+        //given
+        memberRoom = memberRoomFixture1(manittee, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(manittee.getId(), room.getId());
+        doReturn(messages).when(messageRepository)
+                .findMessagesByReceiverIdAndRoomIdAndStatus(manittee.getId(), room.getId(), false);
+
+        //when
+        target.setReadMessagesStatus(manittee, room.getId());
+
+        //then
+        assertThat(messages.get(3).isRead()).isEqualTo(true);
+        assertThat(messages.get(4).isRead()).isEqualTo(true);
+
+        verify(roomRepository, times(1))
+                .findMemberRoomById(manittee.getId(), room.getId());
+        verify(messageRepository, times(1))
+                .findMessagesByReceiverIdAndRoomIdAndStatus(manittee.getId(), room.getId(), false);
+    }
 }

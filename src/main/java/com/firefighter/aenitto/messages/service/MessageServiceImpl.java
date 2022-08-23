@@ -82,6 +82,16 @@ public class MessageServiceImpl implements MessageService {
         return SentMessagesResponse.of(messages, relation.getManittee());
     }
 
+    @Override
+    public void setReadMessagesStatus(Member currentMember, Long roomId) {
+        throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+        List<Message> messages = messageRepository
+                .findMessagesByReceiverIdAndRoomIdAndStatus(currentMember.getId(), roomId, false);
+        for (Message message : messages) {
+            message.readMessage();
+        }
+    }
+
     private String getImageExtension(String originalImageName) {
         try {
             return originalImageName.substring(originalImageName.lastIndexOf("."));
