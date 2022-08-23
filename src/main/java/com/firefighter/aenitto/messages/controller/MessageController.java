@@ -44,4 +44,13 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getSentMessages(currentMember, roomId));
     }
 
+    @PatchMapping("/messages/status")
+    public ResponseEntity setReadMessagesStatus(
+            @CurrentMember final Member currentMember,
+            @PathVariable final Long roomId
+    ) {
+        messageService.setReadMessagesStatus(currentMember, roomId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
