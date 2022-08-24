@@ -42,7 +42,7 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(header().exists("Location"));
     }
 
-    @DisplayName("받은 메시지 가져오기 - 성공")
+    @DisplayName("받은 메시지 가져오기 - 실패 / 참여하고 있는 방이 아님")
     @Sql("classpath:relation.sql")
     @Test
     void get_sent_messages_failure_room_not_participating() throws Exception {
@@ -70,7 +70,7 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.message", is(RoomErrorCode.RELATION_NOT_FOUND.getMessage())));
     }
 
-    @DisplayName("받은 메시지 가져오기 - 성공 / 마니또 존재 X")
+    @DisplayName("받은 메시지 가져오기 - 성공")
     @Sql({
             SqlPath.MEMBER,
             SqlPath.ROOM_PROCESSING,
@@ -90,5 +90,33 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.messages[0].content").exists())
                 .andExpect(jsonPath("$.messages[0].imageUrl").exists())
         ;
+    }
+
+    @DisplayName("메세지 읽음으로 상태변경 - 실패 / 참여하고 있는 방이 아님")
+    @Test
+    void setStatusMessagesRead_failure_room_not_participating() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/rooms/{roomId}/messages/status", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 성공")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.RELATION,
+            SqlPath.SENT_MESSAGE
+    })
+    @Test
+    void setStatusMessagesRead_success() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/rooms/{roomId}/messages/status", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 }
