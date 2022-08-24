@@ -52,3 +52,5 @@ operation::초대코드 검증[snippets='request-headers,http-request,request-fi
 == 메시지 API
 === 보낸 메시지 가져오기
 operation::보낸 메시지 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+=== 메세지 읽음으로 상태변경
+operation::메세지 읽음으로 상태 변경[snippets='path-parameters,request-headers,http-request,http-response']

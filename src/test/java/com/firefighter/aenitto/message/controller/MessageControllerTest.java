@@ -342,7 +342,7 @@ public class MessageControllerTest {
         ;
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 실패 / 참여중인 방이 아님")
+    @DisplayName("메세지 읽음으로 상태 변경 - 실패 / 참여중인 방이 아님")
     @Test
     void setReadMessagesStatus_failure_not_participating_room() throws Exception {
         //given
@@ -363,17 +363,28 @@ public class MessageControllerTest {
                 .andExpect(jsonPath("$.errors").exists());
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 성공")
+    @DisplayName("메세지 읽음으로 상태 변경 - 성공")
     @Test
     void setReadMessagesStatus_success() throws Exception {
         //given
         final String uri = "/api/v1/rooms/{roomId}/messages/status";
 
         //when, then, docs
-        mockMvc.perform(MockMvcRequestBuilders.patch(uri, "4")
+        mockMvc.perform(RestDocumentationRequestBuilders.patch(uri, "4")
                         .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document(
+                        "메세지 읽음으로 상태 변경",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        )
+                ));
     }
 }
