@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.repository;
 
+import com.firefighter.aenitto.common.utils.SqlPath;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +44,12 @@ public class RelationShipRepositoryImplTest {
         room = roomFixture1();
     }
 
-    @DisplayName("roomId 와 memberId로 relation찾기 - 성공")
+    @DisplayName("roomId 와 manittoId로 relation찾기 - 성공")
     @Test()
     @Sql("classpath:relation.sql")
-    void findByRoomIdAndMemberId() {
+    void findByRoomIdAndManitto() {
         // when
-        final Optional<Relation> result = target.findByRoomIdAndMemberId(1L,
+        final Optional<Relation> result = target.findByRoomIdAndManittoId(1L,
                 UUID.fromString("a383cdb3-a871-4410-b146-fb1f7b447b9e"));
 
         // then
@@ -57,5 +57,24 @@ public class RelationShipRepositoryImplTest {
         assertThat(result.get().getId()).isEqualTo(1L);
         assertThat(result.get().getRoom().getId()).isEqualTo(1L);
         assertThat(result.get().getManittee().getNickname()).isEqualTo("manittee");
+    }
+
+    @DisplayName("roomId 와 manitteeId로 relation찾기 - 성공")
+    @Test()
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.RELATION
+    })
+    void findByRoomIdAndManittee() {
+        // when
+        final Optional<Relation> result = target.findByRoomIdAndManitteeId(2L,
+                UUID.fromString("4ba90eab-c62b-4d44-aadb-b7f3183ea83e"));
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.get().getId()).isEqualTo(1L);
+        assertThat(result.get().getRoom().getId()).isEqualTo(2L);
+        assertThat(result.get().getManittee().getNickname()).isEqualTo("nickname2");
     }
 }

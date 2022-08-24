@@ -7,5 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface RelationRepository {
-    public Optional<Relation> findByRoomIdAndMemberId(Long roomId, UUID memberId);
+    Optional<Relation> findByRoomIdAndManittoId(Long roomId, UUID memberId);
+    Optional<Relation> findByRoomIdAndManitteeId(Long roomId, UUID memberId);
 }

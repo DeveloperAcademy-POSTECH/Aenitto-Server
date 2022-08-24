@@ -65,4 +65,14 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .setParameter("status", status)
                 .getResultList();
     }
+    public List<Message> getReceivedMessages (UUID receiverId, Long roomId) {
+        return em.createQuery(
+                        "SELECT m" +
+                                " FROM Message m" +
+                                " WHERE m.receiver.id = :receiverId" +
+                                " AND m.room.id = :roomId", Message.class)
+                .setParameter("receiverId", receiverId)
+                .setParameter("roomId", roomId)
+                .getResultList();
+    }
 }
