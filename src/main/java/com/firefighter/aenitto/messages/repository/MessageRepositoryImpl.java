@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Repository
@@ -77,7 +79,7 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     public List<Message> getTwoRandomImageReceivedMessages (UUID receiverId, Long roomId) {
-        return em.createQuery(
+        List<Message> messages = em.createQuery(
                         "SELECT m" +
                                 " FROM Message m" +
                                 " WHERE m.receiver.id = :receiverId" +
@@ -87,10 +89,12 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .setParameter("receiverId", receiverId)
                 .setParameter("roomId", roomId)
                 .getResultList();
+
+        return getTwoRandomMessages(messages);
     }
 
     public List<Message> getTwoRandomContentReceivedMessages (UUID receiverId, Long roomId) {
-        return em.createQuery(
+        List<Message> messages = em.createQuery(
                         "SELECT m" +
                                 " FROM Message m" +
                                 " WHERE m.receiver.id = :receiverId" +
@@ -100,5 +104,18 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .setParameter("receiverId", receiverId)
                 .setParameter("roomId", roomId)
                 .getResultList();
+
+        return getTwoRandomMessages(messages);
+    }
+
+    private List<Message> getTwoRandomMessages(List<Message> messages){
+        Random rand = new Random();
+        if(messages.size() == 0){
+            return messages;
+        }
+        List<Message> twoRandomMessage = new ArrayList<>();
+        twoRandomMessage.add(messages.get(rand.nextInt(messages.size())));
+        twoRandomMessage.add(messages.get(rand.nextInt(messages.size())));
+        return twoRandomMessage;
     }
 }

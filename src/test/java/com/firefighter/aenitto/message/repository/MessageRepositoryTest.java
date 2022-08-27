@@ -190,7 +190,7 @@ public class MessageRepositoryTest {
 
     @DisplayName("받은 2개 랜덤으로 메시지 가져오기[이미지] - 성공")
     @Test
-    void getTwoRandomRecievedMessagesImage_success() {
+    void ggetTwoRandomImageReceivedMessages_success() {
         // given
         Message imageNullmessage = Message.builder().build();
         messages.add(imageNullmessage);
@@ -211,12 +211,12 @@ public class MessageRepositoryTest {
         List<Message> result = messageRepository.getTwoRandomImageReceivedMessages(member2.getId(), room1.getId());
 
         // then
-        assertThat(result.size()).isEqualTo(7);
+        assertThat(result.size()).isEqualTo(2);
     }
 
     @DisplayName("받은 2개 랜덤으로 메시지 가져오기[내용] - 성공")
     @Test
-    void getTwoRandomRecievedMessagesContent_success() {
+    void getTwoRandomContentReceivedMessages_success() {
         // given
         Message imageNullmessage = Message.builder().build();
         messages.add(imageNullmessage);
@@ -237,6 +237,28 @@ public class MessageRepositoryTest {
         List<Message> result = messageRepository.getTwoRandomContentReceivedMessages(member2.getId(), room1.getId());
 
         // then
-        assertThat(result.size()).isEqualTo(7);
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @DisplayName("받은 2개 랜덤으로 메시지 가져오기[내용] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomImageReceivedMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
+    }
+
+    @DisplayName("받은 2개 랜덤으로 메시지 가져오기[내용] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomContentReceivedMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomContentReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
     }
 }
