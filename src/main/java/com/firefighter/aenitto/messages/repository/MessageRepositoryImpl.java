@@ -75,4 +75,30 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .setParameter("roomId", roomId)
                 .getResultList();
     }
+
+    public List<Message> getTwoRandomImageReceivedMessages (UUID receiverId, Long roomId) {
+        return em.createQuery(
+                        "SELECT m" +
+                                " FROM Message m" +
+                                " WHERE m.receiver.id = :receiverId" +
+                                " AND m.room.id = :roomId" +
+                                " AND m.imgUrl IS NOT NULL"
+                        , Message.class)
+                .setParameter("receiverId", receiverId)
+                .setParameter("roomId", roomId)
+                .getResultList();
+    }
+
+    public List<Message> getTwoRandomContentReceivedMessages (UUID receiverId, Long roomId) {
+        return em.createQuery(
+                        "SELECT m" +
+                                " FROM Message m" +
+                                " WHERE m.receiver.id = :receiverId" +
+                                " AND m.room.id = :roomId" +
+                                " AND m.content IS NOT NULL"
+                        , Message.class)
+                .setParameter("receiverId", receiverId)
+                .setParameter("roomId", roomId)
+                .getResultList();
+    }
 }
