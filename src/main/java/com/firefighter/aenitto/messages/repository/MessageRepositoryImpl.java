@@ -4,6 +4,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.rooms.domain.Room;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.annotation.Obsolete;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
@@ -67,6 +68,7 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .setParameter("status", status)
                 .getResultList();
     }
+    @Override
     public List<Message> getReceivedMessages (UUID receiverId, Long roomId) {
         return em.createQuery(
                         "SELECT m" +
@@ -77,6 +79,7 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .setParameter("roomId", roomId)
                 .getResultList();
     }
+    @Override
 
     public List<Message> getTwoRandomImageReceivedMessages (UUID receiverId, Long roomId) {
         List<Message> messages = em.createQuery(
@@ -92,6 +95,7 @@ public class MessageRepositoryImpl implements MessageRepository {
 
         return getTwoRandomMessages(messages);
     }
+    @Override
 
     public List<Message> getTwoRandomContentReceivedMessages (UUID receiverId, Long roomId) {
         List<Message> messages = em.createQuery(
@@ -102,6 +106,38 @@ public class MessageRepositoryImpl implements MessageRepository {
                                 " AND m.content IS NOT NULL"
                         , Message.class)
                 .setParameter("receiverId", receiverId)
+                .setParameter("roomId", roomId)
+                .getResultList();
+
+        return getTwoRandomMessages(messages);
+    }
+    @Override
+
+    public List<Message> getTwoRandomImageSentMessages (UUID senderId, Long roomId) {
+        List<Message> messages = em.createQuery(
+                        "SELECT m" +
+                                " FROM Message m" +
+                                " WHERE m.sender.id = :senderId" +
+                                " AND m.room.id = :roomId" +
+                                " AND m.imgUrl IS NOT NULL"
+                        , Message.class)
+                .setParameter("senderId", senderId)
+                .setParameter("roomId", roomId)
+                .getResultList();
+
+        return getTwoRandomMessages(messages);
+    }
+    @Override
+
+    public List<Message> getTwoRandomContentSentMessages (UUID senderId, Long roomId) {
+        List<Message> messages = em.createQuery(
+                        "SELECT m" +
+                                " FROM Message m" +
+                                " WHERE m.sender.id = :senderId" +
+                                " AND m.room.id = :roomId" +
+                                " AND m.content IS NOT NULL"
+                        , Message.class)
+                .setParameter("senderId", senderId)
                 .setParameter("roomId", roomId)
                 .getResultList();
 

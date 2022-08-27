@@ -190,7 +190,7 @@ public class MessageRepositoryTest {
 
     @DisplayName("받은 2개 랜덤으로 메시지 가져오기[이미지] - 성공")
     @Test
-    void ggetTwoRandomImageReceivedMessages_success() {
+    void getTwoRandomImageReceivedMessages_success() {
         // given
         Message imageNullmessage = Message.builder().build();
         messages.add(imageNullmessage);
@@ -239,6 +239,81 @@ public class MessageRepositoryTest {
         // then
         assertThat(result.size()).isEqualTo(2);
     }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[내용] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomContentSentMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
+    }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[이미지] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomImageSentMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageSentMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
+    }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[이미지] - 성공")
+    @Test
+    void getTwoRandomImageSentMessages_success() {
+        // given
+        Message imageNullmessage = Message.builder().build();
+        messages.add(imageNullmessage);
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageSentMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[내용] - 성공")
+    @Test
+    void getTwoRandomContentSentMessages_success() {
+        // given
+        Message imageNullmessage = Message.builder().build();
+        messages.add(imageNullmessage);
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomContentSentMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
 
     @DisplayName("받은 2개 랜덤으로 메시지 가져오기[내용] - 실패 / 메시지 없음")
     @Test

@@ -82,6 +82,7 @@ public class MessageServiceImplTest {
 
     private Member manitto;
     private Member manittee;
+    private Member currentMember;
 
     private MemberRoom memberRoom;
 
@@ -98,6 +99,7 @@ public class MessageServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        currentMember = memberFixture();
         manitto = memberFixture();
         manittee = memberFixture2();
         notManittee = memberFixture3();
@@ -394,4 +396,71 @@ public class MessageServiceImplTest {
         verify(messageRepository, times(1))
                 .getReceivedMessages(manittee.getId(), room.getId());
     }
+
+    @DisplayName("추억 가져오기 - 실패 / 참여하고 있지 않은 방")
+    @Test
+    void getMemories_failure_not_participating_room() {
+        //given
+        doReturn(Optional.empty()).when(roomRepository)
+                .findMemberRoomById(any(UUID.class), anyLong());
+
+        //when
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.getMemories(currentMember, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(currentMember.getId(), room.getId());
+    }
+
+    @DisplayName("추억 가져오기 - 실패 / 마니또가 존재하지 않습니다")
+    @Test
+    void getMemories_failure_manitto_not_exists() {
+        //given
+        memberRoom = memberRoomFixture1(currentMember, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(currentMember.getId(), room.getId());
+        doReturn(Optional.empty()).when(relationRepository)
+                .findByRoomIdAndManitteeId(anyLong(), any(UUID.class));
+
+        //when, then
+        assertThatExceptionOfType(RelationNotFoundException.class)
+                .isThrownBy(() -> {
+                    target.getMemories(currentMember, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(currentMember.getId(), room.getId());
+        verify(relationRepository, times(1))
+                .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
+
+    }
+//    @DisplayName("추억 가져오기 - 성공")
+//    @Test
+//    void getMemories_success() {
+//        //given
+//        memberRoom = memberRoomFixture1(currentMember, room);
+//        doReturn(Optional.ofNullable(currentMember)).when(roomRepository)
+//                .findMemberRoomById(currentMember.getId(), room.getId());
+//        doReturn(Optional.ofNullable(relation)).when(relationRepository)
+//                .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
+//        doReturn(messages).when(messageRepository)
+//                .getTwoRandomContentReceivedMessages(currentMember.getId(), room.getId());
+//        doReturn(messages).when(messageRepository)
+//                .getTwoRandomImageReceivedMessages(currentMember.getId(), room.getId());
+//
+//        //when
+//        MemoriesResponse response = target.getMemories(currentMember, room.getId());
+//
+//        //then
+//        assertThat(response.getCount()).isEqualTo(5);
+//        assertThat(response.getMessages().size()).isEqualTo(5);
+//        assertThat(response.getMessages().get(0).getId()).isEqualTo(1L);
+//
+//        verify(roomRepository, times(1))
+//                .findMemberRoomById(manittee.getId(), room.getId());
+//        verify(relationRepository, times(1))
+//                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+//        verify(messageRepository, times(1))
+//                .getReceivedMessages(manittee.getId(), room.getId());
+//    }
 }

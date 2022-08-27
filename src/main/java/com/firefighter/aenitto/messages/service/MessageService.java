@@ -11,4 +11,5 @@ public interface MessageService {
     SentMessagesResponse getSentMessages(Member currentMember, Long roomId);
     void setReadMessagesStatus(Member currentMember, Long roomId);
     ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId);
+    void getMemories(Member currentMember, Long roomId);
 }

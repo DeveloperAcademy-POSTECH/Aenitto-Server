@@ -92,6 +92,11 @@ public class MessageServiceImpl implements MessageService {
             message.readMessage();
         }
     }
+    @Override
+    public void getMemories(Member currentMember, Long roomId) {
+        throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+        throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
+    }
     public ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);

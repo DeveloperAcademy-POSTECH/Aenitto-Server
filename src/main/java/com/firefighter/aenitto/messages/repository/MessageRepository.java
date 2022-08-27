@@ -11,4 +11,8 @@ public interface MessageRepository {
     List<Message> getSentMessages (UUID memberId, Long roomId);
     List<Message> findMessagesByReceiverIdAndRoomIdAndStatus(UUID receiverId, Long roomId, boolean status);
     List<Message> getReceivedMessages (UUID receiverId, Long roomId);
+    List<Message> getTwoRandomImageReceivedMessages (UUID receiverId, Long roomId);
+    List<Message> getTwoRandomContentReceivedMessages (UUID receiverId, Long roomId);
+    List<Message> getTwoRandomContentSentMessages (UUID senderId, Long roomId);
+    List<Message> getTwoRandomImageSentMessages (UUID senderId, Long roomId);
 }
