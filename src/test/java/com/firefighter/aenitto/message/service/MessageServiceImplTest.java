@@ -9,6 +9,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
@@ -434,33 +435,37 @@ public class MessageServiceImplTest {
                 .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
 
     }
-//    @DisplayName("추억 가져오기 - 성공")
-//    @Test
-//    void getMemories_success() {
-//        //given
-//        memberRoom = memberRoomFixture1(currentMember, room);
-//        doReturn(Optional.ofNullable(currentMember)).when(roomRepository)
-//                .findMemberRoomById(currentMember.getId(), room.getId());
-//        doReturn(Optional.ofNullable(relation)).when(relationRepository)
-//                .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
-//        doReturn(messages).when(messageRepository)
-//                .getTwoRandomContentReceivedMessages(currentMember.getId(), room.getId());
-//        doReturn(messages).when(messageRepository)
-//                .getTwoRandomImageReceivedMessages(currentMember.getId(), room.getId());
-//
-//        //when
-//        MemoriesResponse response = target.getMemories(currentMember, room.getId());
-//
-//        //then
-//        assertThat(response.getCount()).isEqualTo(5);
-//        assertThat(response.getMessages().size()).isEqualTo(5);
-//        assertThat(response.getMessages().get(0).getId()).isEqualTo(1L);
-//
-//        verify(roomRepository, times(1))
-//                .findMemberRoomById(manittee.getId(), room.getId());
-//        verify(relationRepository, times(1))
-//                .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
-//        verify(messageRepository, times(1))
-//                .getReceivedMessages(manittee.getId(), room.getId());
-//    }
+    @DisplayName("추억 가져오기 - 성공")
+    @Test
+    void getMemories_success() {
+        //given
+        List<Message> tempMessage = new ArrayList<>();
+        tempMessage.add(message1);
+        tempMessage.add(message2);
+
+        memberRoom = memberRoomFixture1(currentMember, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(currentMember.getId(), room.getId());
+        doReturn(Optional.ofNullable(relation)).when(relationRepository)
+                .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
+        doReturn(Optional.ofNullable(relation)).when(relationRepository)
+                .findByRoomIdAndManittoId(room.getId(), currentMember.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomContentReceivedMessages(currentMember.getId(), room.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomImageReceivedMessages(currentMember.getId(), room.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomContentSentMessages(currentMember.getId(), room.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomImageSentMessages(currentMember.getId(), room.getId());
+
+        //when
+        MemoriesResponse response = target.getMemories(currentMember, room.getId());
+
+        //then
+        assertThat(response.getMemoriesWithManittee().getMessage().size()).isEqualTo(4);
+        assertThat(response.getMemoriesWithManitto().getMessage().size()).isEqualTo(4);
+        assertThat(response.getMemoriesWithManittee().getMember().getNickname()).isNotNull();
+        assertThat(response.getMemoriesWithManitto().getMember().getNickname()).isNotNull();
+    }
 }

@@ -80,7 +80,6 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .getResultList();
     }
     @Override
-
     public List<Message> getTwoRandomImageReceivedMessages (UUID receiverId, Long roomId) {
         List<Message> messages = em.createQuery(
                         "SELECT m" +
@@ -96,7 +95,6 @@ public class MessageRepositoryImpl implements MessageRepository {
         return getTwoRandomMessages(messages);
     }
     @Override
-
     public List<Message> getTwoRandomContentReceivedMessages (UUID receiverId, Long roomId) {
         List<Message> messages = em.createQuery(
                         "SELECT m" +
@@ -112,7 +110,6 @@ public class MessageRepositoryImpl implements MessageRepository {
         return getTwoRandomMessages(messages);
     }
     @Override
-
     public List<Message> getTwoRandomImageSentMessages (UUID senderId, Long roomId) {
         List<Message> messages = em.createQuery(
                         "SELECT m" +
@@ -128,7 +125,6 @@ public class MessageRepositoryImpl implements MessageRepository {
         return getTwoRandomMessages(messages);
     }
     @Override
-
     public List<Message> getTwoRandomContentSentMessages (UUID senderId, Long roomId) {
         List<Message> messages = em.createQuery(
                         "SELECT m" +
