@@ -2,6 +2,7 @@ package com.firefighter.aenitto.message.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
 import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
 import com.firefighter.aenitto.common.exception.message.MessageErrorCode;
 import com.firefighter.aenitto.common.exception.message.NotManitteeException;
@@ -12,6 +13,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.messages.controller.MessageController;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.service.MessageService;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture3;
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
 import static com.firefighter.aenitto.message.MessageFixture.*;
 import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
@@ -83,6 +86,8 @@ public class MessageControllerTest {
     private Message message5;
 
     private List<Message> messages = new ArrayList<>();
+    private List<Message> receivedMessages = new ArrayList<>();
+    private List<Message> sentMessages = new ArrayList<>();
 
     private final String ACCESS_TOKEN = "Bearer testAccessToken";
 
@@ -100,6 +105,7 @@ public class MessageControllerTest {
         objectMapper = new ObjectMapper();
         image = IMAGE;
         manittee = memberFixture2();
+        manitto = memberFixture3();
 
         message1 = messageFixture1();
         message2 = messageFixture2();
@@ -466,5 +472,72 @@ public class MessageControllerTest {
                         )
                 ));
         ;
+    }
+
+    @DisplayName("추억 가져오기 - 참여중인 방이 아님")
+    @Test
+    void get_memories_failure_not_participating_room() throws Exception {
+        //given
+        final String uri = "/api/v1/rooms/{roomId}/memories";
+        doThrow(new RoomNotParticipatingException())
+                .when(messageService)
+                .getMemories(any(Member.class), anyLong());
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+    }
+
+    @DisplayName("추억 가져오기 - 마니또가 존재하지 않음")
+    @Test
+    void get_memories_failure_no_relation() throws Exception {
+        //given
+        final String uri = "/api/v1/rooms/{roomId}/memories";
+        doThrow(new RelationNotFoundException())
+                .when(messageService)
+                .getMemories(any(Member.class), anyLong());
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", RoomErrorCode.RELATION_NOT_FOUND.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.RELATION_NOT_FOUND.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+    }
+
+    @DisplayName("추억 가져오기 - 성공")
+    @Test
+    void get_memories_success() throws Exception {
+        //given
+        receivedMessages.add(message1);
+        receivedMessages.add(message2);
+        receivedMessages.add(message3);
+        receivedMessages.add(message4);
+        sentMessages.add(message1);
+        sentMessages.add(message2);
+        sentMessages.add(message3);
+        sentMessages.add(message4);
+
+        final String uri = "/api/v1/rooms/{roomId}/memories";
+        when(messageService.getMemories(any(Member.class), anyLong()))
+                .thenReturn(MemoriesResponse.of(manittee, manitto, receivedMessages, sentMessages));
+
+        //when, then, docs
+        mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
+                        .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }

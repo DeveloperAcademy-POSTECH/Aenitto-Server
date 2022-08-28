@@ -3,6 +3,7 @@ package com.firefighter.aenitto.messages.controller;
 import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.service.MessageService;
@@ -60,5 +61,13 @@ public class MessageController {
             @PathVariable final Long roomId
     ) {
         return ResponseEntity.ok(messageService.getReceivedMessages(currentMember, roomId));
+    }
+
+    @GetMapping("/memories")
+    public ResponseEntity<MemoriesResponse> getMemories(
+            @CurrentMember Member currentMember,
+            @PathVariable final Long roomId
+    ){
+        return ResponseEntity.ok(messageService.getMemories(currentMember, roomId));
     }
 }

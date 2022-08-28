@@ -282,7 +282,7 @@ public class MessageRepositoryTest {
         em.flush();
 
         // when
-        List<Message> result = messageRepository.getTwoRandomImageSentMessages(member2.getId(), room1.getId());
+        List<Message> result = messageRepository.getTwoRandomImageSentMessages(member1.getId(), room1.getId());
 
         // then
         assertThat(result.size()).isEqualTo(2);
@@ -308,7 +308,7 @@ public class MessageRepositoryTest {
         em.flush();
 
         // when
-        List<Message> result = messageRepository.getTwoRandomContentSentMessages(member2.getId(), room1.getId());
+        List<Message> result = messageRepository.getTwoRandomContentSentMessages(member1.getId(), room1.getId());
 
         // then
         assertThat(result.size()).isEqualTo(2);
