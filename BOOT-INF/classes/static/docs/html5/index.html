@@ -466,7 +466,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#Message-API">메시지 API</a>
 <ul class="sectlevel2">
 <li><a href="#_보낸_메시지_가져오기">보낸 메시지 가져오기</a></li>
-<li><a href="#_메세지_읽음으로_상태변경">메세지 읽음으로 상태변경</a></li>
 <li><a href="#_받은_메시지_가져오기">받은 메시지 가져오기</a></li>
 </ul>
 </li>
@@ -829,13 +828,13 @@ Content-Length: 692
   "participants" : {
     "count" : 3,
     "members" : [ {
-      "id" : "c958616a-652d-4a68-abcc-2a464d746b88",
+      "id" : "4b3e5121-2b98-4cd9-88fb-192d923a8957",
       "nickname" : "멤버1"
     }, {
-      "id" : "c958616a-652d-4a68-abcc-2a464d746b88",
+      "id" : "4b3e5121-2b98-4cd9-88fb-192d923a8957",
       "nickname" : "멤버1"
     }, {
-      "id" : "7acc37df-8e66-4719-b942-01c7294fa1be",
+      "id" : "5163eb7b-3ea8-4d50-a5f1-4f8279524a75",
       "nickname" : "멤버2"
     } ]
   },
@@ -1659,75 +1658,10 @@ Content-Length: 541
     "imageUrl" : "url5"
   } ],
   "manittee" : {
-    "id" : "571cea32-be4e-4c17-bfb6-69a163c519fd",
+    "id" : "7f5c7953-06c2-4e50-bcff-7e132f0f3d19",
     "nickname" : "멤버2"
   }
 }</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_메세지_읽음으로_상태변경"><a class="link" href="#_메세지_읽음으로_상태변경">메세지 읽음으로 상태변경</a></h3>
-<div class="sect3">
-<h4 id="_메세지_읽음으로_상태변경_path_parameters"><a class="link" href="#_메세지_읽음으로_상태변경_path_parameters">Path parameters</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /api/v1/rooms/{roomId}/messages/status</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">방 id</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_메세지_읽음으로_상태변경_request_headers"><a class="link" href="#_메세지_읽음으로_상태변경_request_headers">Request headers</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">유저 인증 토큰</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_메세지_읽음으로_상태변경_http_request"><a class="link" href="#_메세지_읽음으로_상태변경_http_request">HTTP request</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v1/rooms/4/messages/status HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer testAccessToken
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_메세지_읽음으로_상태변경_http_response"><a class="link" href="#_메세지_읽음으로_상태변경_http_response">HTTP response</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content</code></pre>
 </div>
 </div>
 </div>
@@ -1830,7 +1764,7 @@ Content-Length: 441
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-08-24 10:36:06 +0900
+Last updated 2022-08-28 16:16:23 +0900
 </div>
 </div>
 </body>
