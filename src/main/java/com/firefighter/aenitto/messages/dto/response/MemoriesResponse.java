@@ -31,11 +31,11 @@ public class MemoriesResponse {
     @AllArgsConstructor
     public static class Memory {
         private final MemberInfo member;
-        private final List<MessageResponse> message;
+        private final List<MessageResponse> messages;
 
         public static Memory of(Member member, List<Message> messages) {
             return Memory.builder().member(new MemberInfo(member))
-                    .message(MessageResponse.listOf(messages)).build();
+                    .messages(MessageResponse.listOf(messages)).build();
         }
 
         @Getter

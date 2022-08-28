@@ -463,8 +463,8 @@ public class MessageServiceImplTest {
         MemoriesResponse response = target.getMemories(currentMember, room.getId());
 
         //then
-        assertThat(response.getMemoriesWithManittee().getMessage().size()).isEqualTo(4);
-        assertThat(response.getMemoriesWithManitto().getMessage().size()).isEqualTo(4);
+        assertThat(response.getMemoriesWithManittee().getMessages().size()).isEqualTo(4);
+        assertThat(response.getMemoriesWithManitto().getMessages().size()).isEqualTo(4);
         assertThat(response.getMemoriesWithManittee().getMember().getNickname()).isNotNull();
         assertThat(response.getMemoriesWithManitto().getMember().getNickname()).isNotNull();
     }

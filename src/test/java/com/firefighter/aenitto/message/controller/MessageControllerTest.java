@@ -534,10 +534,36 @@ public class MessageControllerTest {
                 .thenReturn(MemoriesResponse.of(manittee, manitto, receivedMessages, sentMessages));
 
         //when, then, docs
-        mockMvc.perform(MockMvcRequestBuilders.get(uri, "1")
+        mockMvc.perform(RestDocumentationRequestBuilders.get(uri, "1")
                         .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("추억 가져오기",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("memoriesWithManitto").description("마니또와의 추억"),
+                                fieldWithPath("memoriesWithManitto.member").description("내 마니또 정보"),
+                                fieldWithPath("memoriesWithManitto.member.nickname").description("내 마니또의 닉네임"),
+                                fieldWithPath("memoriesWithManitto.messages").description("마니또와 주고 받은 메세지들"),
+                                fieldWithPath("memoriesWithManitto.messages[0].id").description("마니또와 주고 받은 메세지의 아이디"),
+                                fieldWithPath("memoriesWithManitto.messages[0].content").description("마니또와 주고 받은 메세지의 내용"),
+                                fieldWithPath("memoriesWithManitto.messages[0].imageUrl").description("마니또와 주고 받은 메세지의 이미지"),
+                                fieldWithPath("memoriesWithManittee").description("마니띠와의 추억"),
+                                fieldWithPath("memoriesWithManittee.member").description("내 마니띠 정보"),
+                                fieldWithPath("memoriesWithManittee.member.nickname").description("내 마니띠의 닉네임"),
+                                fieldWithPath("memoriesWithManittee.messages").description("마니띠와 주고 받은 메세지들"),
+                                fieldWithPath("memoriesWithManittee.messages[0].id").description("마니띠와 주고 받은 메세지의 아이디"),
+                                fieldWithPath("memoriesWithManittee.messages[0].content").description("마니띠와 주고 받은 메세지의 내용"),
+                                fieldWithPath("memoriesWithManittee.messages[0].imageUrl").description("마니띠와 주고 받은 메세지의 이미지")
+                        )
+                ));
     }
 }
