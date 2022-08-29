@@ -5,6 +5,8 @@ import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
 import com.firefighter.aenitto.auth.dto.response.TempLoginResponse;
 import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
 import com.firefighter.aenitto.auth.token.Token;
+import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
+import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,16 +16,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 @Transactional
@@ -100,4 +111,5 @@ public class AuthServiceImplTest {
                 .refreshToken("refreshToken입니다123123")
                 .build();
     }
+
 }
