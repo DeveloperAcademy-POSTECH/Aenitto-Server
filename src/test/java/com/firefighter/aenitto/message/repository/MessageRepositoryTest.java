@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.firefighter.aenitto.message.MessageFixture.messageFixture1;
+import static com.firefighter.aenitto.message.MessageFixture.messageFixture8;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -112,12 +114,6 @@ public class MessageRepositoryTest {
         assertThat(result.getImgUrl()).isNotNull();
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 실패")
-    @Test
-    void getSentMessages_failure() {
-        assertThat(messageRepository.getSentMessages(UUID.randomUUID(), 1L).isEmpty()).isTrue();
-    }
-
     @DisplayName("보낸 메시지 가져오기 - 성공")
     @Test
     void getSentMessages_success() {
@@ -142,10 +138,30 @@ public class MessageRepositoryTest {
         assertThat(result.size()).isEqualTo(7);
     }
 
-    @DisplayName("받은 메시지 가져오기 - 실패")
+    @DisplayName("메세지 읽지 않은 메세지 가져오기 - 성공")
     @Test
-    void getRecievedMessages_failure() {
-        assertThat(messageRepository.getSentMessages(UUID.randomUUID(), 1L).isEmpty()).isTrue();
+    void findMessagesByManittoIdAndRoomIdAndStatus_success() {
+        // given
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+        message1.readMessage();
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository
+                .findMessagesByReceiverIdAndRoomIdAndStatus(member2.getId(), room1.getId(), false);
+
+        // then
+        assertThat(result.size()).isEqualTo(6);
     }
 
     @DisplayName("받은 메시지 가져오기 - 성공")
@@ -170,5 +186,154 @@ public class MessageRepositoryTest {
 
         // then
         assertThat(result.size()).isEqualTo(7);
+    }
+
+    @DisplayName("받은 2개 랜덤으로 메시지 가져오기[이미지] - 성공")
+    @Test
+    void getTwoRandomImageReceivedMessages_success() {
+        // given
+        Message imageNullmessage = Message.builder().build();
+        messages.add(imageNullmessage);
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @DisplayName("받은 2개 랜덤으로 메시지 가져오기[내용] - 성공")
+    @Test
+    void getTwoRandomContentReceivedMessages_success() {
+        // given
+        Message imageNullmessage = Message.builder().build();
+        messages.add(imageNullmessage);
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomContentReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[내용] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomContentSentMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
+    }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[이미지] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomImageSentMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageSentMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
+    }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[이미지] - 성공")
+    @Test
+    void getTwoRandomImageSentMessages_success() {
+        // given
+        Message imageNullmessage = Message.builder().build();
+        messages.add(imageNullmessage);
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageSentMessages(member1.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @DisplayName("보낸 2개 랜덤으로 메시지 가져오기[내용] - 성공")
+    @Test
+    void getTwoRandomContentSentMessages_success() {
+        // given
+        Message imageNullmessage = Message.builder().build();
+        messages.add(imageNullmessage);
+        for (Message message : messages) {
+            message.sendMessage(member1, member2, room1);
+        }
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(room1);
+
+        for (Message message : messages) {
+            em.persist(message);
+        }
+        em.flush();
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomContentSentMessages(member1.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+
+    @DisplayName("받은 2개 랜덤으로 메시지 가져오기[내용] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomImageReceivedMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomImageReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
+    }
+
+    @DisplayName("받은 2개 랜덤으로 메시지 가져오기[내용] - 실패 / 메시지 없음")
+    @Test
+    void getTwoRandomContentReceivedMessages_failure_no_message() {
+
+        // when
+        List<Message> result = messageRepository.getTwoRandomContentReceivedMessages(member2.getId(), room1.getId());
+
+        // then
+        assertThat(result.size()).isEqualTo(0);
     }
 }

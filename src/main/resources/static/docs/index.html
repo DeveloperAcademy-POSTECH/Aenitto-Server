@@ -466,7 +466,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#Message-API">메시지 API</a>
 <ul class="sectlevel2">
 <li><a href="#_보낸_메시지_가져오기">보낸 메시지 가져오기</a></li>
+<li><a href="#_메세지_읽음으로_상태변경">메세지 읽음으로 상태변경</a></li>
 <li><a href="#_받은_메시지_가져오기">받은 메시지 가져오기</a></li>
+<li><a href="#_추억_가져오기">추억 가져오기</a></li>
 </ul>
 </li>
 </ul>
@@ -828,13 +830,13 @@ Content-Length: 692
   "participants" : {
     "count" : 3,
     "members" : [ {
-      "id" : "db5a83d6-cbb1-422d-a46e-0e9ab7d0f036",
+      "id" : "a9422b08-80bc-4de5-89be-f129a10cf610",
       "nickname" : "멤버1"
     }, {
-      "id" : "db5a83d6-cbb1-422d-a46e-0e9ab7d0f036",
+      "id" : "a9422b08-80bc-4de5-89be-f129a10cf610",
       "nickname" : "멤버1"
     }, {
-      "id" : "c8753b14-a142-4a7c-89fd-a5ed9e223950",
+      "id" : "6aed6e88-ecf2-48b8-a01a-9d35e081634c",
       "nickname" : "멤버2"
     } ]
   },
@@ -1658,10 +1660,75 @@ Content-Length: 541
     "imageUrl" : "url5"
   } ],
   "manittee" : {
-    "id" : "54c28ec6-6d39-4b72-8681-1a31a01f7335",
+    "id" : "7d839ffb-6ccf-4cc7-825c-e2d1d76f9c16",
     "nickname" : "멤버2"
   }
 }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_메세지_읽음으로_상태변경"><a class="link" href="#_메세지_읽음으로_상태변경">메세지 읽음으로 상태변경</a></h3>
+<div class="sect3">
+<h4 id="_메세지_읽음으로_상태변경_path_parameters"><a class="link" href="#_메세지_읽음으로_상태변경_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /api/v1/rooms/{roomId}/messages/status</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방 id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_메세지_읽음으로_상태변경_request_headers"><a class="link" href="#_메세지_읽음으로_상태변경_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 인증 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_메세지_읽음으로_상태변경_http_request"><a class="link" href="#_메세지_읽음으로_상태변경_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v1/rooms/4/messages/status HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer testAccessToken
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_메세지_읽음으로_상태변경_http_response"><a class="link" href="#_메세지_읽음으로_상태변경_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content</code></pre>
 </div>
 </div>
 </div>
@@ -1758,13 +1825,127 @@ Content-Length: 441
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_추억_가져오기"><a class="link" href="#_추억_가져오기">추억 가져오기</a></h3>
+<div class="sect3">
+<h4 id="_추억_가져오기_path_parameters"><a class="link" href="#_추억_가져오기_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /api/v1/rooms/{roomId}/memories</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방 id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_추억_가져오기_request_headers"><a class="link" href="#_추억_가져오기_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 인증 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_추억_가져오기_http_request"><a class="link" href="#_추억_가져오기_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms/1/memories HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer testAccessToken
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_추억_가져오기_http_response"><a class="link" href="#_추억_가져오기_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 927
+
+{
+  "memoriesWithManitto" : {
+    "member" : {
+      "nickname" : "멤버2"
+    },
+    "messages" : [ {
+      "id" : 1,
+      "content" : "메시지내용1",
+      "imageUrl" : "url1"
+    }, {
+      "id" : 2,
+      "content" : "메시지내용2",
+      "imageUrl" : "url2"
+    }, {
+      "id" : 3,
+      "content" : "메시지내용3",
+      "imageUrl" : "url3"
+    }, {
+      "id" : 4,
+      "content" : "메시지내용4",
+      "imageUrl" : "url4"
+    } ]
+  },
+  "memoriesWithManittee" : {
+    "member" : {
+      "nickname" : "멤버3"
+    },
+    "messages" : [ {
+      "id" : 1,
+      "content" : "메시지내용1",
+      "imageUrl" : "url1"
+    }, {
+      "id" : 2,
+      "content" : "메시지내용2",
+      "imageUrl" : "url2"
+    }, {
+      "id" : 3,
+      "content" : "메시지내용3",
+      "imageUrl" : "url3"
+    }, {
+      "id" : 4,
+      "content" : "메시지내용4",
+      "imageUrl" : "url4"
+    } ]
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-08-28 16:16:23 +0900
+Last updated 2022-08-30 23:07:35 +0900
 </div>
 </div>
 </body>

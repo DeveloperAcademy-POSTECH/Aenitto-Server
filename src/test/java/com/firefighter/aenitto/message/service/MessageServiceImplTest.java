@@ -9,6 +9,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.channels.MulticastChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -81,6 +83,7 @@ public class MessageServiceImplTest {
 
     private Member manitto;
     private Member manittee;
+    private Member currentMember;
 
     private MemberRoom memberRoom;
 
@@ -97,6 +100,7 @@ public class MessageServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        currentMember = memberFixture();
         manitto = memberFixture();
         manittee = memberFixture2();
         notManittee = memberFixture3();
@@ -289,6 +293,45 @@ public class MessageServiceImplTest {
                 .getSentMessages(manitto.getId(), room.getId());
     }
 
+    @DisplayName("읽은 메세지 상태 변경 - 실패 / 참여하고 있지 않은 방")
+    @Test
+    void setReadMessagesStatus_failure_not_participating_room() {
+        //given
+        doReturn(Optional.empty()).when(roomRepository)
+                .findMemberRoomById(any(UUID.class), anyLong());
+
+        //when
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.setReadMessagesStatus(manitto, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(manitto.getId(), room.getId());
+    }
+
+    @DisplayName("읽은 메세지 상태 변경 - 성공")
+    @Test
+    void setReadMessagesStatus_success() {
+        //given
+        memberRoom = memberRoomFixture1(manittee, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(manittee.getId(), room.getId());
+        doReturn(messages).when(messageRepository)
+                .findMessagesByReceiverIdAndRoomIdAndStatus(manittee.getId(), room.getId(), false);
+
+        //when
+        target.setReadMessagesStatus(manittee, room.getId());
+
+        //then
+        assertThat(messages.get(3).isRead()).isEqualTo(true);
+        assertThat(messages.get(4).isRead()).isEqualTo(true);
+
+        verify(roomRepository, times(1))
+                .findMemberRoomById(manittee.getId(), room.getId());
+        verify(messageRepository, times(1))
+                .findMessagesByReceiverIdAndRoomIdAndStatus(manittee.getId(), room.getId(), false);
+    }
+
     @DisplayName("받은 메시지 가져오기 - 실패 / 참여하고 있지 않은 방")
     @Test
     void getReceivedMessages_failure_not_participating_room() {
@@ -353,5 +396,76 @@ public class MessageServiceImplTest {
                 .findByRoomIdAndManitteeId(room.getId(), manittee.getId());
         verify(messageRepository, times(1))
                 .getReceivedMessages(manittee.getId(), room.getId());
+    }
+
+    @DisplayName("추억 가져오기 - 실패 / 참여하고 있지 않은 방")
+    @Test
+    void getMemories_failure_not_participating_room() {
+        //given
+        doReturn(Optional.empty()).when(roomRepository)
+                .findMemberRoomById(any(UUID.class), anyLong());
+
+        //when
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.getMemories(currentMember, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(currentMember.getId(), room.getId());
+    }
+
+    @DisplayName("추억 가져오기 - 실패 / 마니또가 존재하지 않습니다")
+    @Test
+    void getMemories_failure_manitto_not_exists() {
+        //given
+        memberRoom = memberRoomFixture1(currentMember, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(currentMember.getId(), room.getId());
+        doReturn(Optional.empty()).when(relationRepository)
+                .findByRoomIdAndManitteeId(anyLong(), any(UUID.class));
+
+        //when, then
+        assertThatExceptionOfType(RelationNotFoundException.class)
+                .isThrownBy(() -> {
+                    target.getMemories(currentMember, room.getId());
+                });
+        verify(roomRepository, times(1))
+                .findMemberRoomById(currentMember.getId(), room.getId());
+        verify(relationRepository, times(1))
+                .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
+
+    }
+    @DisplayName("추억 가져오기 - 성공")
+    @Test
+    void getMemories_success() {
+        //given
+        List<Message> tempMessage = new ArrayList<>();
+        tempMessage.add(message1);
+        tempMessage.add(message2);
+
+        memberRoom = memberRoomFixture1(currentMember, room);
+        doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+                .findMemberRoomById(currentMember.getId(), room.getId());
+        doReturn(Optional.ofNullable(relation)).when(relationRepository)
+                .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
+        doReturn(Optional.ofNullable(relation)).when(relationRepository)
+                .findByRoomIdAndManittoId(room.getId(), currentMember.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomContentReceivedMessages(currentMember.getId(), room.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomImageReceivedMessages(currentMember.getId(), room.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomContentSentMessages(currentMember.getId(), room.getId());
+        doReturn(tempMessage).when(messageRepository)
+                .getTwoRandomImageSentMessages(currentMember.getId(), room.getId());
+
+        //when
+        MemoriesResponse response = target.getMemories(currentMember, room.getId());
+
+        //then
+        assertThat(response.getMemoriesWithManittee().getMessages().size()).isEqualTo(4);
+        assertThat(response.getMemoriesWithManitto().getMessages().size()).isEqualTo(4);
+        assertThat(response.getMemoriesWithManittee().getMember().getNickname()).isNotNull();
+        assertThat(response.getMemoriesWithManitto().getMember().getNickname()).isNotNull();
     }
 }

@@ -32,6 +32,10 @@ public class MessageFixture {
         return baseMessageFixture(7, false);
     }
 
+    public static Message messageFixture8() {
+        return baseMessageFixture(8, true);
+    }
+
 
     private static Message baseMessageFixture(int number, boolean read) {
         Message message = transientMessageFixture(number);
