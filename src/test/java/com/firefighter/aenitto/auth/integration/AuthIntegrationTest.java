@@ -1,8 +1,7 @@
 package com.firefighter.aenitto.auth.integration;
 
-import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
+import com.firefighter.aenitto.auth.dto.request.LoginRequest;
 import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
-import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.support.IntegrationTest;
@@ -30,7 +29,7 @@ public class AuthIntegrationTest extends IntegrationTest {
     @DisplayName("로그인 - 성공 / 임시 로그인")
     @ParameterizedTest
     @MethodSource("provideLoginUser")
-    void login_success(TempLoginRequest request) throws Exception {
+    void login_success(LoginRequest request) throws Exception {
 
         // given, when, then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/temp-login")
@@ -48,14 +47,14 @@ public class AuthIntegrationTest extends IntegrationTest {
     private static Stream<Arguments> provideLoginUser() {
         return Stream.of(
                 Arguments.of(createTempLoginRequest()),
-                Arguments.of(TempLoginRequest.builder()
+                Arguments.of(LoginRequest.builder()
                                 .accessToken("accessToken")
                         .build())
         );
     }
 
-    private static TempLoginRequest createTempLoginRequest() {
-        return TempLoginRequest.builder()
+    private static LoginRequest createTempLoginRequest() {
+        return LoginRequest.builder()
                 .accessToken("accessToken")
                 .build();
     }

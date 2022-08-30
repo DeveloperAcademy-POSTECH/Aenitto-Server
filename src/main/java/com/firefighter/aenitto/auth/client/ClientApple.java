@@ -32,11 +32,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class ClientApple implements ClientProxy{
+public class ClientApple implements ClientProxy {
     @Autowired
     private final WebClient webClient;
 
-    public ApplePublicKeyResponse getAppleAuthPublicKey(){
+    public ApplePublicKeyResponse getAppleAuthPublicKey() {
         ApplePublicKeyResponse applePublicKeyResponse = webClient.get()
                 .uri("https://appleid.apple.com/auth/keys")
                 .retrieve()
@@ -45,8 +45,9 @@ public class ClientApple implements ClientProxy{
         return applePublicKeyResponse;
     }
 
-    public String validateToken(String identityToken){
-        try{
+    @Override
+    public String validateToken(String identityToken) {
+        try {
             ApplePublicKeyResponse applePublicKeyResponse = getAppleAuthPublicKey();
             String headerOfIdentityToken = identityToken.substring(0, identityToken.indexOf("."));
             Map<String, String> header = new ObjectMapper().readValue(
@@ -68,7 +69,7 @@ public class ClientApple implements ClientProxy{
             Claims claims = Jwts.parserBuilder().setSigningKey(publicKey)
                     .build().parseClaimsJws(identityToken).getBody();
 
-            JsonObject userInfoObject = new Gson().fromJson(new Gson().toJson(claims),JsonObject.class);
+            JsonObject userInfoObject = new Gson().fromJson(new Gson().toJson(claims), JsonObject.class);
             JsonElement appleAlg = userInfoObject.get("sub");
             String appleSocialId = appleAlg.getAsString();
 
@@ -84,7 +85,7 @@ public class ClientApple implements ClientProxy{
             log.error(e.getMessage());
         } catch (InvalidKeySpecException e) {
             log.error(e.getMessage());
-        }catch (MalformedJwtException e){
+        } catch (MalformedJwtException e) {
             throw new InvalidIdentityTokenException();
         }
         return null;

@@ -1,8 +1,8 @@
 package com.firefighter.aenitto.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
-import com.firefighter.aenitto.auth.dto.response.TempLoginResponse;
+import com.firefighter.aenitto.auth.dto.request.LoginRequest;
+import com.firefighter.aenitto.auth.dto.response.LoginResponse;
 import com.firefighter.aenitto.auth.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -62,16 +62,16 @@ public class AuthControllerTest {
     public void 임시사용자생성_성공() throws Exception{
         //given
         final String url = "/api/v1/temp-login";
-        final TempLoginResponse tempLoginResponse = TempLoginResponse.builder()
+        final LoginResponse tempLoginResponse = LoginResponse.builder()
                 .accessToken("accessToken").build();
 
-        doReturn(tempLoginResponse).when(authService).loginOrSignIn(any(TempLoginRequest.class));
+        doReturn(tempLoginResponse).when(authService).loginOrSignIn(any(LoginRequest.class));
 
         //when
         ResultActions perform = mockMvc.perform(
                 MockMvcRequestBuilders.post(url)
                         .content(objectMapper.writeValueAsString(
-                                TempLoginRequest.builder()
+                                LoginRequest.builder()
                                         .accessToken("accessToken")
                                         .build())
                         ).contentType(MediaType.APPLICATION_JSON)

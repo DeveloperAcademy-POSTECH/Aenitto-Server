@@ -1,7 +1,7 @@
 package com.firefighter.aenitto.auth.controller;
 
-import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
-import com.firefighter.aenitto.auth.dto.response.TempLoginResponse;
+import com.firefighter.aenitto.auth.dto.request.LoginRequest;
+import com.firefighter.aenitto.auth.dto.response.LoginResponse;
 import com.firefighter.aenitto.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +21,9 @@ public class AuthController {
 
     @PostMapping("/temp-login")
     public ResponseEntity temporaryLogin(
-            @Valid @RequestBody final TempLoginRequest tempLoginRequest
+            @Valid @RequestBody final LoginRequest tempLoginRequest
             ) {
-        final TempLoginResponse response = authService.loginOrSignIn(tempLoginRequest);
+        final LoginResponse response = authService.loginOrSignIn(tempLoginRequest);
         return ResponseEntity.ok(response);
     }
 }
