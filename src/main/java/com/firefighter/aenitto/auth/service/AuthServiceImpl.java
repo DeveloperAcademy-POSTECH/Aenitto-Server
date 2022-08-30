@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse loginOrSignIn(LoginRequest loginRequest) {
-        String socialId = clientProxy.validateToken(loginRequest.getAccessToken());
+        String socialId = clientProxy.validateToken(loginRequest.getIdentityToken());
         Optional<Member> member = memberRepository.findBySocialId(socialId);
         if (member.isEmpty()) {
             return signIn(socialId);

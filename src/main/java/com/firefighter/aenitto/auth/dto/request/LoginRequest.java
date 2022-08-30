@@ -14,6 +14,6 @@ import javax.validation.constraints.NotBlank;
 @RequiredArgsConstructor
 public class LoginRequest {
 
-    @NotBlank(message = "identityTokendms null일 수 없습니다.")
-    private final String accessToken;
+    @NotBlank(message = "identityToken은 null일 수 없습니다.")
+    private final String identityToken;
 }

@@ -100,7 +100,7 @@ public class AuthServiceImplTest {
                 .findBySocialId(anyString());
         doReturn(member()).when(memberRepository)
                 .saveMember(any(Member.class));
-        LoginRequest loginRequest = LoginRequest.builder().accessToken("access").build();
+        LoginRequest loginRequest = LoginRequest.builder().identityToken("access").build();
 
         // when
         final LoginResponse result = target.loginOrSignIn(loginRequest);
@@ -125,7 +125,7 @@ public class AuthServiceImplTest {
                 .findByMemberId(member().getId());
         doReturn(Optional.ofNullable(member())).when(memberRepository)
                 .findBySocialId(anyString());
-        LoginRequest loginRequest = LoginRequest.builder().accessToken("access").build();
+        LoginRequest loginRequest = LoginRequest.builder().identityToken("access").build();
 
         // when
         final LoginResponse result = target.loginOrSignIn(loginRequest);
@@ -143,7 +143,7 @@ public class AuthServiceImplTest {
         // given
         doThrow(new FailedToFetchPublicKeyException()).when(clientProxy)
                 .validateToken(anyString());
-        LoginRequest loginRequest = LoginRequest.builder().accessToken("access").build();
+        LoginRequest loginRequest = LoginRequest.builder().identityToken("access").build();
 
         // when, then
         assertThatExceptionOfType(FailedToFetchPublicKeyException.class)
@@ -159,7 +159,7 @@ public class AuthServiceImplTest {
         // given
         doThrow(new InvalidIdentityTokenException()).when(clientProxy)
                 .validateToken(anyString());
-        LoginRequest loginRequest = LoginRequest.builder().accessToken("access").build();
+        LoginRequest loginRequest = LoginRequest.builder().identityToken("access").build();
 
         // when, then
         assertThatExceptionOfType(InvalidIdentityTokenException.class)

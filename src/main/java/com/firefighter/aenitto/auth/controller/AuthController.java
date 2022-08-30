@@ -19,11 +19,10 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/temp-login")
-    public ResponseEntity temporaryLogin(
-            @Valid @RequestBody final LoginRequest tempLoginRequest
-            ) {
-        final LoginResponse response = authService.loginOrSignIn(tempLoginRequest);
-        return ResponseEntity.ok(response);
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginAndSignIn(
+            @Valid @RequestBody final LoginRequest loginRequest
+    ) {
+        return ResponseEntity.ok(authService.loginOrSignIn(loginRequest));
     }
 }

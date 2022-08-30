@@ -37,9 +37,9 @@ public class AuthIntegrationTest extends IntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        Member member = memberRepository.findBySocialId(request.getAccessToken()).get();
+        Member member = memberRepository.findBySocialId(request.getIdentityToken()).get();
         assertAll(
-                () -> assertTrue(memberRepository.findBySocialId(request.getAccessToken()).isPresent()),
+                () -> assertTrue(memberRepository.findBySocialId(request.getIdentityToken()).isPresent()),
                 () -> assertTrue(refreshTokenRepository.findByMemberId(member.getId()).isPresent())
         );
     }
@@ -48,14 +48,14 @@ public class AuthIntegrationTest extends IntegrationTest {
         return Stream.of(
                 Arguments.of(createTempLoginRequest()),
                 Arguments.of(LoginRequest.builder()
-                                .accessToken("accessToken")
+                                .identityToken("accessToken")
                         .build())
         );
     }
 
     private static LoginRequest createTempLoginRequest() {
         return LoginRequest.builder()
-                .accessToken("accessToken")
+                .identityToken("accessToken")
                 .build();
     }
 }
