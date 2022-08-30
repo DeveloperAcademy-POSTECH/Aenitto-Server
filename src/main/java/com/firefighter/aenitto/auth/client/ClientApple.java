@@ -77,17 +77,21 @@ public class ClientApple implements ClientProxy {
 
         } catch (JsonMappingException e) {
             log.error(e.getMessage());
+            throw new InvalidIdentityTokenException();
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage());
+            throw new InvalidIdentityTokenException();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
+            throw new InvalidIdentityTokenException();
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage());
+            throw new InvalidIdentityTokenException();
         } catch (InvalidKeySpecException e) {
             log.error(e.getMessage());
+            throw new InvalidIdentityTokenException();
         } catch (MalformedJwtException e) {
             throw new InvalidIdentityTokenException();
         }
-        return null;
     }
 }

@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.auth.client.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -7,11 +8,14 @@ import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(force = true)
+@AllArgsConstructor
+@Getter
 public class ApplePublicKeyResponse {
-    private final List<Key> keys;
+    private List<Key> keys;
 
     @Getter
     @NoArgsConstructor(force = true)
+    @AllArgsConstructor
     public static class Key {
         private final String kty;
         private final String kid;
@@ -22,6 +26,7 @@ public class ApplePublicKeyResponse {
     }
 
     public Optional<Key> getMatchedKeyBy(String kid, String alg) {
+        System.out.println(this.keys.size());
         return this.keys.stream()
                 .filter(key -> key.getKid().equals(kid) && key.getAlg().equals(alg))
                 .findFirst();
