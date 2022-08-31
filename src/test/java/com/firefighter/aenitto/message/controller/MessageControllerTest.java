@@ -341,6 +341,7 @@ public class MessageControllerTest {
                                 fieldWithPath("messages[0].id").description("메세지 id"),
                                 fieldWithPath("messages[0].content").description("메세지 내용"),
                                 fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진"),
+                                fieldWithPath("messages[0].createdDate").description("메세지 생성 날짜"),
                                 fieldWithPath("manittee").description("내 마니띠"),
                                 fieldWithPath("manittee.id").description("마니띠 id"),
                                 fieldWithPath("manittee.nickname").description("내 마니띠 닉네임")
@@ -468,7 +469,8 @@ public class MessageControllerTest {
                                 fieldWithPath("messages").description("보낸 메시지들"),
                                 fieldWithPath("messages[0].id").description("메세지 id"),
                                 fieldWithPath("messages[0].content").description("메세지 내용"),
-                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진")
+                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진"),
+                                fieldWithPath("messages[0].createdDate").description("메세지 생성 날짜")
                         )
                 ));
         ;
@@ -556,13 +558,15 @@ public class MessageControllerTest {
                                 fieldWithPath("memoriesWithManitto.messages[0].id").description("마니또와 주고 받은 메세지의 아이디"),
                                 fieldWithPath("memoriesWithManitto.messages[0].content").description("마니또와 주고 받은 메세지의 내용"),
                                 fieldWithPath("memoriesWithManitto.messages[0].imageUrl").description("마니또와 주고 받은 메세지의 이미지"),
+                                fieldWithPath("memoriesWithManitto.messages[0].createdDate").description("마니또와 주고 받은 메세지의 생성 날짜"),
                                 fieldWithPath("memoriesWithManittee").description("마니띠와의 추억"),
                                 fieldWithPath("memoriesWithManittee.member").description("내 마니띠 정보"),
                                 fieldWithPath("memoriesWithManittee.member.nickname").description("내 마니띠의 닉네임"),
                                 fieldWithPath("memoriesWithManittee.messages").description("마니띠와 주고 받은 메세지들"),
                                 fieldWithPath("memoriesWithManittee.messages[0].id").description("마니띠와 주고 받은 메세지의 아이디"),
                                 fieldWithPath("memoriesWithManittee.messages[0].content").description("마니띠와 주고 받은 메세지의 내용"),
-                                fieldWithPath("memoriesWithManittee.messages[0].imageUrl").description("마니띠와 주고 받은 메세지의 이미지")
+                                fieldWithPath("memoriesWithManittee.messages[0].imageUrl").description("마니띠와 주고 받은 메세지의 이미지"),
+                                fieldWithPath("memoriesWithManittee.messages[0].createdDate").description("마니띠와 주고 받은 메세지의 생성 날짜")
                         )
                 ));
     }

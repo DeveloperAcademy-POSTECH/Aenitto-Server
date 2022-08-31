@@ -96,6 +96,7 @@ public class MessageServiceImplTest {
     private MultipartFile image;
 
     List<Message> messages = new ArrayList<>();
+    List<Message> messages2 = new ArrayList<>();
 
 
     @BeforeEach
