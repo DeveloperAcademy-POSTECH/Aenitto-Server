@@ -817,7 +817,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 692
+Content-Length: 734
 
 {
   "room" : {
@@ -830,18 +830,21 @@ Content-Length: 692
   "participants" : {
     "count" : 3,
     "members" : [ {
-      "id" : "a9422b08-80bc-4de5-89be-f129a10cf610",
+      "id" : "ef0bd79c-f889-4acf-a260-f07b062cb51d",
       "nickname" : "멤버1"
     }, {
-      "id" : "a9422b08-80bc-4de5-89be-f129a10cf610",
+      "id" : "ef0bd79c-f889-4acf-a260-f07b062cb51d",
       "nickname" : "멤버1"
     }, {
-      "id" : "6aed6e88-ecf2-48b8-a01a-9d35e081634c",
+      "id" : "7b2c92c7-fab8-427c-a80c-a5661c2ff93e",
       "nickname" : "멤버2"
     } ]
   },
   "manittee" : {
     "nickname" : "멤버1"
+  },
+  "invitation" : {
+    "code" : null
   },
   "mission" : {
     "id" : 2,
@@ -926,6 +929,16 @@ Content-Length: 692
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>participants.members[0].nickname</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">참여자 닉네임</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invitation</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">초대코드 정보</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invitation.code</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">초대 코드</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>manittee</code></p></td>
@@ -1660,7 +1673,7 @@ Content-Length: 541
     "imageUrl" : "url5"
   } ],
   "manittee" : {
-    "id" : "7d839ffb-6ccf-4cc7-825c-e2d1d76f9c16",
+    "id" : "11e9a2a0-454b-4398-9263-f943eace87ba",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -1945,7 +1958,7 @@ Content-Length: 927
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-08-30 23:07:35 +0900
+Last updated 2022-08-31 17:57:22 +0900
 </div>
 </div>
 </body>

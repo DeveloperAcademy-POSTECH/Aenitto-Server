@@ -40,6 +40,7 @@ public class RoomResponseDtoBuilder {
                 .manittee(RoomDetailResponse.ManitteeInfo.of(relation))
                 .participants(RoomDetailResponse.ParticipantsInfo.of(room.getMemberRooms()))
                 .messages(new RoomDetailResponse.MessageInfo(3))
+                .invitation(new RoomDetailResponse.InvitationInfo(room.getInvitation()))
                 .admin(false)
                 .didViewRoulette(false)
                 .mission(RoomDetailResponse.MissionInfo.of(mission))
