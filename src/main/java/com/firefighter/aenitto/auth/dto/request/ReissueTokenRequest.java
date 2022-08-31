@@ -5,10 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @NoArgsConstructor(force = true)
 public class ReissueTokenRequest {
+    @NotBlank
     private final String accessToken;
+    @NotBlank
     private final String refreshToken;
 
     @Builder
