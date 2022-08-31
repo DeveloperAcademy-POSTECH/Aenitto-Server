@@ -42,7 +42,8 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(header().exists("Location"));
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 실패 / 참여중인 방이 아님")
+    @DisplayName("보낸 메시지 가져오기 - 실패 / 참여하고 있는 방이 아님")
+    @Sql("classpath:relation.sql")
     @Test
     void get_sent_messages_failure_room_not_participating() throws Exception {
         // when, then
@@ -91,6 +92,33 @@ public class MessageIntegrationTest extends IntegrationTest {
         ;
     }
 
+    @DisplayName("메세지 읽음으로 상태변경 - 실패 / 참여하고 있는 방이 아님")
+    @Test
+    void setStatusMessagesRead_failure_room_not_participating() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/rooms/{roomId}/messages/status", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @DisplayName("메세지 읽음으로 상태변경 - 성공")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.RELATION,
+            SqlPath.SENT_MESSAGE
+    })
+    @Test
+    void setStatusMessagesRead_success() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/rooms/{roomId}/messages/status", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
     @DisplayName("받은 메시지 가져오기 - 실패 / 참여중인 방이 아님")
     @Test
     void get_received_messages_failure_room_not_participating() throws Exception {
@@ -137,6 +165,62 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.messages[0].id").exists())
                 .andExpect(jsonPath("$.messages[0].content").exists())
                 .andExpect(jsonPath("$.messages[0].imageUrl").exists())
+        ;
+    }
+
+    @DisplayName("추억 가져오기 - 실패 / 참여중인 방이 아님")
+    @Test
+    void get_memories_failure_room_not_participating() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/memories", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @DisplayName("받은 메시지 가져오기 - 실패 / 마니또 존재 X")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM
+    })
+    @Test
+    void get_memories_failure_manittee_not_exists() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/memories", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.RELATION_NOT_FOUND.getMessage())));
+    }
+
+    @DisplayName("추억 가져오기 - 성공")
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PROCESSING,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.RELATION,
+            SqlPath.MEMORIES
+    })
+    @Test
+    void get_memories_success() throws Exception {
+        // when, then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/memories", 2L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.memoriesWithManitto.member.nickname").exists())
+                .andExpect(jsonPath("$.memoriesWithManitto.messages[0].id").exists())
+                .andExpect(jsonPath("$.memoriesWithManitto.messages[1].id").exists())
+                .andExpect(jsonPath("$.memoriesWithManitto.messages[2].id").exists())
+                .andExpect(jsonPath("$.memoriesWithManitto.messages[3].id").exists())
+                .andExpect(jsonPath("$.memoriesWithManittee.member.nickname").exists())
+                .andExpect(jsonPath("$.memoriesWithManittee.messages[0].id").exists())
+                .andExpect(jsonPath("$.memoriesWithManittee.messages[1].id").exists())
+                .andExpect(jsonPath("$.memoriesWithManittee.messages[2].id").exists())
+                .andExpect(jsonPath("$.memoriesWithManittee.messages[3].id").exists())
+
         ;
     }
 }

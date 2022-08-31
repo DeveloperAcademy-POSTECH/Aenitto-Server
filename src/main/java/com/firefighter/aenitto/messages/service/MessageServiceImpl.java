@@ -10,6 +10,7 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -84,6 +86,38 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public void setReadMessagesStatus(Member currentMember, Long roomId) {
+        throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+        List<Message> messages = messageRepository
+                .findMessagesByReceiverIdAndRoomIdAndStatus(currentMember.getId(), roomId, false);
+        for (Message message : messages) {
+            message.readMessage();
+        }
+    }
+    @Override
+    public MemoriesResponse getMemories(Member currentMember, Long roomId) {
+        throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+        Relation myManittoRelation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
+        Relation myManitteeRelation = throwExceptionIfManitteeNotFound(currentMember.getId(), roomId);
+        List<Message> receivedMessageImage = messageRepository
+                .getTwoRandomImageReceivedMessages(currentMember.getId(), roomId);
+        List<Message> receivedMessageContent = messageRepository
+                .getTwoRandomContentReceivedMessages(currentMember.getId(), roomId);
+        List<Message> sentMessageImage = messageRepository
+                .getTwoRandomImageSentMessages(currentMember.getId(), roomId);
+        List<Message> sentMessageContent = messageRepository
+                .getTwoRandomContentSentMessages(currentMember.getId(), roomId);
+
+        List<Message> receivedMessage = new ArrayList<>();
+        receivedMessage.addAll(receivedMessageContent);
+        receivedMessage.addAll(receivedMessageImage);
+        List<Message> sentMessage = new ArrayList<>();
+        sentMessage.addAll(sentMessageContent);
+        sentMessage.addAll(sentMessageImage);
+
+        return MemoriesResponse.of(myManittoRelation.getManitto(), myManitteeRelation.getManittee(),
+                receivedMessage, sentMessage);
+    }
     public ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
