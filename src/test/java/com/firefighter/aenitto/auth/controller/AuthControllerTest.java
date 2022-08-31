@@ -1,18 +1,20 @@
 package com.firefighter.aenitto.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
-import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
 import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
-import com.firefighter.aenitto.auth.dto.response.TempLoginResponse;
+
 import com.firefighter.aenitto.auth.service.AuthService;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 import com.firefighter.aenitto.common.exception.auth.AuthErrorCode;
 import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
-import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
-import com.firefighter.aenitto.members.domain.Member;
-import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
+
+import com.firefighter.aenitto.auth.dto.request.LoginRequest;
+import com.firefighter.aenitto.auth.dto.response.LoginResponse;
+
+import com.firefighter.aenitto.common.exception.auth.FailedToFetchPublicKeyException;
+import com.firefighter.aenitto.common.exception.auth.InvalidIdentityTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,22 +30,28 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+
+import static org.mockito.Mockito.*;
+
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,7 +69,8 @@ public class AuthControllerTest {
 
     private ObjectMapper objectMapper;
 
-    @Mock @Qualifier("authServiceImpl")
+    @Mock
+    @Qualifier("authServiceImpl")
     private AuthService authService;
 
     @BeforeEach
@@ -73,42 +82,30 @@ public class AuthControllerTest {
         objectMapper = new ObjectMapper();
     }
 
+    @DisplayName("회원가입-로그인 / 실패 - identityToken 유효하지 않음")
     @Test
-    @DisplayName("임시 사용자 생성 성공")
-    public void 임시사용자생성_성공() throws Exception{
+    void signUplogin_fail_Invalid_identityToken() throws Exception {
         //given
-        final String url = "/api/v1/temp-login";
-        final TempLoginResponse tempLoginResponse = TempLoginResponse.builder()
-                .accessToken("accessToken").build();
+        final String uri = "/api/v1/login";
 
-        doReturn(tempLoginResponse).when(authService).loginOrSignIn(any(TempLoginRequest.class));
+        doThrow(new InvalidIdentityTokenException())
+                .when(authService)
+                .loginOrSignIn(any());
 
-        //when
-        ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                        .content(objectMapper.writeValueAsString(
-                                TempLoginRequest.builder()
-                                        .accessToken("accessToken")
-                                        .build())
-                        ).contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        perform
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken", is(tempLoginResponse.getAccessToken())))
-                .andDo(document("temp-login",
-                        preprocessRequest(prettyPrint()),   // (2)
-                        preprocessResponse(prettyPrint()),
-                        requestFields(
-                                fieldWithPath("accessToken").description("토큰")
-                        ),
-                        responseFields(
-                                fieldWithPath("accessToken").description("발급된 토큰")
-                        )
-                )
-        );
+        //when, then
+        mockMvc.perform(
+                        RestDocumentationRequestBuilders.post(uri)
+                                .content(objectMapper.writeValueAsString(
+                                        LoginRequest.builder().identityToken("token이요").build()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", AuthErrorCode.INVALID_IDENTITY_TOKEN.getMessage()).exists())
+                .andExpect(jsonPath("$.status", AuthErrorCode.INVALID_IDENTITY_TOKEN.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
     }
+
 
     @DisplayName("토큰 재발급 / 실패 - 유효한 토큰이 아님")
     @Test
@@ -143,7 +140,7 @@ public class AuthControllerTest {
         ReissueTokenRequest request = ReissueTokenRequest.builder()
                 .accessToken("accessToken").refreshToken("refreshToken").build();
         doReturn(ReissueTokenResponse.builder()
-                        .accessToken("accessToken").refreshToken("refreshToken").build())
+                .accessToken("accessToken").refreshToken("refreshToken").build())
                 .when(authService).reissueAccessToken(any(ReissueTokenRequest.class));
 
         // when
@@ -169,5 +166,63 @@ public class AuthControllerTest {
                         )
                 ));
         ;
+    }
+
+    @DisplayName("회원가입-로그인 / 실패 - apple public key 가져오기 실패")
+    @Test
+    void signUplogin_fail_apple_public_key() throws Exception {
+        //given
+        final String uri = "/api/v1/login";
+
+        doThrow(new FailedToFetchPublicKeyException())
+                .when(authService)
+                .loginOrSignIn(any());
+
+        //when, then
+        mockMvc.perform(
+                        RestDocumentationRequestBuilders.post(uri)
+                                .content(objectMapper.writeValueAsString(
+                                        LoginRequest.builder().identityToken("token이요").build()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message", AuthErrorCode.APPLE_PUBLIC_KEY_FAILURE.getMessage()).exists())
+                .andExpect(jsonPath("$.status", AuthErrorCode.APPLE_PUBLIC_KEY_FAILURE.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+    }
+
+    @DisplayName("회원가입-로그인 / 성공")
+    @Test
+    void signUplogin_success() throws Exception {
+        //given
+        final String uri = "/api/v1/login";
+
+        LoginRequest request = LoginRequest.builder().identityToken("token이요").build();
+        LoginResponse response = LoginResponse.builder().accessToken("accessToken").refreshToken("refreshToken")
+                .isNewMember(true).userSettingDone(true).build();
+        when(authService.loginOrSignIn(any())).thenReturn(response);
+
+        //when, then, docs
+        mockMvc.perform(
+                        RestDocumentationRequestBuilders.post(uri)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andDo(document("회원가입 및 로그인",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("identityToken").description("애플의 identityToken")
+                        ),
+                        responseFields(
+                                fieldWithPath("accessToken").description("토큰"),
+                                fieldWithPath("refreshToken").description("재발급 토큰"),
+                                fieldWithPath("isNewMember").description("새로운 멤버인지 기존 멤버인지"),
+                                fieldWithPath("userSettingDone").description("닉네임 정보 입력했는지 여부")
+                        )
+                ));
     }
 }

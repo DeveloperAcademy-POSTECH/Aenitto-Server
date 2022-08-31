@@ -56,6 +56,43 @@ class MemberRepositoryTest {
 
     }
 
+    @DisplayName("Member 저장 테스트 - socialId만 저장")
+    @Test
+    void memberSaveSocialIdTest() {
+        // given
+        Member memberSocialId = Member.builder().socialId("socialId").build();
+
+        em.flush();
+        em.clear();
+
+        // when
+        memberRepository.saveMember(memberSocialId);
+        Member findMember = em.find(Member.class, memberSocialId.getId());
+
+        // then
+        assertThat(findMember.getId()).isEqualTo(memberSocialId.getId());
+        assertThat(findMember.getSocialId()).isEqualTo(memberSocialId.getSocialId());
+
+    }
+
+    @DisplayName("Member socialId로 찾기")
+    @Test
+    void findMemberBySocialIdTest() {
+        // given
+        Member memberSocialId = Member.builder().socialId("socialIdTest").build();
+        memberRepository.saveMember(memberSocialId);
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = memberRepository.findBySocialId("socialIdTest").orElseThrow();
+
+        // then
+        assertThat(findMember.getId()).isEqualTo(memberSocialId.getId());
+        assertThat(findMember.getSocialId()).isEqualTo(memberSocialId.getSocialId());
+
+    }
+
     @DisplayName("Member 값 수정 테스트")
     @Test
     void memberMergeTest() {
