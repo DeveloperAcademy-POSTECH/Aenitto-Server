@@ -13,7 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "token_id")
     private Long id;
 
@@ -31,5 +32,9 @@ public class RefreshToken {
     public RefreshToken(UUID memberId, String refreshToken) {
         this.memberId = memberId;
         this.refreshToken = refreshToken;
+    }
+
+    public void updateRefreshToken(String newRefreshToken) {
+        this.refreshToken = newRefreshToken;
     }
 }
