@@ -15,6 +15,9 @@ spring:
 
   jpa:
     defer-datasource-initialization: true
+  output:
+    ansi:
+      enabled: always
 ---
 # H2 IN MEMORY TEST
 spring:
