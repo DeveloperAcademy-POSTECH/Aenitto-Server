@@ -23,7 +23,7 @@ spring:
       on-profile: testdb
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;MODE=LEGACY
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
     username: sa
 
   jpa:
@@ -44,7 +44,7 @@ spring:
       on-profile: postgres-test
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/aenito
+    url: jdbc:postgresql://localhost:5432/aenitto
     username: postgres
 
 
