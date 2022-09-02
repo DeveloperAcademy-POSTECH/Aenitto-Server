@@ -49,13 +49,13 @@ public class RelationShipRepositoryImplTest {
     @Sql("classpath:relation.sql")
     void findByRoomIdAndManitto() {
         // when
-        final Optional<Relation> result = target.findByRoomIdAndManittoId(1L,
+        final Optional<Relation> result = target.findByRoomIdAndManittoId(100L,
                 UUID.fromString("a383cdb3-a871-4410-b146-fb1f7b447b9e"));
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.get().getId()).isEqualTo(1L);
-        assertThat(result.get().getRoom().getId()).isEqualTo(1L);
+        assertThat(result.get().getRoom().getId()).isEqualTo(100L);
         assertThat(result.get().getManittee().getNickname()).isEqualTo("manittee");
     }
 

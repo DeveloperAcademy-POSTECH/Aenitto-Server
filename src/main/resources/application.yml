@@ -15,8 +15,9 @@ spring:
     group: # 포함시킬 하위 프로필명
       develop: develop, developdb, awss3, env
 
-  defer-datasource-initialization: true
-
+  output:
+    ansi:
+      enabled: always
 ---
 # awss3
 spring:

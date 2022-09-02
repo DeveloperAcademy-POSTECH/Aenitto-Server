@@ -608,6 +608,8 @@ class RoomControllerTest {
                                 fieldWithPath("participants.members").description("방 참여자들"),
                                 fieldWithPath("participants.members[0].id").description("참여자 id"),
                                 fieldWithPath("participants.members[0].nickname").description("참여자 닉네임"),
+                                fieldWithPath("invitation").description("초대코드 정보"),
+                                fieldWithPath("invitation.code").description("초대 코드"),
                                 fieldWithPath("manittee").description("마니띠 정보"),
                                 fieldWithPath("manittee.nickname").description("마니띠 닉네임"),
                                 fieldWithPath("mission").description("개별 미션 정보"),

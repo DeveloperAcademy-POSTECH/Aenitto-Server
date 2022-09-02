@@ -22,6 +22,7 @@ public class RoomDetailResponse {
     private final RoomDetail room;
     private final ParticipantsInfo participants;
     private final ManitteeInfo manittee;
+    private final InvitationInfo invitation;
     private final MissionInfo mission;
     private final Boolean didViewRoulette;
     private final Boolean admin;
@@ -30,6 +31,7 @@ public class RoomDetailResponse {
     public static RoomDetailResponse buildPreResponse(Room room, MemberRoom memberRoom) {
         return RoomDetailResponse.builder()
                 .room(RoomDetail.of(room))
+                .invitation(new InvitationInfo(room.getInvitation()))
                 .participants(ParticipantsInfo.of(room.getMemberRooms()))
                 .admin(memberRoom.isAdmin())
                 .build();
@@ -144,5 +146,12 @@ public class RoomDetailResponse {
     @NoArgsConstructor(force = true)
     public static class MessageInfo {
         private final int count;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(force = true)
+    public static class InvitationInfo {
+        private final String code;
     }
 }

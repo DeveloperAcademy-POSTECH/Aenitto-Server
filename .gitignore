@@ -34,6 +34,8 @@ application-leodb.yml
 application-daondb.yml
 env.properties
 BOOT-INF
+AuthIntegrationTest.java
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+

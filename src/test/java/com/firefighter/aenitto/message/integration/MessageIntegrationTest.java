@@ -34,7 +34,7 @@ public class MessageIntegrationTest extends IntegrationTest {
         //TODO createJson 사용해서 바꾸기 - 다온
 
         // when, then
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/rooms/{roomId}/messages", 1L)
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/rooms/{roomId}/messages", 100L)
                         .file(image)
                         .file(requestMultipartFile())
                         .contentType(MediaType.MULTIPART_FORM_DATA))

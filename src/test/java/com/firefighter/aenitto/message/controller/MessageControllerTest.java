@@ -160,7 +160,7 @@ public class MessageControllerTest {
                 .when(messageService)
                 .sendMessage(any(Member.class), anyLong(), any(), any());
 
-        //when, then, docs
+        //when, then
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart(uri, "1")
                                 .file(requestMultipartFile())

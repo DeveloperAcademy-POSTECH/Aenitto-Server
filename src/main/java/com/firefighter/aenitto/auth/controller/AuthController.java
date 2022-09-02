@@ -1,14 +1,17 @@
 package com.firefighter.aenitto.auth.controller;
 
-import com.firefighter.aenitto.auth.dto.request.TempLoginRequest;
-import com.firefighter.aenitto.auth.dto.response.TempLoginResponse;
+
+import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
+import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
+
+import com.firefighter.aenitto.auth.dto.request.LoginRequest;
+import com.firefighter.aenitto.auth.dto.response.LoginResponse;
+
 import com.firefighter.aenitto.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -17,13 +20,20 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
+    @Qualifier("authServiceImpl")
     private final AuthService authService;
 
-    @PostMapping("/temp-login")
-    public ResponseEntity temporaryLogin(
-            @Valid @RequestBody final TempLoginRequest tempLoginRequest
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginAndSignIn(
+            @Valid @RequestBody final LoginRequest loginRequest
+    ) {
+        return ResponseEntity.ok(authService.loginOrSignIn(loginRequest));
+    }
+
+    @PatchMapping("/auth/reissue")
+    public ResponseEntity<ReissueTokenResponse> reissueAccessToken(
+            @Valid @RequestBody final ReissueTokenRequest reissueTokenRequest
             ) {
-        final TempLoginResponse response = authService.loginOrSignIn(tempLoginRequest);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authService.reissueAccessToken(reissueTokenRequest));
     }
 }

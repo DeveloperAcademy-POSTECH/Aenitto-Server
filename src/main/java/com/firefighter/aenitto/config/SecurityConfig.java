@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .antMatchers(
                         "/api/v1/auth/**"
                         ,"/api/v1/temp-login"
+                        ,"/api/v1/login"
                         ).permitAll()
                 .anyRequest().authenticated()
                 .and()
