@@ -817,7 +817,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 734
+Content-Length: 713
 
 {
   "room" : {
@@ -825,26 +825,24 @@ Content-Length: 734
     "title" : "방제목1",
     "startDate" : "2022.07.20",
     "endDate" : "2022.07.21",
+    "capacity" : 10,
     "state" : "PROCESSING"
   },
   "participants" : {
     "count" : 3,
     "members" : [ {
-      "id" : "ef0bd79c-f889-4acf-a260-f07b062cb51d",
+      "id" : "b77bf8bd-1752-4f3c-a59a-bc1914ef684d",
       "nickname" : "멤버1"
     }, {
-      "id" : "ef0bd79c-f889-4acf-a260-f07b062cb51d",
+      "id" : "b77bf8bd-1752-4f3c-a59a-bc1914ef684d",
       "nickname" : "멤버1"
     }, {
-      "id" : "7b2c92c7-fab8-427c-a80c-a5661c2ff93e",
+      "id" : "3c9d5422-fc33-4f88-9d8c-450e9a13d5a7",
       "nickname" : "멤버2"
     } ]
   },
   "manittee" : {
     "nickname" : "멤버1"
-  },
-  "invitation" : {
-    "code" : null
   },
   "mission" : {
     "id" : 2,
@@ -901,6 +899,11 @@ Content-Length: 734
 <td class="tableblock halign-left valign-top"><p class="tableblock">종료 일자</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>room.capacity</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">수용 인원</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>room.state</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">방 상태</p></td>
@@ -929,16 +932,6 @@ Content-Length: 734
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>participants.members[0].nickname</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">참여자 닉네임</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invitation</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">초대코드 정보</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invitation.code</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Null</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">초대 코드</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>manittee</code></p></td>
@@ -1673,7 +1666,7 @@ Content-Length: 541
     "imageUrl" : "url5"
   } ],
   "manittee" : {
-    "id" : "11e9a2a0-454b-4398-9263-f943eace87ba",
+    "id" : "95ca3028-bee8-4f8a-88b1-0d1de01fb356",
     "nickname" : "멤버2"
   }
 }</code></pre>
