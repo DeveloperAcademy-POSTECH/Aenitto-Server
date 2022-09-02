@@ -10,6 +10,8 @@
 == Auth API
 === 회원가입 및 로그인
 operation::회원가입 및 로그인[snippets='http-request,http-response,request-fields,response-fields']
+=== 토큰 재발급
+operation::토큰 재발급[snippets='http-request,http-response,request-fields,response-fields']
 
 
 [[Auth-API]]

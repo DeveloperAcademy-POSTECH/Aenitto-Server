@@ -14,7 +14,7 @@ import java.util.UUID;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "token_id")
     private Long id;
 
@@ -34,7 +34,9 @@ public class RefreshToken {
         this.refreshToken = refreshToken;
     }
 
-    public void renewRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+
+    public void updateRefreshToken(String newRefreshToken) {
+        this.refreshToken = newRefreshToken;
     }
+
 }

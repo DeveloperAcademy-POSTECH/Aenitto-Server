@@ -1,19 +1,20 @@
 package com.firefighter.aenitto.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.auth.dto.request.LoginRequest;
-import com.firefighter.aenitto.auth.dto.response.LoginResponse;
+
+import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
+import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
+
 import com.firefighter.aenitto.auth.service.AuthService;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 import com.firefighter.aenitto.common.exception.auth.AuthErrorCode;
+import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
+
+import com.firefighter.aenitto.auth.dto.request.LoginRequest;
+import com.firefighter.aenitto.auth.dto.response.LoginResponse;
+
 import com.firefighter.aenitto.common.exception.auth.FailedToFetchPublicKeyException;
 import com.firefighter.aenitto.common.exception.auth.InvalidIdentityTokenException;
-import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
-import com.firefighter.aenitto.members.domain.Member;
-import com.firefighter.aenitto.members.dto.request.ChangeNicknameRequest;
-import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
-import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,16 +39,19 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+
 import static org.mockito.Mockito.*;
+
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -100,6 +104,68 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.status", AuthErrorCode.INVALID_IDENTITY_TOKEN.getStatus()).exists())
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.errors").exists());
+    }
+
+
+    @DisplayName("토큰 재발급 / 실패 - 유효한 토큰이 아님")
+    @Test
+    void reissueToken_fail_not_valid_token() throws Exception {
+        // given
+        final String url = "/api/v1/auth/reissue";
+        ReissueTokenRequest request = ReissueTokenRequest.builder()
+                .accessToken("accessToken").refreshToken("refreshToken").build();
+        doThrow(new InvalidTokenException()).when(authService)
+                .reissueAccessToken(any(ReissueTokenRequest.class));
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.patch(url)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status", is(AuthErrorCode.INVALID_TOKEN.getStatus().value())))
+                .andExpect(jsonPath("$.message", is(AuthErrorCode.INVALID_TOKEN.getMessage())));
+    }
+
+    @DisplayName("토큰 재발급 / 성공")
+    @Test
+    void reissueToken_success() throws Exception {
+        // given
+        final String url = "/api/v1/auth/reissue";
+        ReissueTokenRequest request = ReissueTokenRequest.builder()
+                .accessToken("accessToken").refreshToken("refreshToken").build();
+        doReturn(ReissueTokenResponse.builder()
+                .accessToken("accessToken").refreshToken("refreshToken").build())
+                .when(authService).reissueAccessToken(any(ReissueTokenRequest.class));
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.patch(url)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("토큰 재발급",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("accessToken").description("ACCESS TOKEN"),
+                                fieldWithPath("refreshToken").description("재발급 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("accessToken").description("ACCESS TOKEN"),
+                                fieldWithPath("refreshToken").description("재발급 토큰")
+                        )
+                ));
+        ;
     }
 
     @DisplayName("회원가입-로그인 / 실패 - apple public key 가져오기 실패")

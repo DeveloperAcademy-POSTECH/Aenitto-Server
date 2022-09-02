@@ -503,8 +503,6 @@ public class RoomServiceTest {
                 .isThrownBy(() -> {
                     target.startAenitto(member1, roomId);
                 });
-
-
     }
 
     @DisplayName("게임 시작 - 실패 (방장이 아님)")
