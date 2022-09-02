@@ -72,11 +72,11 @@ public class RoomIntegrationTest extends IntegrationTest {
                         .colorIdx(1).build();
 
         // when, then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms/1/participants")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms/100/participants")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/v1/rooms/1"));
+                .andExpect(header().string("Location", "/api/v1/rooms/100"));
     }
 
     @Sql("classpath:room.sql")
@@ -86,7 +86,7 @@ public class RoomIntegrationTest extends IntegrationTest {
 
         // when, then
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/rooms/1/state")
+                MockMvcRequestBuilders.get("/api/v1/rooms/100/state")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state", is("PRE")));
@@ -101,7 +101,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                         MockMvcRequestBuilders.get( "/api/v1/rooms?" + "limit=" + 1)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.participatingRooms[0].id", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[0].id", is(100)))
                 .andExpect(jsonPath("$.participatingRooms[0].title", is("제목")))
                 .andExpect(jsonPath("$.participatingRooms[0].state", is("PRE")))
                 .andExpect(jsonPath("$.participatingRooms[0].participatingCount", is(3)))
@@ -115,7 +115,7 @@ public class RoomIntegrationTest extends IntegrationTest {
     void get_room_participants_success() throws Exception {
         // given, when, then
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/participants", 1L)
+                        MockMvcRequestBuilders.get("/api/v1/rooms/{roomId}/participants", 100L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.count", is(3)))
@@ -333,9 +333,9 @@ public class RoomIntegrationTest extends IntegrationTest {
         // then
         perform
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.participatingRooms[0].id", is(4)))
-                .andExpect(jsonPath("$.participatingRooms[1].id", is(3)))
-                .andExpect(jsonPath("$.participatingRooms[2].id", is(1)))
+                .andExpect(jsonPath("$.participatingRooms[0].id", is(100)))
+                .andExpect(jsonPath("$.participatingRooms[1].id", is(4)))
+                .andExpect(jsonPath("$.participatingRooms[2].id", is(3)))
                 .andExpect(jsonPath("$.participatingRooms[3].id", is(5)))
                 .andExpect(jsonPath("$.participatingRooms[4].id", is(2)));
     }
@@ -347,7 +347,7 @@ public class RoomIntegrationTest extends IntegrationTest {
     @Test
     void deleteRoom_fail_not_admin() throws Exception {
         // given
-        final Long roomId = 1L;
+        final Long roomId = 100L;
         final String url = "/api/v1/rooms/{roomId}";
 
         // when
