@@ -603,6 +603,7 @@ class RoomControllerTest {
                                 fieldWithPath("room.title").description("방 제목"),
                                 fieldWithPath("room.startDate").description("시작 일자"),
                                 fieldWithPath("room.endDate").description("종료 일자"),
+                                fieldWithPath("room.capacity").description("수용 인원"),
                                 fieldWithPath("room.state").description("방 상태"),
                                 fieldWithPath("participants").description("방 참여자 정보"),
                                 fieldWithPath("participants.count").description("참여자 수"),
