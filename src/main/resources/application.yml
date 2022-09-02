@@ -1,4 +1,7 @@
 ### Default Profile
+server:
+  port: 8081
+  
 spring:
   mvc:
     static-path-pattern: /static/**
