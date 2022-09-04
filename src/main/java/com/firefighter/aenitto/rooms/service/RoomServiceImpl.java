@@ -230,6 +230,16 @@ public class RoomServiceImpl implements RoomService {
         memberRoom.getRoom().updateRoom(request);
     }
 
+    @Override
+    @Transactional
+    public void endAenitto() {
+        roomRepository.findAllRooms()
+                .stream().filter(Room::isExpired)
+                .forEach(room -> {
+                    room.setState(RoomState.POST);
+                });
+    }
+
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
         roomRepository.findMemberRoomById(memberId, roomId)

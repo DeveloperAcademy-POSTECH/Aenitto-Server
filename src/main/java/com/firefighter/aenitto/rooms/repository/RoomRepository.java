@@ -13,6 +13,8 @@ import java.util.UUID;
 public interface RoomRepository {
     public Room saveRoom(Room room);
     public Room mergeRoom(Room room);
+
+    public List<Room> findAllRooms();
     public Optional<Room> findRoomById(Long id);
     public Optional<Room> findByInvitation(String invitation);
     public Optional<MemberRoom> findMemberRoomById(UUID memberId, Long roomId);
