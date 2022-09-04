@@ -74,6 +74,7 @@ public class RoomServiceImpl implements RoomService {
                 .build();
 
         memberRoom.setMemberRoom(member, room);
+        missionService.setInitialIndividualMission(memberRoom);
         return roomRepository.saveRoom(room).getId();
     }
 
