@@ -124,6 +124,7 @@ public class RoomServiceTest {
                 .thenReturn(Optional.empty());
         when(roomRepository.saveRoom(any(Room.class)))
                 .thenReturn(room1);
+        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
 
         // given
         CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
@@ -139,6 +140,7 @@ public class RoomServiceTest {
         // then
         assertThat(roomId).isEqualTo(1L);
         verify(roomRepository, times(1)).saveRoom(any(Room.class));
+        verify(missionService, times(1)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
     @DisplayName("초대코드 검증 - 실패 (초대코드 존재하지 않음)")
