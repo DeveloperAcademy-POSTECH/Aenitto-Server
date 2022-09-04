@@ -28,7 +28,8 @@ public class SchedulerService {
 
     // TODO: Logger 설정 -> scheduler 로 서버 내부에서 돌릴 경우 exception throw 하지 않고 logging 남기는 방식으로 (22.09.04 - Leo)
     @Async
-    @Scheduled(cron = "0 55 23 1/1 * ? *", zone = LOCAL_TIMEZONE)
+    @Scheduled(cron = "0 55 23 * * ?", zone = LOCAL_TIMEZONE)
+    // 0초 55분 23시
     void setDailyMissions() {
         try {
             missionService.setDailyCommonMission(LocalDate.now().plusDays(1));
@@ -39,7 +40,7 @@ public class SchedulerService {
     }
 
     @Async
-    @Scheduled(cron = "0 0 0 1/1 * ? *", zone = LOCAL_TIMEZONE)
+    @Scheduled(cron = "0 0 0 * * ?", zone = LOCAL_TIMEZONE)
     void scheduleEndAenitto() {
         roomService.endAenitto();
     }
