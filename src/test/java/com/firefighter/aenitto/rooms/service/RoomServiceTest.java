@@ -747,4 +747,34 @@ public class RoomServiceTest {
         assertThat(room2.getStartDateValue()).isEqualTo(request.getStartDate());
         assertThat(room2.getEndDateValue()).isEqualTo(request.getEndDate());
     }
+
+    @DisplayName("끝난 방 State 변경 - 성공")
+    @Test
+    void endAenitto_success() {
+        // given
+        ReflectionTestUtils.setField(room1, "endDate", LocalDate.of(2022, 9, 2));
+        ReflectionTestUtils.setField(room2, "endDate", LocalDate.of(2022, 9, 1));
+        ReflectionTestUtils.setField(room3, "endDate", LocalDate.of(2022, 9, 3));
+        ReflectionTestUtils.setField(room4, "endDate", LocalDate.of(2022, 9, 4));
+        ReflectionTestUtils.setField(room5, "endDate", LocalDate.of(2022, 9, 5));
+
+        ReflectionTestUtils.setField(room1, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room2, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room3, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room4, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room5, "state", RoomState.PROCESSING);
+
+        // when
+        when(roomRepository.findAllRooms()).thenReturn(Arrays.asList(room1, room2, room3, room4, room5));
+        target.endAenitto();
+
+        // then
+        assertThat(room1.getState()).isEqualTo(RoomState.POST);
+        assertThat(room2.getState()).isEqualTo(RoomState.POST);
+        assertThat(room3.getState()).isEqualTo(RoomState.POST);
+        assertThat(room4.getState()).isEqualTo(RoomState.PROCESSING);
+        assertThat(room5.getState()).isEqualTo(RoomState.PROCESSING);
+
+
+    }
 }
