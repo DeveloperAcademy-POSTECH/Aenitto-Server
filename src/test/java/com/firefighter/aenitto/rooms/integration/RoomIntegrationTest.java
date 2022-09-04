@@ -13,18 +13,18 @@ import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.support.IntegrationTest;
 import com.firefighter.aenitto.support.security.WithMockCustomMember;
-import org.apache.coyote.Request;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -63,9 +63,12 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.participatingCount", is(0)));
     }
 
+    @Sql({
+            SqlPath.ROOM_PARTICIPATE
+    })
     @DisplayName("방 참여 -> 성공")
-    @Test
     @WithMockCustomMember
+    @Test
     void participate_room_success() throws Exception {
         // given
         ParticipateRoomRequest request = ParticipateRoomRequest.builder()
@@ -77,6 +80,22 @@ public class RoomIntegrationTest extends IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/rooms/100"));
+
+
+        flushAndClear();
+        MemberRoom findMemberRoom = em.createQuery(
+                        "SELECT mr" +
+                                " FROM MemberRoom mr" +
+                                " WHERE mr.room.id = :roomId" +
+                                " AND mr.member.id = :memberId", MemberRoom.class)
+                .setParameter("roomId", 100L)
+                .setParameter("memberId", UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+
+        assertThat(findMemberRoom.getIndividualMissions()).hasSize(1);
+        assertThat(findMemberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
     }
 
     @Sql("classpath:room.sql")

@@ -11,6 +11,7 @@ import com.firefighter.aenitto.missions.MissionFixture;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.repository.MissionRepositoryImpl;
+import com.firefighter.aenitto.missions.service.MissionServiceImpl;
 import com.firefighter.aenitto.rooms.RoomFixture;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
@@ -52,6 +53,7 @@ public class RoomServiceTest {
     @Mock private MemberRepositoryImpl memberRepository;
     @Mock private MissionRepositoryImpl missionRepository;
     @Mock private MessageRepository messageRepository;
+    @Mock private MissionServiceImpl missionService;
 
     // Fixtures
     Room room1;
@@ -273,6 +275,7 @@ public class RoomServiceTest {
                 .thenReturn(Optional.empty());
         when(roomRepository.findRoomById(anyLong()))
                 .thenReturn(Optional.of(room1));
+        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
@@ -282,8 +285,10 @@ public class RoomServiceTest {
 
         // then
         assertThat(roomId).isEqualTo(room1.getId());
+
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
+        verify(missionService, times(1)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
     @DisplayName("방 상태 확인 - 실패 (참여 중인 방 x)")
