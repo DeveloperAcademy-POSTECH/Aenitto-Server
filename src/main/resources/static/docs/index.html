@@ -925,7 +925,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 734
+Content-Length: 531
 
 {
   "room" : {
@@ -933,19 +933,14 @@ Content-Length: 734
     "title" : "방제목1",
     "startDate" : "2022.07.20",
     "endDate" : "2022.07.21",
+    "capacity" : 10,
     "state" : "PROCESSING"
   },
   "participants" : {
-    "count" : 3,
+    "count" : 1,
     "members" : [ {
-      "id" : "344d3aae-0cbf-4b65-92dc-83ea888e2023",
+      "id" : "854ceb22-35ed-4d52-a925-9b6377b23cd2",
       "nickname" : "멤버1"
-    }, {
-      "id" : "344d3aae-0cbf-4b65-92dc-83ea888e2023",
-      "nickname" : "멤버1"
-    }, {
-      "id" : "0f248e7a-ab00-492a-96b4-16a702a72986",
-      "nickname" : "멤버2"
     } ]
   },
   "manittee" : {
@@ -1007,6 +1002,11 @@ Content-Length: 734
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>room.endDate</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">종료 일자</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>room.capacity</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">수용 인원</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>room.state</code></p></td>
@@ -1479,7 +1479,7 @@ Content-Length: 402
     "id" : 1,
     "title" : "방제목1",
     "state" : "PROCESSING",
-    "participatingCount" : 3,
+    "participatingCount" : 1,
     "capacity" : 10,
     "startDate" : "2022.07.20",
     "endDate" : "2022.07.21"
@@ -1631,7 +1631,7 @@ Content-Length: 145
   "id" : 1,
   "title" : "방제목1",
   "capacity" : 10,
-  "participatingCount" : 3,
+  "participatingCount" : 1,
   "startDate" : "2022.07.20",
   "endDate" : "2022.07.21"
 }</code></pre>
@@ -1781,7 +1781,7 @@ Content-Length: 541
     "imageUrl" : "url5"
   } ],
   "manittee" : {
-    "id" : "0dc95bfb-010e-4452-874a-4f4120696331",
+    "id" : "58f3e13e-243e-4e1a-96b2-432419f00f97",
     "nickname" : "멤버2"
   }
 }</code></pre>
