@@ -32,4 +32,6 @@ public interface RoomService {
 
     public void updateRoom(Member member, Long roomId, UpdateRoomRequest request);
 
+    public void endAenitto();
+
 }
