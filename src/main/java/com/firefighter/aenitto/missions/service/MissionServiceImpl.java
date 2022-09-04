@@ -78,7 +78,6 @@ public class MissionServiceImpl implements MissionService {
     @Override
     @Transactional
     public void setInitialIndividualMission(MemberRoom memberRoom) {
-        System.out.println("씨빠라라라라라라라랄라라라랄아ㅡㄹㅇ나르ㅏㅡ안");
         Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
                 .orElseThrow(MissionEmptyException::new);
         memberRoom.addIndividualMission(mission, LocalDate.now());

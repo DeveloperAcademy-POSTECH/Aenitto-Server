@@ -4,6 +4,7 @@ package com.firefighter.aenitto.rooms.integration;
 import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.utils.SqlPath;
+import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
@@ -25,6 +26,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -32,7 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RoomIntegrationTest extends IntegrationTest {
     private Room room;
 
+    @Sql({
+            SqlPath.ROOM_PARTICIPATE
+    })
     @DisplayName("방 생성 -> 성공")
+    @WithMockCustomMember
     @Test
     void create_room() throws Exception {
         // given
@@ -42,8 +48,17 @@ public class RoomIntegrationTest extends IntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"));
+
+
+        flushAndClear();
+        Member member = em.find(Member.class, UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"));
+        MemberRoom memberRoom = member.getMemberRooms().get(0);
+
+        assertThat(memberRoom.getIndividualMissions()).hasSize(1);
+        assertThat(memberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
     }
 
     @DisplayName("초대코드 검증 -> 성공")
