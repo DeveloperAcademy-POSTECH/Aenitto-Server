@@ -31,15 +31,15 @@ public class RoomTest {
     void isExpired_success() {
         // given
         Room room1 = Room.builder()
-                .endDate(LocalDate.of(2022, 9, 3))
+                .endDate(LocalDate.now().minusDays(1))
                 .build();
 
         Room room2 = Room.builder()
-                .endDate(LocalDate.of(2022, 9, 4))
+                .endDate(LocalDate.now())
                 .build();
 
         Room room3 = Room.builder()
-                .endDate(LocalDate.of(2022, 9, 5))
+                .endDate(LocalDate.now().plusDays(1))
                 .build();
 
 
