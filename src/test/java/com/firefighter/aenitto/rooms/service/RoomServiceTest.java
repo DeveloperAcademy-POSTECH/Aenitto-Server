@@ -759,11 +759,11 @@ public class RoomServiceTest {
     @Test
     void endAenitto_success() {
         // given
-        ReflectionTestUtils.setField(room1, "endDate", LocalDate.of(2022, 9, 2));
-        ReflectionTestUtils.setField(room2, "endDate", LocalDate.of(2022, 9, 1));
-        ReflectionTestUtils.setField(room3, "endDate", LocalDate.of(2022, 9, 3));
-        ReflectionTestUtils.setField(room4, "endDate", LocalDate.of(2022, 9, 4));
-        ReflectionTestUtils.setField(room5, "endDate", LocalDate.of(2022, 9, 5));
+        ReflectionTestUtils.setField(room1, "endDate", LocalDate.now().minusDays(3));
+        ReflectionTestUtils.setField(room2, "endDate", LocalDate.now().minusDays(2));
+        ReflectionTestUtils.setField(room3, "endDate", LocalDate.now().minusDays(1));
+        ReflectionTestUtils.setField(room4, "endDate", LocalDate.now());
+        ReflectionTestUtils.setField(room5, "endDate", LocalDate.now().plusDays(1));
 
         ReflectionTestUtils.setField(room1, "state", RoomState.PROCESSING);
         ReflectionTestUtils.setField(room2, "state", RoomState.PROCESSING);

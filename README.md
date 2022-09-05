@@ -23,7 +23,7 @@ _**다음 날이 기대되는 소소한 즐거움, AENITTO.**_
 
 ## API 문서 (Spring Rest Docs)
 
-- [Aenitto API Documentation](http://43.200.81.247:8080/static/docs/index.html)
+- https://dev.aenitto.shop/static/docs/index.html
 
 
 
