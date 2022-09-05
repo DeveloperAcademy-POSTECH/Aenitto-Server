@@ -11,6 +11,7 @@ import com.firefighter.aenitto.missions.MissionFixture;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.repository.MissionRepositoryImpl;
+import com.firefighter.aenitto.missions.service.MissionServiceImpl;
 import com.firefighter.aenitto.rooms.RoomFixture;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
@@ -52,6 +53,7 @@ public class RoomServiceTest {
     @Mock private MemberRepositoryImpl memberRepository;
     @Mock private MissionRepositoryImpl missionRepository;
     @Mock private MessageRepository messageRepository;
+    @Mock private MissionServiceImpl missionService;
 
     // Fixtures
     Room room1;
@@ -122,6 +124,7 @@ public class RoomServiceTest {
                 .thenReturn(Optional.empty());
         when(roomRepository.saveRoom(any(Room.class)))
                 .thenReturn(room1);
+        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
 
         // given
         CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
@@ -137,6 +140,7 @@ public class RoomServiceTest {
         // then
         assertThat(roomId).isEqualTo(1L);
         verify(roomRepository, times(1)).saveRoom(any(Room.class));
+        verify(missionService, times(1)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
     @DisplayName("초대코드 검증 - 실패 (초대코드 존재하지 않음)")
@@ -273,6 +277,7 @@ public class RoomServiceTest {
                 .thenReturn(Optional.empty());
         when(roomRepository.findRoomById(anyLong()))
                 .thenReturn(Optional.of(room1));
+        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
@@ -282,8 +287,10 @@ public class RoomServiceTest {
 
         // then
         assertThat(roomId).isEqualTo(room1.getId());
+
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
+        verify(missionService, times(1)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
     @DisplayName("방 상태 확인 - 실패 (참여 중인 방 x)")
@@ -746,5 +753,35 @@ public class RoomServiceTest {
         assertThat(room2.getCapacity()).isEqualTo(request.getCapacity());
         assertThat(room2.getStartDateValue()).isEqualTo(request.getStartDate());
         assertThat(room2.getEndDateValue()).isEqualTo(request.getEndDate());
+    }
+
+    @DisplayName("끝난 방 State 변경 - 성공")
+    @Test
+    void endAenitto_success() {
+        // given
+        ReflectionTestUtils.setField(room1, "endDate", LocalDate.of(2022, 9, 2));
+        ReflectionTestUtils.setField(room2, "endDate", LocalDate.of(2022, 9, 1));
+        ReflectionTestUtils.setField(room3, "endDate", LocalDate.of(2022, 9, 3));
+        ReflectionTestUtils.setField(room4, "endDate", LocalDate.of(2022, 9, 4));
+        ReflectionTestUtils.setField(room5, "endDate", LocalDate.of(2022, 9, 5));
+
+        ReflectionTestUtils.setField(room1, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room2, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room3, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room4, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room5, "state", RoomState.PROCESSING);
+
+        // when
+        when(roomRepository.findAllRooms()).thenReturn(Arrays.asList(room1, room2, room3, room4, room5));
+        target.endAenitto();
+
+        // then
+        assertThat(room1.getState()).isEqualTo(RoomState.POST);
+        assertThat(room2.getState()).isEqualTo(RoomState.POST);
+        assertThat(room3.getState()).isEqualTo(RoomState.POST);
+        assertThat(room4.getState()).isEqualTo(RoomState.PROCESSING);
+        assertThat(room5.getState()).isEqualTo(RoomState.PROCESSING);
+
+
     }
 }

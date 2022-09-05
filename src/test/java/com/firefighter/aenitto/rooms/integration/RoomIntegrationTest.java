@@ -4,6 +4,7 @@ package com.firefighter.aenitto.rooms.integration;
 import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.utils.SqlPath;
+import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
@@ -13,18 +14,19 @@ import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.support.IntegrationTest;
 import com.firefighter.aenitto.support.security.WithMockCustomMember;
-import org.apache.coyote.Request;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -32,7 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RoomIntegrationTest extends IntegrationTest {
     private Room room;
 
+    @Sql({
+            SqlPath.ROOM_PARTICIPATE
+    })
     @DisplayName("방 생성 -> 성공")
+    @WithMockCustomMember
     @Test
     void create_room() throws Exception {
         // given
@@ -42,8 +48,17 @@ public class RoomIntegrationTest extends IntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"));
+
+
+        flushAndClear();
+        Member member = em.find(Member.class, UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"));
+        MemberRoom memberRoom = member.getMemberRooms().get(0);
+
+        assertThat(memberRoom.getIndividualMissions()).hasSize(1);
+        assertThat(memberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
     }
 
     @DisplayName("초대코드 검증 -> 성공")
@@ -63,9 +78,12 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.participatingCount", is(0)));
     }
 
+    @Sql({
+            SqlPath.ROOM_PARTICIPATE
+    })
     @DisplayName("방 참여 -> 성공")
-    @Test
     @WithMockCustomMember
+    @Test
     void participate_room_success() throws Exception {
         // given
         ParticipateRoomRequest request = ParticipateRoomRequest.builder()
@@ -77,6 +95,22 @@ public class RoomIntegrationTest extends IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/rooms/100"));
+
+
+        flushAndClear();
+        MemberRoom findMemberRoom = em.createQuery(
+                        "SELECT mr" +
+                                " FROM MemberRoom mr" +
+                                " WHERE mr.room.id = :roomId" +
+                                " AND mr.member.id = :memberId", MemberRoom.class)
+                .setParameter("roomId", 100L)
+                .setParameter("memberId", UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+
+        assertThat(findMemberRoom.getIndividualMissions()).hasSize(1);
+        assertThat(findMemberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
     }
 
     @Sql("classpath:room.sql")
@@ -221,6 +255,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.room.title").exists())
                 .andExpect(jsonPath("$.room.startDate").exists())
                 .andExpect(jsonPath("$.room.endDate").exists())
+                .andExpect(jsonPath("$.room.capacity").exists())
                 .andExpect(jsonPath("$.room.state", is("PRE")))
                 .andExpect(jsonPath("$.participants").exists())
                 .andExpect(jsonPath("$.admin").exists())
@@ -265,6 +300,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.room.title").exists())
                 .andExpect(jsonPath("$.room.startDate").exists())
                 .andExpect(jsonPath("$.room.endDate").exists())
+                .andExpect(jsonPath("$.room.capacity").exists())
                 .andExpect(jsonPath("$.room.state", is("PROCESSING")))
                 .andExpect(jsonPath("$.participants").doesNotExist())
                 .andExpect(jsonPath("$.invitation").doesNotExist())
@@ -306,6 +342,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.room.title").exists())
                 .andExpect(jsonPath("$.room.startDate").exists())
                 .andExpect(jsonPath("$.room.endDate").exists())
+                .andExpect(jsonPath("$.room.capacity").exists())
                 .andExpect(jsonPath("$.room.state", is("POST")))
                 .andExpect(jsonPath("$.participants").doesNotExist())
                 .andExpect(jsonPath("$.admin").exists())

@@ -99,15 +99,12 @@ class RoomControllerTest {
         room3 = roomFixture2();
         member = memberFixture();
         member2 = memberFixture2();
-
         member3 = memberFixture3();
+
         memberRoom = memberRoomFixture1(member, room1);
         memberRoom1 = memberRoomFixture1(member, room3);
         memberRoom2 = memberRoomFixture2(member2, room3);
         memberRoom3 = memberRoomFixture3(member3, room3);
-
-        memberRoom = memberRoomFixture1(member, room1);
-        memberRoom2 = memberRoomFixture2(member2, room1);
 
         mission1 = MissionFixture.missionFixture2_Individual();
     }
@@ -235,10 +232,11 @@ class RoomControllerTest {
 
         // then
         perform
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
-                .andExpect(jsonPath("$.participatingCount", is(3)))
+                .andExpect(jsonPath("$.participatingCount", is(1)))
                 .andDo(document("초대코드 검증",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -603,6 +601,7 @@ class RoomControllerTest {
                                 fieldWithPath("room.title").description("방 제목"),
                                 fieldWithPath("room.startDate").description("시작 일자"),
                                 fieldWithPath("room.endDate").description("종료 일자"),
+                                fieldWithPath("room.capacity").description("수용 인원"),
                                 fieldWithPath("room.state").description("방 상태"),
                                 fieldWithPath("participants").description("방 참여자 정보"),
                                 fieldWithPath("participants.count").description("참여자 수"),

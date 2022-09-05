@@ -8,7 +8,11 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.missions.domain.MissionType;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
+import com.firefighter.aenitto.missions.service.MissionService;
+import com.firefighter.aenitto.missions.service.MissionServiceImpl;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -26,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,6 +47,8 @@ public class RoomServiceImpl implements RoomService {
     private final MissionRepository missionRepository;
     @Qualifier("messageRepositoryImpl")
     private final MessageRepository messageRepository;
+    @Qualifier("missionServiceImpl")
+    private final MissionService missionService;
 
 
 
@@ -67,6 +74,7 @@ public class RoomServiceImpl implements RoomService {
                 .build();
 
         memberRoom.setMemberRoom(member, room);
+        missionService.setInitialIndividualMission(memberRoom);
         return roomRepository.saveRoom(room).getId();
     }
 
@@ -103,6 +111,8 @@ public class RoomServiceImpl implements RoomService {
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
+        missionService.setInitialIndividualMission(memberRoom);
+
         return roomId;
     }
 
@@ -219,6 +229,16 @@ public class RoomServiceImpl implements RoomService {
         throwExceptionIfNotAdmin(memberRoom);
 
         memberRoom.getRoom().updateRoom(request);
+    }
+
+    @Override
+    @Transactional
+    public void endAenitto() {
+        roomRepository.findAllRooms()
+                .stream().filter(Room::isExpired)
+                .forEach(room -> {
+                    room.setState(RoomState.POST);
+                });
     }
 
 

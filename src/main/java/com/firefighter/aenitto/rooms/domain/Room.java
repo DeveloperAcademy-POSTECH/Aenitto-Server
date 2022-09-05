@@ -84,6 +84,10 @@ public class Room extends CreationModificationLog {
         return (capacity <= memberRooms.size());
     }
 
+    public boolean isExpired() {
+        return this.endDate.isBefore(LocalDate.now());
+    }
+
     public Room updateRoom(UpdateRoomRequest request) {
         if (request.getTitle() != null) {
             this.title = request.getTitle();
