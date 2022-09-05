@@ -31,10 +31,10 @@ public class MessageController {
             @CurrentMember final Member currentMember,
             @PathVariable final Long roomId,
             @RequestPart @Nullable final MultipartFile image,
-            @Valid @RequestPart final SendMessageRequest sendMessageRequest
+            @Valid @RequestPart final SendMessageRequest testMessageRequest
     ) {
         final Long messageId = messageService.sendMessage(currentMember, roomId,
-                sendMessageRequest, image);
+                testMessageRequest, image);
         return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId + "/messages/" + messageId)).build();
     }
 
