@@ -78,7 +78,6 @@ public class RoomServiceImpl implements RoomService {
                 .build();
 
         memberRoom.setMemberRoom(member, room);
-        missionService.setInitialIndividualMission(memberRoom);
         return roomRepository.saveRoom(room).getId();
     }
 
@@ -115,7 +114,6 @@ public class RoomServiceImpl implements RoomService {
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
-        missionService.setInitialIndividualMission(memberRoom);
 
         return roomId;
     }
@@ -206,6 +204,10 @@ public class RoomServiceImpl implements RoomService {
 
         // 참여인원에 대하여 Relation 생성
         Relation.createRelations(room.getMemberRooms(), room);
+
+        // 참여인원에 대하여 individual Mission 생성
+        room.getMemberRooms().stream()
+                .forEach(missionService::setInitialIndividualMission);
 
         // RoomState 수정
         room.setState(RoomState.PROCESSING);

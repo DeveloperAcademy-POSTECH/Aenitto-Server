@@ -7,6 +7,7 @@ import com.firefighter.aenitto.common.utils.SqlPath;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
@@ -21,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.UTFDataFormatException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WithMockCustomMember
 public class RoomIntegrationTest extends IntegrationTest {
-    private Room room;
+    private static final UUID MOCK_USER_ID = UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e");
 
     @Sql({
             SqlPath.ROOM_PARTICIPATE
@@ -54,11 +56,55 @@ public class RoomIntegrationTest extends IntegrationTest {
 
 
         flushAndClear();
-        Member member = em.find(Member.class, UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"));
-        MemberRoom memberRoom = member.getMemberRooms().get(0);
+        Member member = em.find(Member.class, MOCK_USER_ID);
+        assertThat(member.getMemberRooms()).hasSize(1);
+    }
 
-        assertThat(memberRoom.getIndividualMissions()).hasSize(1);
-        assertThat(memberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PRE,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.COMMON_MISSION,
+    })
+    @DisplayName("게임 시작 - 성공")
+    @WithMockCustomMember
+    @Test
+    void startAenitto_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}/state";
+
+        // when, then (1)
+        Room beforeRoom = em.find(Room.class, roomId);
+        assertThat(beforeRoom.getRelations()).hasSize(0);
+        assertThat(beforeRoom.getState()).isEqualTo(RoomState.PRE);
+        beforeRoom.getMemberRooms().stream()
+                .forEach(mr -> {
+                    assertThat(mr.getIndividualMissions()).hasSize(0);
+                });
+
+        // when(2)
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.patch(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then (2)
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        flushAndClear();
+
+        // when, then(3)
+        Room afterRoom = em.find(Room.class, roomId);
+
+        assertThat(afterRoom.getRelations()).hasSize(5);
+        assertThat(afterRoom.getState()).isEqualTo(RoomState.PROCESSING);
+        afterRoom.getMemberRooms().stream()
+                .forEach(mr -> {
+                    assertThat(mr.getIndividualMissions()).hasSize(1);
+                });
     }
 
     @DisplayName("초대코드 검증 -> 성공")
@@ -104,13 +150,12 @@ public class RoomIntegrationTest extends IntegrationTest {
                                 " WHERE mr.room.id = :roomId" +
                                 " AND mr.member.id = :memberId", MemberRoom.class)
                 .setParameter("roomId", 100L)
-                .setParameter("memberId", UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
+                .setParameter("memberId", MOCK_USER_ID)
                 .getResultStream()
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 
-        assertThat(findMemberRoom.getIndividualMissions()).hasSize(1);
-        assertThat(findMemberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
+        assertThat(findMemberRoom).isNotNull();
     }
 
     @Sql("classpath:room.sql")
@@ -541,7 +586,7 @@ public class RoomIntegrationTest extends IntegrationTest {
         Room findRoom = em.find(Room.class, roomId);
         Optional<MemberRoom> voidMemberRoom
                 = findRoom.getMemberRooms().stream()
-                .filter(memberRoom -> memberRoom.getMember().getId() == UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
+                .filter(memberRoom -> memberRoom.getMember().getId() == MOCK_USER_ID)
                 .findFirst();
 
         assertThat(findRoom.getMemberRooms()).hasSize(4);
