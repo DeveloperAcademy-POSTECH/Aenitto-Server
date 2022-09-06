@@ -44,7 +44,7 @@ public class MessageController {
             @PathVariable final Long roomId,
             @RequestPart @Nullable final MultipartFile image,
             @Valid @RequestPart final String manitteeId,
-            @RequestPart final String messageContent
+            @Nullable @RequestPart final String messageContent
     ) {
         final Long messageId = messageService.sendMessageSeparate(currentMember, roomId,
                 manitteeId, messageContent, image);
