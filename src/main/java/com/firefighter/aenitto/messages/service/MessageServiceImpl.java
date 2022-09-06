@@ -53,6 +53,32 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
+    public long sendMessageSeparate(Member currentMember, Long roomId, String manitteeId,
+                                String messageContent, MultipartFile image) {
+
+        Relation relation = relationRepository.findByRoomIdAndManittoId(roomId, currentMember.getId())
+                .orElseThrow(RoomNotParticipatingException::new);
+
+        if (!Objects.equals(relation.getManittee().getId(), UUID.fromString(manitteeId))) {
+            throw new NotManitteeException();
+        }
+
+        // TODO: 메시지 생성 메서드
+        Message message = Message.builder().content(messageContent).build();
+        message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
+
+        if (image != null) {
+            String renameImageName = getRenameImage(image);
+            uploadToFileStorage(image, renameImageName);
+            String imageUrl = storageService.getUrl(renameImageName);
+            message.setImgUrl(imageUrl);
+        }
+
+        return messageRepository.saveMessage(message).getId();
+    }
+
+    @Override
+    @Transactional
     public long sendMessage(Member currentMember, Long roomId,
                             SendMessageRequest request, MultipartFile image) {
 
@@ -94,6 +120,7 @@ public class MessageServiceImpl implements MessageService {
             message.readMessage();
         }
     }
+
     @Override
     public MemoriesResponse getMemories(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
@@ -118,6 +145,7 @@ public class MessageServiceImpl implements MessageService {
         return MemoriesResponse.of(myManittoRelation.getManitto(), myManitteeRelation.getManittee(),
                 receivedMessage, sentMessage);
     }
+
     public ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
