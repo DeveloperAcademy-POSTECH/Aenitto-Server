@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WithMockCustomMember
 public class RoomIntegrationTest extends IntegrationTest {
-    private Room room;
+    private static final UUID MOCK_USER_ID = UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e");
 
     @Sql({
             SqlPath.ROOM_PARTICIPATE
@@ -54,7 +54,7 @@ public class RoomIntegrationTest extends IntegrationTest {
 
 
         flushAndClear();
-        Member member = em.find(Member.class, UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"));
+        Member member = em.find(Member.class, MOCK_USER_ID);
         assertThat(member.getMemberRooms()).hasSize(1);
     }
 
@@ -101,7 +101,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                                 " WHERE mr.room.id = :roomId" +
                                 " AND mr.member.id = :memberId", MemberRoom.class)
                 .setParameter("roomId", 100L)
-                .setParameter("memberId", UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
+                .setParameter("memberId", MOCK_USER_ID)
                 .getResultStream()
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
@@ -537,7 +537,7 @@ public class RoomIntegrationTest extends IntegrationTest {
         Room findRoom = em.find(Room.class, roomId);
         Optional<MemberRoom> voidMemberRoom
                 = findRoom.getMemberRooms().stream()
-                .filter(memberRoom -> memberRoom.getMember().getId() == UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
+                .filter(memberRoom -> memberRoom.getMember().getId() == MOCK_USER_ID)
                 .findFirst();
 
         assertThat(findRoom.getMemberRooms()).hasSize(4);
