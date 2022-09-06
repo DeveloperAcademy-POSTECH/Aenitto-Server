@@ -467,4 +467,84 @@ public class RoomIntegrationTest extends IntegrationTest {
         assertThat(updatedRoom.getStartDateValue()).isEqualTo("2022.10.09");
         assertThat(updatedRoom.getEndDateValue()).isEqualTo("2022.10.21");
     }
+
+    @DisplayName("방 나가기 - 실패 (참여 중인 방 x)")
+    @WithMockCustomMember
+    @Test
+    void exitRoom_fail_not_participating() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage())));
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PRE,
+            SqlPath.MEMBER_ROOM,
+    })
+    @DisplayName("방 나가기 - 실패 (방장임)")
+    @WithMockCustomMember
+    @Test
+    void exitRoom_fail_admin() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(RoomErrorCode.ADMIN_CANNOT_EXIT_ROOM.getMessage())));
+
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.EXIT_ROOM
+    })
+    @DisplayName("방 나가기 - 성공")
+    @Test
+    void exitRoom_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andExpect(status().isNoContent());
+
+
+        flushAndClear();
+
+        Room findRoom = em.find(Room.class, roomId);
+        Optional<MemberRoom> voidMemberRoom
+                = findRoom.getMemberRooms().stream()
+                .filter(memberRoom -> memberRoom.getMember().getId() == UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"))
+                .findFirst();
+
+        assertThat(findRoom.getMemberRooms()).hasSize(4);
+        assertThat(voidMemberRoom).isEmpty();
+    }
 }
