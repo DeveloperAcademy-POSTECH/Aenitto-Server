@@ -31,17 +31,21 @@ public class SchedulerService {
     @Scheduled(cron = "0 55 23 * * ?", zone = LOCAL_TIMEZONE)
     // 0초 55분 23시
     void setDailyMissions() {
+        log.info("SchedulerService::setDailyMissions - START");
         try {
             missionService.setDailyCommonMission(LocalDate.now().plusDays(1));
             missionService.setDailyIndividualMission(LocalDate.now().plusDays(1));
         } catch (CustomException e) {
             log.warn("daily mission 을 설정하는데 문제가 생겼네요. \nmessage: {}", e.getMessage());
         }
+        log.info("SchedulerService::setDailyMissions - END");
     }
 
     @Async
     @Scheduled(cron = "0 0 0 * * ?", zone = LOCAL_TIMEZONE)
     void scheduleEndAenitto() {
+        log.info("SchedulerService::endAenitto - START");
         roomService.endAenitto();
+        log.info("SchedulerService::endAenitto - END");
     }
 }
