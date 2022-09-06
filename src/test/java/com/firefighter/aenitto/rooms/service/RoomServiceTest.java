@@ -136,7 +136,6 @@ public class RoomServiceTest {
                 .thenReturn(Optional.empty());
         when(roomRepository.saveRoom(any(Room.class)))
                 .thenReturn(room1);
-        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
 
         // given
         CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
@@ -152,7 +151,6 @@ public class RoomServiceTest {
         // then
         assertThat(roomId).isEqualTo(1L);
         verify(roomRepository, times(1)).saveRoom(any(Room.class));
-        verify(missionService, times(1)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
     @DisplayName("초대코드 검증 - 실패 (초대코드 존재하지 않음)")
@@ -289,7 +287,6 @@ public class RoomServiceTest {
                 .thenReturn(Optional.empty());
         when(roomRepository.findRoomById(anyLong()))
                 .thenReturn(Optional.of(room1));
-        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
@@ -302,7 +299,6 @@ public class RoomServiceTest {
 
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
-        verify(missionService, times(1)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
     @DisplayName("방 상태 확인 - 실패 (참여 중인 방 x)")

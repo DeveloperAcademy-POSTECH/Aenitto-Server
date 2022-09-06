@@ -78,7 +78,6 @@ public class RoomServiceImpl implements RoomService {
                 .build();
 
         memberRoom.setMemberRoom(member, room);
-        missionService.setInitialIndividualMission(memberRoom);
         return roomRepository.saveRoom(room).getId();
     }
 
@@ -115,7 +114,6 @@ public class RoomServiceImpl implements RoomService {
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
-        missionService.setInitialIndividualMission(memberRoom);
 
         return roomId;
     }

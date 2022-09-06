@@ -55,10 +55,7 @@ public class RoomIntegrationTest extends IntegrationTest {
 
         flushAndClear();
         Member member = em.find(Member.class, UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e"));
-        MemberRoom memberRoom = member.getMemberRooms().get(0);
-
-        assertThat(memberRoom.getIndividualMissions()).hasSize(1);
-        assertThat(memberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
+        assertThat(member.getMemberRooms()).hasSize(1);
     }
 
     @DisplayName("초대코드 검증 -> 성공")
@@ -109,8 +106,7 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 
-        assertThat(findMemberRoom.getIndividualMissions()).hasSize(1);
-        assertThat(findMemberRoom.getIndividualMissions().get(0).getMission().getContent()).isEqualTo("미션2");
+        assertThat(findMemberRoom).isNotNull();
     }
 
     @Sql("classpath:room.sql")
