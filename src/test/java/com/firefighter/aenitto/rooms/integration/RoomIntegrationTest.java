@@ -7,6 +7,7 @@ import com.firefighter.aenitto.common.utils.SqlPath;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
 import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
@@ -21,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.UTFDataFormatException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,6 +58,53 @@ public class RoomIntegrationTest extends IntegrationTest {
         flushAndClear();
         Member member = em.find(Member.class, MOCK_USER_ID);
         assertThat(member.getMemberRooms()).hasSize(1);
+    }
+
+    @Sql({
+            SqlPath.MEMBER,
+            SqlPath.ROOM_PRE,
+            SqlPath.MEMBER_ROOM,
+            SqlPath.COMMON_MISSION,
+    })
+    @DisplayName("게임 시작 - 성공")
+    @WithMockCustomMember
+    @Test
+    void startAenitto_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}/state";
+
+        // when, then (1)
+        Room beforeRoom = em.find(Room.class, roomId);
+        assertThat(beforeRoom.getRelations()).hasSize(0);
+        assertThat(beforeRoom.getState()).isEqualTo(RoomState.PRE);
+        beforeRoom.getMemberRooms().stream()
+                .forEach(mr -> {
+                    assertThat(mr.getIndividualMissions()).hasSize(0);
+                });
+
+        // when(2)
+        ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.patch(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then (2)
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        flushAndClear();
+
+        // when, then(3)
+        Room afterRoom = em.find(Room.class, roomId);
+
+        assertThat(afterRoom.getRelations()).hasSize(5);
+        assertThat(afterRoom.getState()).isEqualTo(RoomState.PROCESSING);
+        afterRoom.getMemberRooms().stream()
+                .forEach(mr -> {
+                    assertThat(mr.getIndividualMissions()).hasSize(1);
+                });
     }
 
     @DisplayName("초대코드 검증 -> 성공")

@@ -93,35 +93,28 @@ public class RoomServiceTest {
 
     @BeforeEach
     void setup() {
-        room1 = roomFixture1();
-        room2 = roomFixture2();
-
-        room3 = roomFixture2();
-        member = memberFixture();
         currentUserDetails = CURRENT_USER_DETAILS;
 
+        room1 = roomFixture1();
+        room2 = roomFixture2();
         room3 = roomFixture3();
         room4 = roomFixture4();
         room5 = roomFixture5();
 
+        member = memberFixture();
         member1 = memberFixture();
         member2 = memberFixture2();
         member3 = memberFixture3();
         member4 = memberFixture4();
         member5 = memberFixture5();
 
-        memberRoom = memberRoomFixture1(member, room1);
+//        memberRoom = memberRoomFixture1(member, room1);
         memberRoom1 = memberRoomFixture1(member, room3);
         memberRoom2 = memberRoomFixture2(member2, room3);
         memberRoom3 = memberRoomFixture3(member3, room3);
 
-
-        memberRoom = memberRoomFixture1(member1, room1);
-
         mission1 = MissionFixture.missionFixture2_Individual();
         individualMission1 = individualMissionFixture1();
-
-        currentUserDetails = CURRENT_USER_DETAILS;
     }
 
     @DisplayName("방 생성 성공")
@@ -583,25 +576,29 @@ public class RoomServiceTest {
     void startAenitto_success() {
         // given
         final Long roomId = 1L;
-        ReflectionTestUtils.setField(memberRoom, "admin", true);
-        room1.setState(RoomState.PRE);
+        memberRoom1 = RoomFixture.memberRoomFixture1(member1, room1);
         memberRoom2 = RoomFixture.memberRoomFixture2(member2, room1);
         memberRoom3 = RoomFixture.memberRoomFixture3(member3, room1);
         memberRoom4 = RoomFixture.memberRoomFixture4(member4, room1);
         memberRoom5 = RoomFixture.memberRoomFixture5(member5, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", true);
+        room1.setState(RoomState.PRE);
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
+        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
         target.startAenitto(member1, roomId);
 
         // then
-        assertThat(room1.getRelations().size()).isEqualTo(6);
+        assertThat(room1.getRelations().size()).isEqualTo(5);
         assertThat(room1.getRelations().get(0).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(1).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(2).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(3).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(4).getManittee()).isNotNull();
+
+        verify(missionService, times(5)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
 
