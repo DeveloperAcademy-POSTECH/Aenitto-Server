@@ -23,6 +23,8 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepositoryImpl;
 import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -48,12 +51,21 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTest {
 
-    @InjectMocks private RoomServiceImpl target;
-    @Mock private RoomRepositoryImpl roomRepository;
-    @Mock private MemberRepositoryImpl memberRepository;
-    @Mock private MissionRepositoryImpl missionRepository;
-    @Mock private MessageRepository messageRepository;
-    @Mock private MissionServiceImpl missionService;
+    @InjectMocks
+    private RoomServiceImpl target;
+    @Mock
+    private RoomRepositoryImpl roomRepository;
+    @Mock
+    private MemberRepositoryImpl memberRepository;
+    @Mock
+    private MissionRepositoryImpl missionRepository;
+    @Mock
+    private MessageRepository messageRepository;
+    @Mock
+    private MissionServiceImpl missionService;
+
+    @Mock @Qualifier("memberRoomRepositoryImpl")
+    private MemberRoomRepository memberRoomRepository;
 
     // Fixtures
     Room room1;
@@ -609,7 +621,7 @@ public class RoomServiceTest {
 
         //then
         assertThatExceptionOfType(RoomNotParticipatingException.class)
-                .isThrownBy(()-> {
+                .isThrownBy(() -> {
                     target.getRoomParticipants(member, roomId);
                 });
     }
@@ -781,7 +793,48 @@ public class RoomServiceTest {
         assertThat(room3.getState()).isEqualTo(RoomState.POST);
         assertThat(room4.getState()).isEqualTo(RoomState.PROCESSING);
         assertThat(room5.getState()).isEqualTo(RoomState.PROCESSING);
+    }
 
+    @DisplayName("방 나가기 - 실패 (참여중인 방 x)")
+    @Test
+    void exitRoom_fail_not_participating() {
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.empty());
 
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.exitRoom(member1, 1L);
+                });
+
+        verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
+    }
+
+    @DisplayName("방 나가기 - 실패 (방장임)")
+    @Test
+    void exitRoom_fail_admin() {
+        ReflectionTestUtils.setField(memberRoom, "admin", true);
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom));
+
+        assertThatExceptionOfType(AdminCannotExitRoomException.class)
+                .isThrownBy(() -> {
+                    target.exitRoom(member1, room1.getId());
+                });
+
+        verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
+    }
+
+    @DisplayName("방 나가기 - 성공")
+    @Test
+    void exitRoom_success() {
+        ReflectionTestUtils.setField(memberRoom, "admin", false);
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom));
+        doNothing().when(memberRoomRepository).delete(any(MemberRoom.class));
+
+        target.exitRoom(member1, room1.getId());
+
+        verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
+        verify(memberRoomRepository, times(1)).delete(any(MemberRoom.class));
     }
 }
