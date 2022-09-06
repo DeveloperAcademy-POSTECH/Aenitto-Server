@@ -117,4 +117,13 @@ public class RoomController {
         roomService.updateRoom(member, roomId, request);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/rooms/{roomId}/participants")
+    public ResponseEntity exitRoom(
+            @CurrentMember final Member member,
+            @PathVariable final Long roomId
+    ) {
+        roomService.exitRoom(member, roomId);
+        return ResponseEntity.noContent().build();
+    }
 }

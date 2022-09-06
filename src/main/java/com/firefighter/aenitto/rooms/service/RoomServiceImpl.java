@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.common.exception.ErrorCode;
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
@@ -22,6 +23,7 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,6 +51,8 @@ public class RoomServiceImpl implements RoomService {
     private final MessageRepository messageRepository;
     @Qualifier("missionServiceImpl")
     private final MissionService missionService;
+    @Qualifier("memberRoomRepositoryImpl")
+    private final MemberRoomRepository memberRoomRepository;
 
 
 
@@ -233,6 +237,14 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
+    public void exitRoom(Member member, Long roomId) {
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        throwExceptionIfAdmin(memberRoom);
+        memberRoomRepository.delete(memberRoom);
+    }
+
+    @Override
+    @Transactional
     public void endAenitto() {
         roomRepository.findAllRooms()
                 .stream().filter(Room::isExpired)
@@ -257,6 +269,12 @@ public class RoomServiceImpl implements RoomService {
     private void throwExceptionIfNotAdmin(MemberRoom memberRoom) {
         if (!memberRoom.isAdmin()) {
             throw new RoomUnAuthorizedException();
+        }
+    }
+
+    private void throwExceptionIfAdmin(MemberRoom memberRoom) {
+        if (memberRoom.isAdmin()) {
+            throw new AdminCannotExitRoomException();
         }
     }
 }
