@@ -45,8 +45,8 @@ public class RoomComparatorTest {
         List<Room> sortedRooms = RoomComparator.sortRooms(rooms);
 
         // then
-        assertThat(sortedRooms.get(0).getId()).isEqualTo(6L);
-        assertThat(sortedRooms.get(1).getId()).isEqualTo(4L);
+        assertThat(sortedRooms.get(0).getId()).isEqualTo(4L);
+        assertThat(sortedRooms.get(1).getId()).isEqualTo(6L);
         assertThat(sortedRooms.get(2).getId()).isEqualTo(2L);
         assertThat(sortedRooms.get(3).getId()).isEqualTo(1L);
         assertThat(sortedRooms.get(4).getId()).isEqualTo(5L);

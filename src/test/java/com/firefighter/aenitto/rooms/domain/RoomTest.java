@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,27 +27,33 @@ public class RoomTest {
         assertThat(random).isUpperCase();
     }
 
-    @DisplayName("Room::isExpired 테스트 - 성공")
+    @DisplayName("Room::isProcessingAndExpired 테스트 - 성공")
     @Test
-    void isExpired_success() {
+    void isProcessingAndExpired_success() {
         // given
         Room room1 = Room.builder()
                 .endDate(LocalDate.now().minusDays(1))
                 .build();
 
         Room room2 = Room.builder()
-                .endDate(LocalDate.now())
+                .endDate(LocalDate.now().minusDays(1))
                 .build();
 
         Room room3 = Room.builder()
+                .endDate(LocalDate.now())
+                .build();
+
+        Room room4 = Room.builder()
                 .endDate(LocalDate.now().plusDays(1))
                 .build();
 
+        ReflectionTestUtils.setField(room2, "state", RoomState.PROCESSING);
 
         // when, then
-        assertThat(room1.isExpired()).isTrue();
-        assertThat(room2.isExpired()).isFalse();
-        assertThat(room3.isExpired()).isFalse();
+        assertThat(room1.isProcessingAndExpired()).isFalse();
+        assertThat(room2.isProcessingAndExpired()).isTrue();
+        assertThat(room3.isProcessingAndExpired()).isFalse();
+        assertThat(room4.isProcessingAndExpired()).isFalse();
     }
 }
 
