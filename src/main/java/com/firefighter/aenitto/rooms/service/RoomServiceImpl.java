@@ -75,6 +75,7 @@ public class RoomServiceImpl implements RoomService {
         // admin MemberRoom 생성 및 persist
         MemberRoom memberRoom = MemberRoom.builder()
                 .admin(true)
+                .colorIdx(createRoomRequest.getMember().getColorIdx())
                 .build();
 
         memberRoom.setMemberRoom(member, room);
