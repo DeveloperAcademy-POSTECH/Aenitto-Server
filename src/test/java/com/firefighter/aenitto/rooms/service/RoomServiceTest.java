@@ -769,7 +769,7 @@ public class RoomServiceTest {
         ReflectionTestUtils.setField(room4, "endDate", LocalDate.now());
         ReflectionTestUtils.setField(room5, "endDate", LocalDate.now().plusDays(1));
 
-        ReflectionTestUtils.setField(room1, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room1, "state", RoomState.PRE);
         ReflectionTestUtils.setField(room2, "state", RoomState.PROCESSING);
         ReflectionTestUtils.setField(room3, "state", RoomState.PROCESSING);
         ReflectionTestUtils.setField(room4, "state", RoomState.PROCESSING);
@@ -780,7 +780,7 @@ public class RoomServiceTest {
         target.endAenitto();
 
         // then
-        assertThat(room1.getState()).isEqualTo(RoomState.POST);
+        assertThat(room1.getState()).isEqualTo(RoomState.PRE);
         assertThat(room2.getState()).isEqualTo(RoomState.POST);
         assertThat(room3.getState()).isEqualTo(RoomState.POST);
         assertThat(room4.getState()).isEqualTo(RoomState.PROCESSING);

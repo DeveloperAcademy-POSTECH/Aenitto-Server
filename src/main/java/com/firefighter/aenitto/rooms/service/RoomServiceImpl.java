@@ -248,8 +248,8 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public void endAenitto() {
-        roomRepository.findAllRooms()
-                .stream().filter(Room::isExpired)
+        roomRepository.findAllRooms().stream()
+                .filter(Room::isProcessingAndExpired)
                 .forEach(room -> {
                     room.setState(RoomState.POST);
                 });
