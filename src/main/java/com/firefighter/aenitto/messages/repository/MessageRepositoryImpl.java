@@ -49,7 +49,7 @@ public class MessageRepositoryImpl implements MessageRepository {
                         "SELECT m " +
                                 "FROM Message m " +
                                 "WHERE m.sender.id = :memberId " +
-                                "AND m.room.id = :roomId", Message.class)
+                                "AND m.room.id = :roomId ORDER BY m.createdAt DESC", Message.class)
                 .setParameter("memberId", senderId)
                 .setParameter("roomId", roomId)
                 .getResultList();
@@ -74,7 +74,7 @@ public class MessageRepositoryImpl implements MessageRepository {
                         "SELECT m" +
                                 " FROM Message m" +
                                 " WHERE m.receiver.id = :receiverId" +
-                                " AND m.room.id = :roomId", Message.class)
+                                " AND m.room.id = :roomId ORDER BY m.createdAt DESC", Message.class)
                 .setParameter("receiverId", receiverId)
                 .setParameter("roomId", roomId)
                 .getResultList();
