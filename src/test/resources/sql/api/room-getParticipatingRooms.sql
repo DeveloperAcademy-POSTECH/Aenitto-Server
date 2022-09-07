@@ -2,16 +2,16 @@
 
 -- Room
 INSERT INTO room (room_id, title, capacity, start_date, end_date, invitation, state) VALUES
-(2,'제목2',13, '2022-10-09','2022-10-20', 'XYQOTE', 'POST');
+(2,'제목2',13, '2022-10-10','2022-10-20', 'XYQOTE', 'POST');
 
 INSERT INTO room (room_id, title, capacity, start_date, end_date, invitation, state) VALUES
-(3,'제목3',13, '2022-10-09','2022-10-20', 'XYQOTE', 'PROCESSING');
+(3,'제목3',13, '2022-10-07','2022-10-20', 'XYQOTE', 'PROCESSING');
 
 INSERT INTO room (room_id, title, capacity, start_date, end_date, invitation, state) VALUES
-(4,'제목4',13, '2022-10-09','2022-10-20', 'XYQOTE', 'PRE');
+(4,'제목4',13, '2022-10-11','2022-10-20', 'XYQOTE', 'PRE');
 
 INSERT INTO room (room_id, title, capacity, start_date, end_date, invitation, state) VALUES
-(5,'제목5',13, '2022-10-09','2022-10-20', 'XYQOTE', 'POST');
+(5,'제목5',13, '2022-10-06','2022-10-20', 'XYQOTE', 'POST');
 
 
 -- MemberRoom

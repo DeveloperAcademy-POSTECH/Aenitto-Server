@@ -415,9 +415,9 @@ public class RoomIntegrationTest extends IntegrationTest {
         // then
         perform
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.participatingRooms[0].id", is(100)))
-                .andExpect(jsonPath("$.participatingRooms[1].id", is(4)))
-                .andExpect(jsonPath("$.participatingRooms[2].id", is(3)))
+                .andExpect(jsonPath("$.participatingRooms[0].id", is(3)))
+                .andExpect(jsonPath("$.participatingRooms[1].id", is(100)))
+                .andExpect(jsonPath("$.participatingRooms[2].id", is(4)))
                 .andExpect(jsonPath("$.participatingRooms[3].id", is(5)))
                 .andExpect(jsonPath("$.participatingRooms[4].id", is(2)));
     }
@@ -491,7 +491,7 @@ public class RoomIntegrationTest extends IntegrationTest {
         Room beforeRoom = em.find(Room.class, roomId);
         assertThat(beforeRoom.getTitle()).isEqualTo("제목2");
         assertThat(beforeRoom.getCapacity()).isEqualTo(13);
-        assertThat(beforeRoom.getStartDateValue()).isEqualTo("2022.10.09");
+        assertThat(beforeRoom.getStartDateValue()).isEqualTo("2022.10.10");
         assertThat(beforeRoom.getEndDateValue()).isEqualTo("2022.10.20");
         flushAndClear();
 
@@ -509,7 +509,7 @@ public class RoomIntegrationTest extends IntegrationTest {
         Room updatedRoom = em.find(Room.class, roomId);
         assertThat(updatedRoom.getTitle()).isEqualTo(request.getTitle());
         assertThat(updatedRoom.getCapacity()).isEqualTo(request.getCapacity());
-        assertThat(updatedRoom.getStartDateValue()).isEqualTo("2022.10.09");
+        assertThat(updatedRoom.getStartDateValue()).isEqualTo("2022.10.10");
         assertThat(updatedRoom.getEndDateValue()).isEqualTo("2022.10.21");
     }
 

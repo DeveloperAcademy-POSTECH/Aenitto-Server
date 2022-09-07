@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -330,11 +331,11 @@ class RoomRepositoryImplTest {
     void findParticipatinRoom_success() {
         // given
         Member member1 = MemberFixture.transientMemberFixture(1);
-        Room room1 = RoomFixture.transientRoomFixture(1, 10, 10);
-        Room room2 = RoomFixture.transientRoomFixture(2, 10, 10);
-        Room room3 = RoomFixture.transientRoomFixture(3, 10, 10);
-        Room room4 = RoomFixture.transientRoomFixture(4, 10, 10);
-        Room room5 = RoomFixture.transientRoomFixture(5, 10, 10);
+        Room room1 = RoomFixture.transientRoomFixture(1, 10, 2);
+        Room room2 = RoomFixture.transientRoomFixture(2, 10, 5);
+        Room room3 = RoomFixture.transientRoomFixture(3, 10, 1);
+        Room room4 = RoomFixture.transientRoomFixture(4, 10, 8);
+        Room room5 = RoomFixture.transientRoomFixture(5, 10, 5);
 
         MemberRoom memberRoom1 = RoomFixture.transientMemberRoomFixture(1);
         MemberRoom memberRoom2 = RoomFixture.transientMemberRoomFixture(2);

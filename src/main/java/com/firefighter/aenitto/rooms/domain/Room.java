@@ -84,8 +84,8 @@ public class Room extends CreationModificationLog {
         return (capacity <= memberRooms.size());
     }
 
-    public boolean isExpired() {
-        return this.endDate.isBefore(LocalDate.now());
+    public boolean isProcessingAndExpired() {
+        return (this.state == RoomState.PROCESSING) & (this.endDate.isBefore(LocalDate.now()));
     }
 
     public Room updateRoom(UpdateRoomRequest request) {
