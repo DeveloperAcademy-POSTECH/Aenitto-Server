@@ -11,6 +11,7 @@ import com.firefighter.aenitto.missions.MissionFixture;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.repository.MissionRepositoryImpl;
+import com.firefighter.aenitto.missions.service.MissionServiceImpl;
 import com.firefighter.aenitto.rooms.RoomFixture;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
@@ -22,6 +23,8 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepositoryImpl;
 import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -47,11 +51,21 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTest {
 
-    @InjectMocks private RoomServiceImpl target;
-    @Mock private RoomRepositoryImpl roomRepository;
-    @Mock private MemberRepositoryImpl memberRepository;
-    @Mock private MissionRepositoryImpl missionRepository;
-    @Mock private MessageRepository messageRepository;
+    @InjectMocks
+    private RoomServiceImpl target;
+    @Mock
+    private RoomRepositoryImpl roomRepository;
+    @Mock
+    private MemberRepositoryImpl memberRepository;
+    @Mock
+    private MissionRepositoryImpl missionRepository;
+    @Mock
+    private MessageRepository messageRepository;
+    @Mock
+    private MissionServiceImpl missionService;
+
+    @Mock @Qualifier("memberRoomRepositoryImpl")
+    private MemberRoomRepository memberRoomRepository;
 
     // Fixtures
     Room room1;
@@ -65,7 +79,6 @@ public class RoomServiceTest {
     Member member3;
     Member member4;
     Member member5;
-    MemberRoom memberRoom;
     MemberRoom memberRoom1;
     MemberRoom memberRoom2;
     MemberRoom memberRoom3;
@@ -79,13 +92,10 @@ public class RoomServiceTest {
 
     @BeforeEach
     void setup() {
-        room1 = roomFixture1();
-        room2 = roomFixture2();
-
-        room3 = roomFixture2();
-        member = memberFixture();
         currentUserDetails = CURRENT_USER_DETAILS;
 
+        room1 = roomFixture1();
+        room2 = roomFixture2();
         room3 = roomFixture3();
         room4 = roomFixture4();
         room5 = roomFixture5();
@@ -96,18 +106,9 @@ public class RoomServiceTest {
         member4 = memberFixture4();
         member5 = memberFixture5();
 
-        memberRoom = memberRoomFixture1(member, room1);
-        memberRoom1 = memberRoomFixture1(member, room3);
-        memberRoom2 = memberRoomFixture2(member2, room3);
-        memberRoom3 = memberRoomFixture3(member3, room3);
-
-
-        memberRoom = memberRoomFixture1(member1, room1);
-
+        // MARK: MemberRoom 은 각 테스트에 필요할 때 할당해서 써주세요. 초기화 x
         mission1 = MissionFixture.missionFixture2_Individual();
         individualMission1 = individualMissionFixture1();
-
-        currentUserDetails = CURRENT_USER_DETAILS;
     }
 
     @DisplayName("방 생성 성공")
@@ -160,11 +161,13 @@ public class RoomServiceTest {
     @DisplayName("초대코드 검증 - 실패 (이미 유저가 참여중인 방)")
     @Test
     void verifyInvitation_fail_participating() {
+        memberRoom1 = memberRoomFixture1(member1, room1);
+
         // mock
         when(roomRepository.findByInvitation(anyString()))
                 .thenReturn(Optional.of(room1));
         when(roomRepository.findMemberRoomById(any(), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
 
         // then
         final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
@@ -203,15 +206,15 @@ public class RoomServiceTest {
     @DisplayName("방 참여 - 실패 (이미 유저가 참여중인 방")
     @Test
     void participateRoom_fail_participating() {
-        // mock
-        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
-        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
-
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
+        memberRoom1 = memberRoomFixture1(member1, room1);
 
         // when, then
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
+                .thenReturn(Optional.of(memberRoom1));
+
         assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
                 .isThrownBy(() -> {
                     target.participateRoom(member1, room1.getId(), request);
@@ -282,6 +285,7 @@ public class RoomServiceTest {
 
         // then
         assertThat(roomId).isEqualTo(room1.getId());
+
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
     }
@@ -304,11 +308,13 @@ public class RoomServiceTest {
     @Test
     void getRoomState_success() {
         // given
-        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
-        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        ReflectionTestUtils.setField(room1, "state", RoomState.PROCESSING);
 
         // when
+        when(memberRepository.findByMemberId(any())).thenReturn(Optional.ofNullable(currentUserDetails.getMember()));
+        when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
+                .thenReturn(Optional.of(memberRoom1));
         GetRoomStateResponse roomState = target.getRoomState(currentUserDetails.getMember(), room1.getId());
 
 
@@ -503,26 +509,24 @@ public class RoomServiceTest {
                 .isThrownBy(() -> {
                     target.startAenitto(member1, roomId);
                 });
-
-
     }
 
     @DisplayName("게임 시작 - 실패 (방장이 아님)")
     @Test
     void startAenitto_fail_unauthorized() {
         // given
-        final Long roomId = 1L;
-        ReflectionTestUtils.setField(memberRoom, "admin", false);
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", false);
 
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
 
         // then
         assertThatExceptionOfType(RoomUnAuthorizedException.class)
                 .isThrownBy(() -> {
-                    target.startAenitto(member1, roomId);
+                    target.startAenitto(member1, room1.getId());
                 });
     }
 
@@ -530,18 +534,18 @@ public class RoomServiceTest {
     @Test
     void startAenitto_fail_already_started() {
         // given
-        final Long roomId = 1L;
-        ReflectionTestUtils.setField(memberRoom, "admin", true);
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", true);
         room1.setState(RoomState.PROCESSING);
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
 
         // then
         assertThatExceptionOfType(RoomAlreadyStartedException.class)
                 .isThrownBy(() -> {
-                    target.startAenitto(member1, roomId);
+                    target.startAenitto(member1, room1.getId());
                 });
     }
 
@@ -549,19 +553,19 @@ public class RoomServiceTest {
     @Test
     void startAenitto_fail_lack_participants() {
         // given
-        final Long roomId = 1L;
-        ReflectionTestUtils.setField(memberRoom, "admin", true);
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", true);
         room1.setState(RoomState.PRE);
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
 
 
         // then
         assertThatExceptionOfType(RoomInsufficientParticipantsException.class)
                 .isThrownBy(() -> {
-                    target.startAenitto(member1, roomId);
+                    target.startAenitto(member1, room1.getId());
                 });
     }
 
@@ -570,42 +574,43 @@ public class RoomServiceTest {
     void startAenitto_success() {
         // given
         final Long roomId = 1L;
-        ReflectionTestUtils.setField(memberRoom, "admin", true);
-        room1.setState(RoomState.PRE);
+        memberRoom1 = RoomFixture.memberRoomFixture1(member1, room1);
         memberRoom2 = RoomFixture.memberRoomFixture2(member2, room1);
         memberRoom3 = RoomFixture.memberRoomFixture3(member3, room1);
         memberRoom4 = RoomFixture.memberRoomFixture4(member4, room1);
         memberRoom5 = RoomFixture.memberRoomFixture5(member5, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", true);
+        room1.setState(RoomState.PRE);
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
+        doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
         target.startAenitto(member1, roomId);
 
         // then
-        assertThat(room1.getRelations().size()).isEqualTo(6);
+        assertThat(room1.getRelations().size()).isEqualTo(5);
         assertThat(room1.getRelations().get(0).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(1).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(2).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(3).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(4).getManittee()).isNotNull();
+
+        verify(missionService, times(5)).setInitialIndividualMission(any(MemberRoom.class));
     }
 
 
     @DisplayName("방 멤버 조회 - 실패(참여하지 않은 방)")
     @Test
     void find_roomParticipants_fail_not_participating() {
-        //given
-        final Long roomId = 1L;
-
         //when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
                 .thenThrow(RoomNotParticipatingException.class);
 
         //then
         assertThatExceptionOfType(RoomNotParticipatingException.class)
-                .isThrownBy(()-> {
-                    target.getRoomParticipants(member, roomId);
+                .isThrownBy(() -> {
+                    target.getRoomParticipants(member1, room1.getId());
                 });
     }
 
@@ -613,13 +618,14 @@ public class RoomServiceTest {
     @Test
     void find_roomParticipants_success() {
         //given
-        final Long roomId = 1L;
-        List<MemberRoom> memberRooms;
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        memberRoom2 = memberRoomFixture2(member2, room1);
+        memberRoom3 = memberRoomFixture3(member3, room1);
 
         //when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
                 .thenReturn(Optional.ofNullable(memberRoom1));
-        RoomParticipantsResponse roomParticipantsResponse = target.getRoomParticipants(member, room1.getId());
+        RoomParticipantsResponse roomParticipantsResponse = target.getRoomParticipants(member1, room1.getId());
 
         //then
         assertThat(roomParticipantsResponse.getCount()).isEqualTo(3);
@@ -668,9 +674,11 @@ public class RoomServiceTest {
     @DisplayName("방 삭제 - 실패 (방장 x)")
     @Test
     void deleteRoom_fail_unauthorized() {
+        memberRoom1 = memberRoomFixture1(member1, room1);
+
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
 
         // then
         assertThatExceptionOfType(RoomUnAuthorizedException.class)
@@ -683,11 +691,12 @@ public class RoomServiceTest {
     @Test
     void deleteRoom_success() {
         // given
-        ReflectionTestUtils.setField(memberRoom, "admin", true);
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", true);
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
-                .thenReturn(Optional.of(memberRoom));
+                .thenReturn(Optional.of(memberRoom1));
         target.deleteRoom(member1, room1.getId());
 
         // then
@@ -748,5 +757,86 @@ public class RoomServiceTest {
         assertThat(room2.getCapacity()).isEqualTo(request.getCapacity());
         assertThat(room2.getStartDateValue()).isEqualTo(request.getStartDate());
         assertThat(room2.getEndDateValue()).isEqualTo(request.getEndDate());
+    }
+
+    @DisplayName("끝난 방 State 변경 - 성공")
+    @Test
+    void endAenitto_success() {
+        // given
+        ReflectionTestUtils.setField(room1, "endDate", LocalDate.now().minusDays(3));
+        ReflectionTestUtils.setField(room2, "endDate", LocalDate.now().minusDays(2));
+        ReflectionTestUtils.setField(room3, "endDate", LocalDate.now().minusDays(1));
+        ReflectionTestUtils.setField(room4, "endDate", LocalDate.now());
+        ReflectionTestUtils.setField(room5, "endDate", LocalDate.now().plusDays(1));
+
+        ReflectionTestUtils.setField(room1, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room2, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room3, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room4, "state", RoomState.PROCESSING);
+        ReflectionTestUtils.setField(room5, "state", RoomState.PROCESSING);
+
+        // when
+        when(roomRepository.findAllRooms()).thenReturn(Arrays.asList(room1, room2, room3, room4, room5));
+        target.endAenitto();
+
+        // then
+        assertThat(room1.getState()).isEqualTo(RoomState.POST);
+        assertThat(room2.getState()).isEqualTo(RoomState.POST);
+        assertThat(room3.getState()).isEqualTo(RoomState.POST);
+        assertThat(room4.getState()).isEqualTo(RoomState.PROCESSING);
+        assertThat(room5.getState()).isEqualTo(RoomState.PROCESSING);
+    }
+
+    @DisplayName("방 나가기 - 실패 (참여중인 방 x)")
+    @Test
+    void exitRoom_fail_not_participating() {
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(RoomNotParticipatingException.class)
+                .isThrownBy(() -> {
+                    target.exitRoom(member1, 1L);
+                });
+
+        verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
+    }
+
+    @DisplayName("방 나가기 - 실패 (방장임)")
+    @Test
+    void exitRoom_fail_admin() {
+        // given
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", true);
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom1));
+
+        // then
+        assertThatExceptionOfType(AdminCannotExitRoomException.class)
+                .isThrownBy(() -> {
+                    target.exitRoom(member1, room1.getId());
+                });
+
+        verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
+    }
+
+    @DisplayName("방 나가기 - 성공")
+    @Test
+    void exitRoom_success() {
+        // given
+        memberRoom1 = memberRoomFixture1(member1, room1);
+        ReflectionTestUtils.setField(memberRoom1, "admin", false);
+
+        // when
+        when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(memberRoom1));
+        doNothing().when(memberRoomRepository).delete(any(MemberRoom.class));
+
+        target.exitRoom(member1, room1.getId());
+
+        // then
+        verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
+        verify(memberRoomRepository, times(1)).delete(any(MemberRoom.class));
     }
 }

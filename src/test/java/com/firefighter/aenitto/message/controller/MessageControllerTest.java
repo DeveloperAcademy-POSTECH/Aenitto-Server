@@ -252,7 +252,7 @@ public class MessageControllerTest {
         SendMessageRequest request = SendMessageRequest.builder()
                 .manitteeId("alkdf;l0p==k").messageContent("string").build();
         String requestJson = objectMapper.writeValueAsString(request);
-        MockMultipartFile requestMultipartfile = new MockMultipartFile("sendMessageRequest", "sendMessageRequest", "application/json", requestJson.getBytes());
+        MockMultipartFile requestMultipartfile = new MockMultipartFile("testMessageRequest", "testMessageRequest", "application/json", requestJson.getBytes());
 
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.multipart(uri, "1")

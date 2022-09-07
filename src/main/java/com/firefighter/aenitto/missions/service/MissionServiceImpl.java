@@ -74,4 +74,11 @@ public class MissionServiceImpl implements MissionService {
             }
         }
     }
+
+    @Override
+    public void setInitialIndividualMission(MemberRoom memberRoom) {
+        Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
+                .orElseThrow(MissionEmptyException::new);
+        memberRoom.addIndividualMission(mission, LocalDate.now());
+    }
 }

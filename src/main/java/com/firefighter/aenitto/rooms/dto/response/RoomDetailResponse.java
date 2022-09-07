@@ -66,12 +66,14 @@ public class RoomDetailResponse {
         private final String title;
         private final String startDate;
         private final String endDate;
+        private final int capacity;
         private final String state;
 
         public static RoomDetail of (Room room) {
             return RoomDetail.builder()
                     .id(room.getId())
                     .title(room.getTitle())
+                    .capacity(room.getCapacity())
                     .startDate(room.getStartDateValue())
                     .endDate(room.getEndDateValue())
                     .state(room.getState().toString())

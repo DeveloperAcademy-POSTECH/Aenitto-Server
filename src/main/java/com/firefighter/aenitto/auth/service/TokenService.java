@@ -2,6 +2,7 @@ package com.firefighter.aenitto.auth.service;
 
 import com.firefighter.aenitto.auth.token.CurrentUserDetails;
 import com.firefighter.aenitto.auth.token.Token;
+import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -74,7 +75,7 @@ public class TokenService {
             return claims.getBody()
                     .getExpiration().getTime();
         } catch (Exception e) {
-            return 0;
+            throw new InvalidTokenException();
         }
     }
 

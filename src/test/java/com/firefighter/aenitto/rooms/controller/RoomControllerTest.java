@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.room.AdminCannotExitRoomException;
 import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
@@ -67,7 +68,8 @@ class RoomControllerTest {
     @InjectMocks
     RoomController roomController;
 
-    @Mock @Qualifier("roomServiceImpl")
+    @Mock
+    @Qualifier("roomServiceImpl")
     RoomService roomService;
 
     @Autowired
@@ -99,15 +101,12 @@ class RoomControllerTest {
         room3 = roomFixture2();
         member = memberFixture();
         member2 = memberFixture2();
-
         member3 = memberFixture3();
+
         memberRoom = memberRoomFixture1(member, room1);
         memberRoom1 = memberRoomFixture1(member, room3);
         memberRoom2 = memberRoomFixture2(member2, room3);
         memberRoom3 = memberRoomFixture3(member3, room3);
-
-        memberRoom = memberRoomFixture1(member, room1);
-        memberRoom2 = memberRoomFixture2(member2, room1);
 
         mission1 = MissionFixture.missionFixture2_Individual();
     }
@@ -235,10 +234,11 @@ class RoomControllerTest {
 
         // then
         perform
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.capacity", is(room1.getCapacity())))
                 .andExpect(jsonPath("$.title", is(room1.getTitle())))
-                .andExpect(jsonPath("$.participatingCount", is(3)))
+                .andExpect(jsonPath("$.participatingCount", is(1)))
                 .andDo(document("초대코드 검증",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -246,7 +246,7 @@ class RoomControllerTest {
                                 fieldWithPath("invitationCode").description("초대코드")
                         ),
                         requestHeaders(
-                          headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("멤버 id"),
@@ -412,18 +412,18 @@ class RoomControllerTest {
 //                                parameterWithName("count").description("한 페이지에 가지고올 결과물 수. \ndefault = 3")
 //                        ),
                         requestHeaders(
-                          headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
                         ),
                         responseFields(
-                        fieldWithPath("participatingRooms").description("참여 중인 방"),
-                        fieldWithPath("participatingRooms[0].id").description("Room Id"),
-                        fieldWithPath("participatingRooms[0].title").description("방 제목"),
-                        fieldWithPath("participatingRooms[0].state").description("방 상태"),
-                        fieldWithPath("participatingRooms[0].participatingCount").description("참여 인원"),
-                        fieldWithPath("participatingRooms[0].capacity").description("수용 인원"),
-                        fieldWithPath("participatingRooms[0].startDate").description("시작일"),
-                        fieldWithPath("participatingRooms[0].endDate").description("종료일")
-                )));
+                                fieldWithPath("participatingRooms").description("참여 중인 방"),
+                                fieldWithPath("participatingRooms[0].id").description("Room Id"),
+                                fieldWithPath("participatingRooms[0].title").description("방 제목"),
+                                fieldWithPath("participatingRooms[0].state").description("방 상태"),
+                                fieldWithPath("participatingRooms[0].participatingCount").description("참여 인원"),
+                                fieldWithPath("participatingRooms[0].capacity").description("수용 인원"),
+                                fieldWithPath("participatingRooms[0].startDate").description("시작일"),
+                                fieldWithPath("participatingRooms[0].endDate").description("종료일")
+                        )));
 
         verify(roomService, times(1)).getParticipatingRooms(any(Member.class));
     }
@@ -511,7 +511,7 @@ class RoomControllerTest {
 
     @DisplayName("방에 참여중인 멤버 조회하기 - 실패 (참여중인 방이 아님)")
     @Test
-    void find_room_participants_fail_not_participating() throws Exception{
+    void find_room_participants_fail_not_participating() throws Exception {
         //given
         final long id = 10L;
         final String url = "/api/v1/rooms/{roomId}/participants";
@@ -520,8 +520,8 @@ class RoomControllerTest {
 
         //when, then, docs
         mockMvc.perform(MockMvcRequestBuilders.get(url, id)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer TestToken")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer TestToken")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
                 .andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
@@ -603,6 +603,7 @@ class RoomControllerTest {
                                 fieldWithPath("room.title").description("방 제목"),
                                 fieldWithPath("room.startDate").description("시작 일자"),
                                 fieldWithPath("room.endDate").description("종료 일자"),
+                                fieldWithPath("room.capacity").description("수용 인원"),
                                 fieldWithPath("room.state").description("방 상태"),
                                 fieldWithPath("participants").description("방 참여자 정보"),
                                 fieldWithPath("participants.count").description("참여자 수"),
@@ -636,6 +637,7 @@ class RoomControllerTest {
 
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.delete(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -647,6 +649,9 @@ class RoomControllerTest {
                         "방 삭제",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
+                        ),
                         pathParameters(
                                 parameterWithName("roomId").description("방 id")
                         )
@@ -714,5 +719,88 @@ class RoomControllerTest {
                         )
                 ));
         verify(roomService, times(1)).updateRoom(any(Member.class), anyLong(), any(UpdateRoomRequest.class));
+    }
+
+    @Test
+    @DisplayName("방 나가기 - 실패 (참여 중인 방 아님)")
+    void exitRoom_fail_not_participating() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        // when
+        doThrow(new RoomNotParticipatingException())
+                .when(roomService).exitRoom(any(Member.class), anyLong());
+
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+    }
+
+    @Test
+    @DisplayName("방 나가기 - 실패 (방장임)")
+    void exitRoom_fail_admin() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        // when
+        doThrow(new AdminCannotExitRoomException())
+                .when(roomService).exitRoom(any(Member.class), anyLong());
+
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete(url, roomId)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", RoomErrorCode.ADMIN_CANNOT_EXIT_ROOM.getMessage()).exists())
+                .andExpect(jsonPath("$.status", RoomErrorCode.ADMIN_CANNOT_EXIT_ROOM.getStatus()).exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists());
+
+    }
+
+    @Test
+    @DisplayName("방 나가기 - 성공")
+    void exitRoom_success() throws Exception {
+        // given
+        final Long roomId = 1L;
+        final String url = "/api/v1/rooms/{roomId}/participants";
+
+        // when
+        ResultActions perform = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete(url, roomId)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("방 나가기",
+                        preprocessRequest(prettyPrint()),   // (2)
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("roomId").description("방 이름")
+                        )
+                ));
     }
 }

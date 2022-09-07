@@ -31,6 +31,14 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     @Override
+    public List<Room> findAllRooms() {
+        return em.createQuery(
+                "SELECT r" +
+                        " FROM Room r", Room.class)
+                .getResultList();
+    }
+
+    @Override
     public Optional<Room> findRoomById(Long id) {
         return Optional.ofNullable(em.find(Room.class, id));
     }

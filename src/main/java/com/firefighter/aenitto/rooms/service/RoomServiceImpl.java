@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.rooms.service;
 
+import com.firefighter.aenitto.common.exception.ErrorCode;
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.*;
@@ -8,7 +9,11 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.missions.domain.MissionType;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
+import com.firefighter.aenitto.missions.service.MissionService;
+import com.firefighter.aenitto.missions.service.MissionServiceImpl;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -18,6 +23,7 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,6 +49,10 @@ public class RoomServiceImpl implements RoomService {
     private final MissionRepository missionRepository;
     @Qualifier("messageRepositoryImpl")
     private final MessageRepository messageRepository;
+    @Qualifier("missionServiceImpl")
+    private final MissionService missionService;
+    @Qualifier("memberRoomRepositoryImpl")
+    private final MemberRoomRepository memberRoomRepository;
 
 
 
@@ -103,6 +114,7 @@ public class RoomServiceImpl implements RoomService {
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
+
         return roomId;
     }
 
@@ -193,6 +205,10 @@ public class RoomServiceImpl implements RoomService {
         // 참여인원에 대하여 Relation 생성
         Relation.createRelations(room.getMemberRooms(), room);
 
+        // 참여인원에 대하여 individual Mission 생성
+        room.getMemberRooms().stream()
+                .forEach(missionService::setInitialIndividualMission);
+
         // RoomState 수정
         room.setState(RoomState.PROCESSING);
     }
@@ -221,6 +237,24 @@ public class RoomServiceImpl implements RoomService {
         memberRoom.getRoom().updateRoom(request);
     }
 
+    @Override
+    @Transactional
+    public void exitRoom(Member member, Long roomId) {
+        MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
+        throwExceptionIfAdmin(memberRoom);
+        memberRoomRepository.delete(memberRoom);
+    }
+
+    @Override
+    @Transactional
+    public void endAenitto() {
+        roomRepository.findAllRooms()
+                .stream().filter(Room::isExpired)
+                .forEach(room -> {
+                    room.setState(RoomState.POST);
+                });
+    }
+
 
     private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
         roomRepository.findMemberRoomById(memberId, roomId)
@@ -237,6 +271,12 @@ public class RoomServiceImpl implements RoomService {
     private void throwExceptionIfNotAdmin(MemberRoom memberRoom) {
         if (!memberRoom.isAdmin()) {
             throw new RoomUnAuthorizedException();
+        }
+    }
+
+    private void throwExceptionIfAdmin(MemberRoom memberRoom) {
+        if (memberRoom.isAdmin()) {
+            throw new AdminCannotExitRoomException();
         }
     }
 }
