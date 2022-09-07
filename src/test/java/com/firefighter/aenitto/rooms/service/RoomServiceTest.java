@@ -637,11 +637,7 @@ public class RoomServiceTest {
     @DisplayName("참여 중인 방 조회 - 성공")
     @Test
     void getParticipatingRooms_success() {
-        memberRoom2 = memberRoomFixture2(member1, room2);
-        memberRoom3 = memberRoomFixture3(member1, room3);
-        memberRoom4 = memberRoomFixture4(member1, room4);
-        memberRoom5 = memberRoomFixture5(member1, room5);
-
+        // when
         when(roomRepository.findAllParticipatingRooms(any(UUID.class)))
                 .thenReturn(Arrays.asList(room5, room4, room3, room2, room1));
 
@@ -650,9 +646,9 @@ public class RoomServiceTest {
 
         // then
         assertThat(participatingRooms1).hasSize(5);
-        assertThat(participatingRooms1.get(0).getId()).isEqualTo(4L);
-        assertThat(participatingRooms1.get(1).getId()).isEqualTo(2L);
-        assertThat(participatingRooms1.get(2).getId()).isEqualTo(1L);
+        assertThat(participatingRooms1.get(0).getId()).isEqualTo(1L);
+        assertThat(participatingRooms1.get(1).getId()).isEqualTo(4L);
+        assertThat(participatingRooms1.get(2).getId()).isEqualTo(2L);
         assertThat(participatingRooms1.get(3).getId()).isEqualTo(5L);
         assertThat(participatingRooms1.get(4).getId()).isEqualTo(3L);
     }

@@ -415,9 +415,9 @@ public class RoomIntegrationTest extends IntegrationTest {
         // then
         perform
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.participatingRooms[0].id", is(100)))
-                .andExpect(jsonPath("$.participatingRooms[1].id", is(4)))
-                .andExpect(jsonPath("$.participatingRooms[2].id", is(3)))
+                .andExpect(jsonPath("$.participatingRooms[0].id", is(3)))
+                .andExpect(jsonPath("$.participatingRooms[1].id", is(100)))
+                .andExpect(jsonPath("$.participatingRooms[2].id", is(4)))
                 .andExpect(jsonPath("$.participatingRooms[3].id", is(5)))
                 .andExpect(jsonPath("$.participatingRooms[4].id", is(2)));
     }

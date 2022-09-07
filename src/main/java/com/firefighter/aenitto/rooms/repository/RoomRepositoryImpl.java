@@ -89,7 +89,7 @@ public class RoomRepositoryImpl implements RoomRepository {
                                 " FROM MemberRoom mr" +
                                 " WHERE mr.member.id = :memberId" +
                                 " AND mr.room.deleted = FALSE" +
-                                " ORDER BY mr.room.id DESC", Room.class)
+                                " ORDER BY mr.room.startDate ASC, mr.room.id DESC", Room.class)
                 .setParameter("memberId", memberId)
                 .getResultList();
     }
