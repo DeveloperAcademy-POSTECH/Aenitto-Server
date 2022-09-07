@@ -1,5 +1,6 @@
 package com.firefighter.aenitto.messages.dto.response;
 
+import com.firefighter.aenitto.common.utils.DateConverter;
 import com.firefighter.aenitto.messages.domain.Message;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,10 +18,13 @@ public class MessageResponse {
     private final Long id;
     private final String content;
     private final String imageUrl;
+    private final String createdDate;
 
     public static MessageResponse of(Message message){
         return MessageResponse.builder().id(message.getId())
-                .content(message.getContent()).imageUrl(message.getImgUrl()).build();
+                .content(message.getContent())
+                .createdDate(DateConverter.localDateToString(message.getCreatedAt().toLocalDate()))
+                .imageUrl(message.getImgUrl()).build();
     }
 
     public static List<MessageResponse> listOf(List<Message> messages) {
