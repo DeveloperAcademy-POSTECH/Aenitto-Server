@@ -89,6 +89,7 @@ public class AuthServiceImpl implements AuthService {
                         .refreshToken(token.getRefreshToken()).memberId(member.getId()).build());
 
         return LoginResponse.builder().accessToken(token.getAccessToken())
+                .nickname(member.getNickname())
                 .refreshToken(token.getRefreshToken()).isNewMember(true)
                 .userSettingDone(false).build();
     }
@@ -102,6 +103,7 @@ public class AuthServiceImpl implements AuthService {
         refreshToken.updateRefreshToken(token.getRefreshToken());
 
         return LoginResponse.builder().accessToken(token.getAccessToken())
+                .nickname(member.getNickname())
                 .refreshToken(token.getRefreshToken()).isNewMember(false)
                 .userSettingDone(member.getNickname() != null).build();
     }
