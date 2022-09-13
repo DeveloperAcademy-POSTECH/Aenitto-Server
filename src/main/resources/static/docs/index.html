@@ -507,11 +507,12 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 122
+Content-Length: 143
 
 {
   "accessToken" : "accessToken",
   "refreshToken" : "refreshToken",
+  "nickname" : null,
   "isNewMember" : true,
   "userSettingDone" : true
 }</code></pre>
@@ -562,6 +563,11 @@ Content-Length: 122
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>accessToken</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">토큰</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>nickname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">닉네임</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>refreshToken</code></p></td>
@@ -1032,7 +1038,7 @@ Content-Length: 573
   "participants" : {
     "count" : 1,
     "members" : [ {
-      "id" : "ef932325-fb06-42e3-9c62-ee5f2e17c788",
+      "id" : "a20cfb52-67f9-49f2-9abe-177943aa1225",
       "nickname" : "멤버1"
     } ]
   },
@@ -1857,30 +1863,30 @@ Content-Length: 711
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   } ],
   "manittee" : {
-    "id" : "49579f5c-f12c-4fce-81bb-b75a23c2065a",
+    "id" : "659da520-c95c-4ef6-8a30-9e960da2431d",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -2023,27 +2029,27 @@ Content-Length: 611
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-    "createdDate" : "2022.09.07"
+    "createdDate" : "2022.09.09"
   } ]
 }</code></pre>
 </div>
@@ -2123,22 +2129,22 @@ Content-Length: 1215
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     } ]
   },
   "memoriesWithManittee" : {
@@ -2149,22 +2155,22 @@ Content-Length: 1215
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-      "createdDate" : "2022.09.07"
+      "createdDate" : "2022.09.09"
     } ]
   }
 }</code></pre>
