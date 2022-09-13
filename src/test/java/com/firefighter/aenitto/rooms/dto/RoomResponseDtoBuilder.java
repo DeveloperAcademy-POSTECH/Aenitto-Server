@@ -34,10 +34,12 @@ public class RoomResponseDtoBuilder {
         return RoomParticipantsResponse.of(memberRooms);
     }
 
-    public static RoomDetailResponse roomDetailResponse(Room room, Relation relation, Mission mission) {
+    public static RoomDetailResponse roomDetailResponse(Room room, Relation relationManittee,
+                                                        Relation relationManitto, Mission mission) {
         return RoomDetailResponse.builder()
                 .room(RoomDetailResponse.RoomDetail.of(room))
-                .manittee(RoomDetailResponse.ManitteeInfo.of(relation))
+                .manittee(RoomDetailResponse.RelationInfo.of(relationManittee))
+                .manitto(RoomDetailResponse.RelationInfo.of(relationManitto))
                 .participants(RoomDetailResponse.ParticipantsInfo.of(room.getMemberRooms()))
                 .messages(new RoomDetailResponse.MessageInfo(3))
                 .invitation(new RoomDetailResponse.InvitationInfo(room.getInvitation()))

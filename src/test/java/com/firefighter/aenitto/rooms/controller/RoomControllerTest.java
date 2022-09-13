@@ -488,7 +488,7 @@ class RoomControllerTest {
         final Relation relation = relationFixture(member, member2, room1);
 
         when(roomService.startAenitto(any(Member.class), anyLong()))
-                .thenReturn(RoomDetailResponse.ManitteeInfo.of(relation));
+                .thenReturn(RoomDetailResponse.RelationInfo.of(relation));
 
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.patch(url, roomId)
@@ -588,7 +588,8 @@ class RoomControllerTest {
 
         // when
         when(roomService.getRoomDetail(any(Member.class), anyLong()))
-                .thenReturn(RoomResponseDtoBuilder.roomDetailResponse(room1, room1.getRelations().get(0), mission1));
+                .thenReturn(RoomResponseDtoBuilder.roomDetailResponse(room1, room1.getRelations().get(0),
+                        room1.getRelations().get(0), mission1));
 
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.get(url, roomId)
@@ -623,6 +624,8 @@ class RoomControllerTest {
                                 fieldWithPath("invitation.code").description("초대 코드"),
                                 fieldWithPath("manittee").description("마니띠 정보"),
                                 fieldWithPath("manittee.nickname").description("마니띠 닉네임"),
+                                fieldWithPath("manitto").description("마니또 정보"),
+                                fieldWithPath("manitto.nickname").description("마니또 닉네임"),
                                 fieldWithPath("mission").description("개별 미션 정보"),
                                 fieldWithPath("mission.id").description("미션 id"),
                                 fieldWithPath("mission.content").description("미션 내용"),

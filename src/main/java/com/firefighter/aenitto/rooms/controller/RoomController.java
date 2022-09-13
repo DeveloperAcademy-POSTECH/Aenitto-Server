@@ -85,7 +85,7 @@ public class RoomController {
             @CurrentMember final Member member,
             @PathVariable final Long roomId
     ) {
-        RoomDetailResponse.ManitteeInfo result = roomService.startAenitto(member, roomId);
+        RoomDetailResponse.RelationInfo result = roomService.startAenitto(member, roomId);
         return ResponseEntity.ok(result);
     }
 
