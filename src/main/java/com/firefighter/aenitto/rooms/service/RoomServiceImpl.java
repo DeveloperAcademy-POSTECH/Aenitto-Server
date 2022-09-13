@@ -188,7 +188,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public void startAenitto(Member member, Long roomId) {
+    public RoomDetailResponse.ManitteeInfo startAenitto(Member member, Long roomId) {
         // 참여 중인 방이 아닐 경우 -> throw Exception
         MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
         // 방장이 아닌 경우 -> throw Exception
@@ -212,6 +212,9 @@ public class RoomServiceImpl implements RoomService {
 
         // RoomState 수정
         room.setState(RoomState.PROCESSING);
+        Relation adminManitteeRelation = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                .orElseThrow(RelationNotFoundException::new);
+        return RoomDetailResponse.ManitteeInfo.of(adminManitteeRelation);
     }
 
     @Override
