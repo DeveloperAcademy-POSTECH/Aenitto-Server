@@ -24,6 +24,7 @@ import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
+import com.firefighter.aenitto.rooms.repository.RelationRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,6 +44,10 @@ public class RoomServiceImpl implements RoomService {
 
     @Qualifier("roomRepositoryImpl")
     private final RoomRepository roomRepository;
+
+    @Qualifier("relationRepositoryImpl")
+    private final RelationRepository relationRepository;
+
     @Qualifier("memberRepositoryImpl")
     private final MemberRepository memberRepository;
     @Qualifier("missionRepositoryImpl")
@@ -140,7 +145,9 @@ public class RoomServiceImpl implements RoomService {
                 return RoomDetailResponse.buildPreResponse(room, memberRoom);
             case PROCESSING: {
                 // 마니띠, 룰렛 봤는지, admin 인지, 미션, 읽지 않은 메시지 수
-                Relation relation = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                Relation relationManitto = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                        .orElseThrow(RelationNotFoundException::new);
+                Relation relationManittee = relationRepository.findByRoomIdAndManitteeId(roomId, member.getId())
                         .orElseThrow(RelationNotFoundException::new);
                 IndividualMission individualMission = missionRepository.findIndividualMissionByDate(LocalDate.now(), memberRoom.getId())
                         .orElseThrow(MissionNotFoundException::new);
@@ -151,7 +158,8 @@ public class RoomServiceImpl implements RoomService {
                 }
                 return RoomDetailResponse.buildProcessingResponse(
                         room,
-                        relation,
+                        relationManitto,
+                        relationManittee,
                         memberRoom,
                         didView,
                         individualMission.getMission(),

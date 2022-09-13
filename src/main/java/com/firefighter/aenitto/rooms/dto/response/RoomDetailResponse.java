@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 public class RoomDetailResponse {
     private final RoomDetail room;
     private final ParticipantsInfo participants;
-    private final ManitteeInfo manittee;
+    private final RelationInfo manittee;
+    private final RelationInfo manitto;
     private final InvitationInfo invitation;
     private final MissionInfo mission;
     private final Boolean didViewRoulette;
@@ -37,10 +38,11 @@ public class RoomDetailResponse {
                 .build();
     }
 
-    public static RoomDetailResponse buildProcessingResponse(Room room, Relation relation, MemberRoom memberRoom, boolean didView, Mission mission, int messageCount) {
+    public static RoomDetailResponse buildProcessingResponse(Room room, Relation relationManittee, Relation relationManitto, MemberRoom memberRoom, boolean didView, Mission mission, int messageCount) {
         return RoomDetailResponse.builder()
                 .room(RoomDetail.of(room))
-                .manittee(ManitteeInfo.of(relation))
+                .manittee(RelationInfo.of(relationManittee))
+                .manitto(RelationInfo.of(relationManitto))
                 .mission(MissionInfo.of(mission))
                 .didViewRoulette(didView)
                 .admin(memberRoom.isAdmin())
@@ -52,7 +54,7 @@ public class RoomDetailResponse {
         return RoomDetailResponse.builder()
                 .room(RoomDetail.of(room))
                 .admin(memberRoom.isAdmin())
-                .manittee(ManitteeInfo.of(relation))
+                .manittee(RelationInfo.of(relation))
                 .messages(new MessageInfo(messageCount))
                 .build();
     }
@@ -115,11 +117,11 @@ public class RoomDetailResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor(force = true)
-    public static class ManitteeInfo {
+    public static class RelationInfo {
         private final String nickname;
 
-        public static ManitteeInfo of(Relation relation) {
-            return ManitteeInfo.builder()
+        public static RelationInfo of(Relation relation) {
+            return RelationInfo.builder()
                     .nickname(relation.getManittee().getNickname())
                     .build();
         }
