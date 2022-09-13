@@ -23,9 +23,7 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
-import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
-import com.firefighter.aenitto.rooms.repository.MemberRoomRepositoryImpl;
-import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
+import com.firefighter.aenitto.rooms.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,6 +43,7 @@ import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static com.firefighter.aenitto.missions.IndividualMissionFixture.*;
+import static com.firefighter.aenitto.rooms.domain.RelationFixture.relationFixture;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -53,6 +52,10 @@ public class RoomServiceTest {
 
     @InjectMocks
     private RoomServiceImpl target;
+
+    @Mock
+    private RelationRepositoryImpl relationRepository;
+
     @Mock
     private RoomRepositoryImpl roomRepository;
     @Mock
@@ -84,6 +87,8 @@ public class RoomServiceTest {
     MemberRoom memberRoom3;
     MemberRoom memberRoom4;
     MemberRoom memberRoom5;
+
+    Relation relation;
 
     CurrentUserDetails currentUserDetails;
 
@@ -409,6 +414,7 @@ public class RoomServiceTest {
         final Long roomId = 1L;
         final RoomState state = RoomState.PROCESSING;
         memberRoom2 = memberRoomFixture2(member2, room1);
+        relation = relationFixture(member1, member2, room1);
         Relation.createRelations(room1.getMemberRooms(), room1);
 
         // when
@@ -418,6 +424,8 @@ public class RoomServiceTest {
                 .thenReturn(Optional.of(room1.getRelations().get(0)));
         when(missionRepository.findIndividualMissionByDate(any(LocalDate.class), anyLong()))
                 .thenReturn(Optional.empty());
+        when(relationRepository.findByRoomIdAndManitteeId(anyLong(), any(UUID.class)))
+                .thenReturn(Optional.of(relation));
 
         assertThatExceptionOfType(MissionNotFoundException.class)
                 .isThrownBy(() -> {
@@ -432,6 +440,7 @@ public class RoomServiceTest {
         final Long roomId = 1L;
         final RoomState state = RoomState.PROCESSING;
         memberRoom2 = memberRoomFixture2(member2, room1);
+        relation = relationFixture(member1, member2, room1);
         Relation.createRelations(room1.getMemberRooms(), room1);
         ReflectionTestUtils.setField(individualMission1, "mission", mission1);
 
@@ -440,6 +449,8 @@ public class RoomServiceTest {
                 .thenReturn(Optional.of(memberRoom2));
         when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
                 .thenReturn(Optional.of(room1.getRelations().get(0)));
+        when(relationRepository.findByRoomIdAndManitteeId(anyLong(), any(UUID.class)))
+                .thenReturn(Optional.of(relation));
         when(missionRepository.findIndividualMissionByDate(any(LocalDate.class), anyLong()))
                 .thenReturn(Optional.of(individualMission1));
         when(messageRepository.findUnreadMessageCount(any(UUID.class), anyLong()))
@@ -447,7 +458,8 @@ public class RoomServiceTest {
 
         RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
         RoomDetailResponse.RoomDetail room = roomDetail.getRoom();
-        RoomDetailResponse.ManitteeInfo manittee = roomDetail.getManittee();
+        RoomDetailResponse.RelationInfo manittee = roomDetail.getManittee();
+        RoomDetailResponse.RelationInfo manitto = roomDetail.getManitto();
         RoomDetailResponse.MessageInfo messages = roomDetail.getMessages();
         RoomDetailResponse.MissionInfo mission = roomDetail.getMission();
 
@@ -481,7 +493,7 @@ public class RoomServiceTest {
 
         RoomDetailResponse roomDetail = target.getRoomDetail(member1, roomId);
         RoomDetailResponse.RoomDetail room = roomDetail.getRoom();
-        RoomDetailResponse.ManitteeInfo manittee = roomDetail.getManittee();
+        RoomDetailResponse.RelationInfo manittee = roomDetail.getManittee();
         RoomDetailResponse.MessageInfo messages = roomDetail.getMessages();
 
         // then
@@ -835,4 +847,6 @@ public class RoomServiceTest {
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(memberRoomRepository, times(1)).delete(any(MemberRoom.class));
     }
+
+
 }

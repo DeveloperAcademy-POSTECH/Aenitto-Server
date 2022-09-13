@@ -77,4 +77,5 @@ public class RelationShipRepositoryImplTest {
         assertThat(result.get().getRoom().getId()).isEqualTo(2L);
         assertThat(result.get().getManittee().getNickname()).isEqualTo("nickname2");
     }
+
 }
