@@ -30,7 +30,7 @@ operation::함께하는 친구들 리스트[snippets='http-request,http-response
 == Room API
 
 === 마니또 시작하기
-operation::마니또 시작하기[snippets='path-parameters,request-headers,http-request,http-response']
+operation::마니또 시작하기[snippets='path-parameters,request-headers,http-request,http-response,response-fields']
 
 === 방 상태 조회
 operation::방 상태 조회[snippets='path-parameters,request-headers,http-request,http-response,response-fields']

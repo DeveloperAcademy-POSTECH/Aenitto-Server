@@ -593,12 +593,16 @@ public class RoomServiceTest {
         memberRoom5 = RoomFixture.memberRoomFixture5(member5, room1);
         ReflectionTestUtils.setField(memberRoom1, "admin", true);
         room1.setState(RoomState.PRE);
+        final Relation relation = relationFixture(member1, member2, room1);
 
         // when
         when(roomRepository.findMemberRoomById(any(UUID.class), anyLong()))
                 .thenReturn(Optional.of(memberRoom1));
+
         doNothing().when(missionService).setInitialIndividualMission(any(MemberRoom.class));
-        target.startAenitto(member1, roomId);
+        when(roomRepository.findRelationByManittoId(any(UUID.class), anyLong()))
+                .thenReturn(Optional.of(relation));
+        RoomDetailResponse.RelationInfo result = target.startAenitto(member1, roomId);
 
         // then
         assertThat(room1.getRelations().size()).isEqualTo(5);
@@ -607,6 +611,7 @@ public class RoomServiceTest {
         assertThat(room1.getRelations().get(2).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(3).getManittee()).isNotNull();
         assertThat(room1.getRelations().get(4).getManittee()).isNotNull();
+        assertThat(result.getNickname()).isNotNull();
 
         verify(missionService, times(5)).setInitialIndividualMission(any(MemberRoom.class));
     }

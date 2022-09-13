@@ -18,6 +18,7 @@ import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
+import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
 import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
 import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
 import com.firefighter.aenitto.rooms.service.RoomService;
@@ -49,6 +50,7 @@ import java.util.List;
 
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
+import static com.firefighter.aenitto.rooms.domain.RelationFixture.relationFixture;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
@@ -481,8 +483,13 @@ class RoomControllerTest {
         final Long roomId = 1L;
         final String url = "/api/v1/rooms/{roomId}/state";
 
+
         // when
-        doNothing().when(roomService).startAenitto(any(Member.class), anyLong());
+        final Relation relation = relationFixture(member, member2, room1);
+
+        when(roomService.startAenitto(any(Member.class), anyLong()))
+                .thenReturn(RoomDetailResponse.RelationInfo.of(relation));
+
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.patch(url, roomId)
                         .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
@@ -492,7 +499,7 @@ class RoomControllerTest {
         // then
         perform
                 .andDo(print())
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andDo(document(
                         "마니또 시작하기",
                         preprocessRequest(prettyPrint()),
@@ -502,6 +509,8 @@ class RoomControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+                        ),responseFields(
+                                fieldWithPath("nickname").description("어드민의 마니띠")
                         )
                 ));
 

@@ -92,7 +92,7 @@ public class RoomIntegrationTest extends IntegrationTest {
         // then (2)
         perform
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         flushAndClear();
 
