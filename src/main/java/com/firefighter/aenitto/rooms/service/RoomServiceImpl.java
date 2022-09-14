@@ -118,7 +118,7 @@ public class RoomServiceImpl implements RoomService {
         // 방의 수용인원이 초과했을 경우 -> throw
         if (findRoom.unAcceptable()) throw new RoomCapacityExceededException();
 
-        if(findRoom.isProcessing()) throw new RoomAlreadyStartedException();
+        if(findRoom.isNotPre()) throw new RoomAlreadyStartedException();
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);

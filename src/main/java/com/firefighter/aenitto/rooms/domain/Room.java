@@ -87,7 +87,7 @@ public class Room extends CreationModificationLog {
     public boolean isProcessingAndExpired() {
         return (this.state == RoomState.PROCESSING) & (this.endDate.isBefore(LocalDate.now()));
     }
-    public boolean isProcessing() {
+    public boolean isNotPre() {
         return (this.state != RoomState.PRE);
     }
 
