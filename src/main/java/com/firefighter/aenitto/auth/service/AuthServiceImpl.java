@@ -13,6 +13,7 @@ import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
 import com.firefighter.aenitto.auth.token.Token;
 import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
 import com.firefighter.aenitto.common.exception.auth.InvalidUserTokenException;
+import com.firefighter.aenitto.common.exception.auth.TokenNotExpired;
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -48,6 +49,9 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(InvalidTokenException::new);
 
+        if (tokenService.checkTokenExpired(reissueTokenRequest.getAccessToken()))
+            throw new TokenNotExpired();
+
         if (!refreshToken.getRefreshToken().equals(reissueTokenRequest.getRefreshToken())) {
             throw new InvalidUserTokenException();
         }
@@ -73,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
         Optional<Member> member = memberRepository.findBySocialId(socialId);
         if (member.isEmpty()) {
             return signIn(socialId);
-        }else {
+        } else {
             return logIn(socialId, member.get());
         }
     }
