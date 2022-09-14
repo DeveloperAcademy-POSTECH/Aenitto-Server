@@ -67,8 +67,8 @@ public class TokenService {
                 .compact();
     }
 
-    public long verifyRefreshToken(String token){
-        try{
+    public long verifyRefreshToken(String token) {
+        try {
             Jws<Claims> claims = Jwts.parser()
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
