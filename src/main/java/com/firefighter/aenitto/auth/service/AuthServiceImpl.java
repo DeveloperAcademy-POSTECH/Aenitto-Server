@@ -49,11 +49,14 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(InvalidTokenException::new);
 
-        if (tokenService.checkTokenExpired(reissueTokenRequest.getAccessToken()))
-            throw new TokenNotExpired();
-
         if (!refreshToken.getRefreshToken().equals(reissueTokenRequest.getRefreshToken())) {
             throw new InvalidUserTokenException();
+        }
+        if (tokenService.checkTokenExpired(reissueTokenRequest.getAccessToken())){
+            return ReissueTokenResponse.builder()
+                    .accessToken(reissueTokenRequest.getAccessToken())
+                    .refreshToken(reissueTokenRequest.getRefreshToken())
+                    .build();
         }
 
         Token token = tokenService.generateToken(socialId, "USER");
