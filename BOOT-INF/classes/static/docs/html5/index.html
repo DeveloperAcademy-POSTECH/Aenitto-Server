@@ -884,9 +884,39 @@ Host: localhost:8080</code></pre>
 <h4 id="_마니또_시작하기_http_response"><a class="link" href="#_마니또_시작하기_http_response">HTTP response</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 28
+
+{
+  "nickname" : "멤버2"
+}</code></pre>
 </div>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_마니또_시작하기_response_fields"><a class="link" href="#_마니또_시작하기_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>nickname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">어드민의 마니띠</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -1038,11 +1068,7 @@ Content-Length: 621
   "participants" : {
     "count" : 1,
     "members" : [ {
-<<<<<<< HEAD
-      "id" : "07e005e5-a002-430f-91ac-89cb2faccc90",
-=======
-      "id" : "a20cfb52-67f9-49f2-9abe-177943aa1225",
->>>>>>> develop
+      "id" : "6f21accd-e5ae-4bb2-8c1a-7dd878dc367d",
       "nickname" : "멤버1"
     } ]
   },
@@ -1880,53 +1906,30 @@ Content-Length: 711
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
+    "createdDate" : "2022.09.14"
   } ],
   "manittee" : {
-    "id" : "ff3c97c1-f7f4-4f33-83e8-8c5f80fbe661",
-=======
-    "createdDate" : "2022.09.09"
-  } ],
-  "manittee" : {
-    "id" : "659da520-c95c-4ef6-8a30-9e960da2431d",
->>>>>>> develop
+    "id" : "c0332132-af24-41f8-855e-84600438792e",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -2069,47 +2072,27 @@ Content-Length: 611
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-<<<<<<< HEAD
-    "createdDate" : "2022.09.13"
-=======
-    "createdDate" : "2022.09.09"
->>>>>>> develop
+    "createdDate" : "2022.09.14"
   } ]
 }</code></pre>
 </div>
@@ -2189,38 +2172,22 @@ Content-Length: 1215
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     } ]
   },
   "memoriesWithManittee" : {
@@ -2231,38 +2198,22 @@ Content-Length: 1215
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-<<<<<<< HEAD
-      "createdDate" : "2022.09.13"
-=======
-      "createdDate" : "2022.09.09"
->>>>>>> develop
+      "createdDate" : "2022.09.14"
     } ]
   }
 }</code></pre>
@@ -2276,7 +2227,7 @@ Content-Length: 1215
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-09-07 15:12:21 +0900
+Last updated 2022-09-14 21:33:10 +0900
 </div>
 </div>
 </body>
