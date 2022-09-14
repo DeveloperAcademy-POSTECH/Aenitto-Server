@@ -92,6 +92,23 @@ public class TokenService {
         }
     }
 
+    public boolean checkTokenExpired(String token) {
+        try {
+            Jws<Claims> claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token);
+            Long time = claims.getBody().getExpiration().getTime();
+            if (time > 1L) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            throw new InvalidTokenException();
+        }
+
+    }
+
     public String getUid(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
