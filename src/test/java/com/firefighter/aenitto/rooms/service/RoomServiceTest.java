@@ -280,16 +280,16 @@ public class RoomServiceTest {
         when(roomRepository.findMemberRoomById(eq(currentUserDetails.getMember().getId()), anyLong()))
                 .thenReturn(Optional.empty());
         when(roomRepository.findRoomById(anyLong()))
-                .thenReturn(Optional.of(room1));
+                .thenReturn(Optional.of(room2));
 
         // given
         final ParticipateRoomRequest request = RoomRequestDtoBuilder.participateRoomRequest();
 
         // when
-        Long roomId = target.participateRoom(member1, room1.getId(), request);
+        Long roomId = target.participateRoom(member1, room2.getId(), request);
 
         // then
-        assertThat(roomId).isEqualTo(room1.getId());
+        assertThat(roomId).isEqualTo(room2.getId());
 
         verify(roomRepository, times(1)).findMemberRoomById(any(UUID.class), anyLong());
         verify(roomRepository, times(1)).findRoomById(anyLong());
