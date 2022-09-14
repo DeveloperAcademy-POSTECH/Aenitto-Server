@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
 
@@ -140,8 +141,8 @@ public class TokenService {
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
+        } catch (ExpiredJwtException  | io.jsonwebtoken.security.SignatureException e) {
+            throw new InvalidTokenException();
         }
     }
 }
