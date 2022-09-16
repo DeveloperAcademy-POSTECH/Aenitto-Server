@@ -163,28 +163,28 @@ public class RoomServiceTest {
         verify(roomRepository, times(1)).findByInvitation(anyString());
     }
 
-    @DisplayName("초대코드 검증 - 실패 (이미 유저가 참여중인 방)")
-    @Test
-    void verifyInvitation_fail_participating() {
-        memberRoom1 = memberRoomFixture1(member1, room1);
-
-        // mock
-        when(roomRepository.findByInvitation(anyString()))
-                .thenReturn(Optional.of(room1));
-        when(roomRepository.findMemberRoomById(any(), anyLong()))
-                .thenReturn(Optional.of(memberRoom1));
-
-        // then
-        final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
-
-        // when, then
-        assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
-                .isThrownBy(() -> {
-                    target.verifyInvitation(member1, verifyInvitationRequest);
-                });
-        verify(roomRepository, times(1)).findByInvitation(anyString());
-        verify(roomRepository, times(1)).findMemberRoomById(any(), anyLong());
-    }
+//    @DisplayName("초대코드 검증 - 실패 (이미 유저가 참여중인 방)")
+//    @Test
+//    void verifyInvitation_fail_participating() {
+//        memberRoom1 = memberRoomFixture1(member1, room1);
+//
+//        // mock
+//        when(roomRepository.findByInvitation(anyString()))
+//                .thenReturn(Optional.of(room1));
+//        when(roomRepository.findMemberRoomById(any(), anyLong()))
+//                .thenReturn(Optional.of(memberRoom1));
+//
+//        // then
+//        final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
+//
+//        // when, then
+//        assertThatExceptionOfType(RoomAlreadyParticipatingException.class)
+//                .isThrownBy(() -> {
+//                    target.verifyInvitation(member1, verifyInvitationRequest);
+//                });
+//        verify(roomRepository, times(1)).findByInvitation(anyString());
+//        verify(roomRepository, times(1)).findMemberRoomById(any(), anyLong());
+//    }
 
     @DisplayName("초대코드 검증 - 성공")
     @Test
@@ -192,8 +192,8 @@ public class RoomServiceTest {
         // mock
         when(roomRepository.findByInvitation(anyString()))
                 .thenReturn(Optional.of(room1));
-        when(roomRepository.findMemberRoomById(eq(member1.getId()), anyLong()))
-                .thenReturn(Optional.empty());
+//        when(roomRepository.findMemberRoomById(eq(member1.getId()), anyLong()))
+//                .thenReturn(Optional.empty());
 
         // given
         final VerifyInvitationRequest verifyInvitationRequest = RoomRequestDtoBuilder.verifyInvitationRequest();
