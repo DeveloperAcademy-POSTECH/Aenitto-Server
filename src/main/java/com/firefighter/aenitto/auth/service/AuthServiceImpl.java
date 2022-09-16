@@ -44,8 +44,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ReissueTokenResponse reissueAccessToken(ReissueTokenRequest reissueTokenRequest) {
         Long refreshTokenTime = tokenService.verifyRefreshToken(reissueTokenRequest.getRefreshToken());
+        System.out.println("after verifying refresh token");
         String socialId = tokenService.getSocialId(reissueTokenRequest.getAccessToken());
+        System.out.println("social Id 가져오기");
         Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
+        System.out.println("memberRepo 소셜 id 찾기");
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(InvalidTokenException::new);
 

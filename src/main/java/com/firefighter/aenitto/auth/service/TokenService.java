@@ -99,6 +99,7 @@ public class TokenService {
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
             Long time = claims.getBody().getExpiration().getTime();
+            System.out.println("토큰 남은 기한 " + time);
             if (time > 1L) {
                 return true;
             } else {
@@ -130,18 +131,19 @@ public class TokenService {
         Claims claims = parseClaims(accessToken);
 
         if (claims.get(AUTHORITIES_KEY) == null) {
+            System.out.println("권한 정보가 없는 토큰입니다");
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
         final String socialId = claims.getSubject();
-        final CurrentUserDetails currentUserDetails = (CurrentUserDetails) userDetailsService.loadUserByUsername(socialId);
-
         return socialId;
     }
 
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody();
-        } catch (ExpiredJwtException  | io.jsonwebtoken.security.SignatureException e) {
+        } catch (ExpiredJwtException e) {
+            throw new InvalidTokenException();
+        } catch (io.jsonwebtoken.security.SignatureException e) {
             throw new InvalidTokenException();
         }
     }

@@ -96,8 +96,6 @@ public class RoomServiceImpl implements RoomService {
         Room findRoom = roomRepository.findByInvitation(invitation)
                 .orElseThrow(InvitationNotFoundException::new);
 
-        // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
-        throwExceptionIfParticipating(member.getId(), findRoom.getId());
 
         return VerifyInvitationResponse.from(findRoom);
     }
