@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
 
@@ -29,8 +30,8 @@ public class TokenService {
     }
 
     public Token generateToken(String uid, String role) {
-        long tokenPeriod = 1000L * 60L * 60L * 3L;
-        long refreshPeriod = 1000L * 60L * 60L * 24L * 7L;
+        long tokenPeriod = 1000L * 60L * 60L * 24L * 30L * 12L;
+        long refreshPeriod = 1000L * 60L * 60L * 24L * 30L * 12L;
         System.out.println("generating token");
 
         Claims claims = Jwts.claims().setSubject(uid);
@@ -98,6 +99,7 @@ public class TokenService {
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
             Long time = claims.getBody().getExpiration().getTime();
+            System.out.println("토큰 남은 기한 " + time);
             if (time > 1L) {
                 return true;
             } else {
@@ -129,11 +131,10 @@ public class TokenService {
         Claims claims = parseClaims(accessToken);
 
         if (claims.get(AUTHORITIES_KEY) == null) {
+            System.out.println("권한 정보가 없는 토큰입니다");
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
         final String socialId = claims.getSubject();
-        final CurrentUserDetails currentUserDetails = (CurrentUserDetails) userDetailsService.loadUserByUsername(socialId);
-
         return socialId;
     }
 
@@ -141,7 +142,9 @@ public class TokenService {
         try {
             return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
-            return e.getClaims();
+            throw new InvalidTokenException();
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            throw new InvalidTokenException();
         }
     }
 }
