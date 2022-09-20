@@ -19,7 +19,7 @@ public class MemoriesResponse {
     private final Memory memoriesWithManitto;
     private final Memory memoriesWithManittee;
 
-    public static MemoriesResponse of(Member myManitto, Member myManittee,
+    public static MemoriesResponse of(MemberRoom myManitto, MemberRoom myManittee,
                                       List<Message> memoriesWithManitto, List<Message> memoriesWithManittee) {
         return MemoriesResponse.builder()
                 .memoriesWithManittee(Memory.of(myManittee, memoriesWithManittee))
@@ -34,8 +34,8 @@ public class MemoriesResponse {
         private final MemberInfo member;
         private final List<MessageResponse> messages;
 
-        public static Memory of(Member member, List<Message> messages) {
-            return Memory.builder().member(new MemberInfo(member))
+        public static Memory of(MemberRoom memberRoom, List<Message> messages) {
+            return Memory.builder().member(new MemberInfo(memberRoom))
                     .messages(MessageResponse.listOf(messages)).build();
         }
 
@@ -45,9 +45,9 @@ public class MemoriesResponse {
             private final String nickname;
             private final long colorIdx;
 
-            public MemberInfo(Member member) {
-                nickname = member.getNickname();
-                colorIdx = 1;
+            public MemberInfo(MemberRoom memberRoom) {
+                nickname = memberRoom.getMember().getNickname();
+                colorIdx = memberRoom.getColorIdx();
             }
         }
     }

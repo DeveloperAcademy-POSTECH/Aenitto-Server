@@ -17,6 +17,8 @@ import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.service.MessageService;
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Room;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +49,7 @@ import static com.firefighter.aenitto.members.MemberFixture.memberFixture3;
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
 import static com.firefighter.aenitto.message.MessageFixture.*;
 import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
+import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -78,6 +81,10 @@ public class MessageControllerTest {
     private MockMultipartFile image;
     private Member manitto;
     private Member manittee;
+    private Room room;
+
+    private MemberRoom myManitto;
+    private MemberRoom myManittee;
 
     private Message message1;
     private Message message2;
@@ -104,8 +111,11 @@ public class MessageControllerTest {
 
         objectMapper = new ObjectMapper();
         image = IMAGE;
+        room = roomFixture1();
         manittee = memberFixture2();
         manitto = memberFixture3();
+        myManitto = memberRoomFixture1(manitto, room);
+        myManittee = memberRoomFixture2(manittee, room);
 
         message1 = messageFixture1();
         message2 = messageFixture2();
@@ -533,7 +543,7 @@ public class MessageControllerTest {
 
         final String uri = "/api/v1/rooms/{roomId}/memories";
         when(messageService.getMemories(any(Member.class), anyLong()))
-                .thenReturn(MemoriesResponse.of(manittee, manitto, receivedMessages, sentMessages));
+                .thenReturn(MemoriesResponse.of(myManittee, myManitto, receivedMessages, sentMessages));
 
         //when, then, docs
         mockMvc.perform(RestDocumentationRequestBuilders.get(uri, "1")
