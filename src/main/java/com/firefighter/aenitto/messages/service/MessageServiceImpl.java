@@ -142,7 +142,7 @@ public class MessageServiceImpl implements MessageService {
         sentMessage.addAll(sentMessageContent);
         sentMessage.addAll(sentMessageImage);
 
-        return MemoriesResponse.of(myManittoRelation.getManitto(), myManitteeRelation.getManittee(),
+        return MemoriesResponse.of(myManittoRelation.getManitto() , myManitteeRelation.getManittee(),
                 receivedMessage, sentMessage);
     }
 

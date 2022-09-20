@@ -2,6 +2,7 @@ package com.firefighter.aenitto.messages.dto.response;
 
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.messages.domain.Message;
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,9 +43,11 @@ public class MemoriesResponse {
         @NoArgsConstructor(force = true)
         public static class MemberInfo {
             private final String nickname;
+            private final long colorIdx;
 
             public MemberInfo(Member member) {
                 nickname = member.getNickname();
+                colorIdx = 1;
             }
         }
     }
