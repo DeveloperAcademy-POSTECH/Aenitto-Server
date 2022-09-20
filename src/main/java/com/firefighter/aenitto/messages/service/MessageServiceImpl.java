@@ -108,6 +108,9 @@ public class MessageServiceImpl implements MessageService {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation relation = throwExceptionIfManitteeNotFound(currentMember.getId(), roomId);
         List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
+        for (Message message : messages) {
+            message.readMessage();
+        }
         return SentMessagesResponse.of(messages, relation.getManittee());
     }
 
