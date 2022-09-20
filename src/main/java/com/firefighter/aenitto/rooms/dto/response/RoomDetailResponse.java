@@ -41,8 +41,8 @@ public class RoomDetailResponse {
     public static RoomDetailResponse buildProcessingResponse(Room room, Relation relationManittee, Relation relationManitto, MemberRoom memberRoom, boolean didView, Mission mission, int messageCount) {
         return RoomDetailResponse.builder()
                 .room(RoomDetail.of(room))
-                .manittee(RelationInfo.of(relationManittee))
-                .manitto(RelationInfo.of(relationManitto))
+                .manittee(RelationInfo.ofManittee(relationManittee))
+                .manitto(RelationInfo.ofManitto(relationManitto))
                 .mission(MissionInfo.of(mission))
                 .didViewRoulette(didView)
                 .admin(memberRoom.isAdmin())
@@ -54,7 +54,7 @@ public class RoomDetailResponse {
         return RoomDetailResponse.builder()
                 .room(RoomDetail.of(room))
                 .admin(memberRoom.isAdmin())
-                .manittee(RelationInfo.of(relation))
+                .manittee(RelationInfo.ofManittee(relation))
                 .messages(new MessageInfo(messageCount))
                 .build();
     }
@@ -120,9 +120,15 @@ public class RoomDetailResponse {
     public static class RelationInfo {
         private final String nickname;
 
-        public static RelationInfo of(Relation relation) {
+        public static RelationInfo ofManittee(Relation relation) {
             return RelationInfo.builder()
                     .nickname(relation.getManittee().getNickname())
+                    .build();
+        }
+
+        public static RelationInfo ofManitto(Relation relation) {
+            return RelationInfo.builder()
+                    .nickname(relation.getManitto().getNickname())
                     .build();
         }
     }
