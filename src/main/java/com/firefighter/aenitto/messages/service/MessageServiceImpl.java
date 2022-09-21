@@ -54,7 +54,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public long sendMessageSeparate(Member currentMember, Long roomId, String manitteeId,
-                                String messageContent, MultipartFile image) {
+                                    String messageContent, MultipartFile image) {
 
         Relation relation = relationRepository.findByRoomIdAndManittoId(roomId, currentMember.getId())
                 .orElseThrow(RoomNotParticipatingException::new);
@@ -126,6 +126,8 @@ public class MessageServiceImpl implements MessageService {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation myManittoRelation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
         Relation myManitteeRelation = throwExceptionIfManitteeNotFound(currentMember.getId(), roomId);
+        MemberRoom myManitto = throwExceptionIfNotParticipating(myManittoRelation.getManitto().getId(), roomId);
+        MemberRoom myManittee = throwExceptionIfNotParticipating(myManitteeRelation.getManittee().getId(), roomId);
         List<Message> receivedMessageImage = messageRepository
                 .getTwoRandomImageReceivedMessages(currentMember.getId(), roomId);
         List<Message> receivedMessageContent = messageRepository
@@ -142,8 +144,7 @@ public class MessageServiceImpl implements MessageService {
         sentMessage.addAll(sentMessageContent);
         sentMessage.addAll(sentMessageImage);
 
-        return MemoriesResponse.of(myManittoRelation.getManitto(), myManitteeRelation.getManittee(),
-                receivedMessage, sentMessage);
+        return MemoriesResponse.of(myManitto, myManittee, receivedMessage, sentMessage);
     }
 
     public ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
