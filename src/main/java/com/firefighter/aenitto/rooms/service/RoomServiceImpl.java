@@ -222,7 +222,7 @@ public class RoomServiceImpl implements RoomService {
         room.setState(RoomState.PROCESSING);
         Relation adminManitteeRelation = roomRepository.findRelationByManittoId(member.getId(), roomId)
                 .orElseThrow(RelationNotFoundException::new);
-        return RoomDetailResponse.RelationInfo.of(adminManitteeRelation);
+        return RoomDetailResponse.RelationInfo.ofManittee(adminManitteeRelation);
     }
 
     @Override
