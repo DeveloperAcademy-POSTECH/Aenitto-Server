@@ -38,8 +38,8 @@ public class RoomResponseDtoBuilder {
                                                         Relation relationManitto, Mission mission) {
         return RoomDetailResponse.builder()
                 .room(RoomDetailResponse.RoomDetail.of(room))
-                .manittee(RoomDetailResponse.RelationInfo.of(relationManittee))
-                .manitto(RoomDetailResponse.RelationInfo.of(relationManitto))
+                .manittee(RoomDetailResponse.RelationInfo.ofManittee(relationManittee))
+                .manitto(RoomDetailResponse.RelationInfo.ofManitto(relationManitto))
                 .participants(RoomDetailResponse.ParticipantsInfo.of(room.getMemberRooms()))
                 .messages(new RoomDetailResponse.MessageInfo(3))
                 .invitation(new RoomDetailResponse.InvitationInfo(room.getInvitation()))

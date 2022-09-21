@@ -488,7 +488,7 @@ class RoomControllerTest {
         final Relation relation = relationFixture(member, member2, room1);
 
         when(roomService.startAenitto(any(Member.class), anyLong()))
-                .thenReturn(RoomDetailResponse.RelationInfo.of(relation));
+                .thenReturn(RoomDetailResponse.RelationInfo.ofManittee(relation));
 
         ResultActions perform = mockMvc.perform(
                 RestDocumentationRequestBuilders.patch(url, roomId)
