@@ -63,9 +63,9 @@ public class MissionServiceImpl implements MissionService {
     @Transactional
     public void setDailyIndividualMission(LocalDate date) throws MissionAlreadySetException, MissionEmptyException {
         List<Room> roomsProcessing = roomRepository.findRoomsByState(RoomState.PROCESSING);
-        Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
-                .orElseThrow(MissionEmptyException::new);
         for (Room room : roomsProcessing) {
+            Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
+                    .orElseThrow(MissionEmptyException::new);
             for (MemberRoom memberRoom : room.getMemberRooms()) {
                 if (memberRoom.didSetDailyIndividualMission(date)) {
                     throw new MissionAlreadySetException();
