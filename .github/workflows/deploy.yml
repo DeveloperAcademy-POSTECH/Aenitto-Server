@@ -9,9 +9,9 @@ name: Spring Boot & Gradle CI/CD
 # branch 단위 외에도, tag나 cron 식 등을 사용할 수 있음
 on:
   push:
-    branches: [ develop, feature/6-continuous-deploy-setting ]
+    branches: [ prod ]
   pull_request:
-    branches: [ develop ]
+    branches: [ prod ]
 
 jobs:
   build:
