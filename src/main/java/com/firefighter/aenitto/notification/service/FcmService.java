@@ -16,6 +16,7 @@ import java.util.List;
 public class FcmService implements NotificationService {
     private final ObjectMapper objectMapper;
 
+
     private String makeMessage(String targetToken, String title, String body)
             throws JsonProcessingException {
 
