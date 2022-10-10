@@ -96,7 +96,7 @@ public class AuthControllerTest {
         mockMvc.perform(
                         RestDocumentationRequestBuilders.post(uri)
                                 .content(objectMapper.writeValueAsString(
-                                        LoginRequest.builder().identityToken("token이요").build()))
+                                        LoginRequest.builder().fcmToken("fcmToken").identityToken("token이요").build()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -182,7 +182,7 @@ public class AuthControllerTest {
         mockMvc.perform(
                         RestDocumentationRequestBuilders.post(uri)
                                 .content(objectMapper.writeValueAsString(
-                                        LoginRequest.builder().identityToken("token이요").build()))
+                                        LoginRequest.builder().fcmToken("fcmToken").identityToken("token이요").build()))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
@@ -198,7 +198,7 @@ public class AuthControllerTest {
         //given
         final String uri = "/api/v1/login";
 
-        LoginRequest request = LoginRequest.builder().identityToken("token이요").build();
+        LoginRequest request = LoginRequest.builder().fcmToken("fcmToken").identityToken("token이요").build();
         LoginResponse response = LoginResponse.builder().accessToken("accessToken").refreshToken("refreshToken")
                 .isNewMember(true).userSettingDone(true).build();
         when(authService.loginOrSignIn(any())).thenReturn(response);
@@ -215,7 +215,8 @@ public class AuthControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("identityToken").description("애플의 identityToken")
+                                fieldWithPath("identityToken").description("애플의 identityToken"),
+                                fieldWithPath("fcmToken").description("FCM token")
                         ),
                         responseFields(
                                 fieldWithPath("accessToken").description("토큰"),

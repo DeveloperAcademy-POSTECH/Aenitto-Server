@@ -44,11 +44,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ReissueTokenResponse reissueAccessToken(ReissueTokenRequest reissueTokenRequest) {
         Long refreshTokenTime = tokenService.verifyRefreshToken(reissueTokenRequest.getRefreshToken());
-        System.out.println("after verifying refresh token");
         String socialId = tokenService.getSocialId(reissueTokenRequest.getAccessToken());
-        System.out.println("social Id 가져오기");
         Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
-        System.out.println("memberRepo 소셜 id 찾기");
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(InvalidTokenException::new);
 
@@ -82,16 +79,16 @@ public class AuthServiceImpl implements AuthService {
         String socialId = clientProxy.validateToken(loginRequest.getIdentityToken());
         Optional<Member> member = memberRepository.findBySocialId(socialId);
         if (member.isEmpty()) {
-            return signIn(socialId);
+            return signIn(socialId, loginRequest.getFcmToken());
         } else {
-            return logIn(socialId, member.get());
+            return logIn(socialId, member.get(), loginRequest.getFcmToken());
         }
     }
 
     @Transactional
-    private LoginResponse signIn(String socialId) {
+    private LoginResponse signIn(String socialId, String fcmToken) {
         Member member = memberRepository
-                .saveMember(Member.builder().socialId(socialId).build());
+                .saveMember(Member.builder().fcmToken(fcmToken).socialId(socialId).build());
         Token token = tokenService.generateToken(member.getSocialId(), "USER");
 
         RefreshToken refreshToken = refreshTokenRepository
@@ -105,8 +102,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Transactional
-    private LoginResponse logIn(String socialId, Member member) {
+    private LoginResponse logIn(String socialId, Member member, String fcmToken) {
 
+        member.setFcmToken(fcmToken);
         Token token = tokenService.generateToken(member.getSocialId(), "USER");
 
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId()).orElseThrow();
