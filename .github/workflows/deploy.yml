@@ -84,8 +84,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           aws deploy create-deployment \
-          --application-name aenitto-api \
-          --deployment-group-name aenitto-deploy-group \
-          --file-exists-behavior RETAIN \
+          --application-name aenitto-dev \
+          --deployment-group-name aenitto-dev-deploy-group \
+          --file-exists-behavior OVERWRITE \
           --s3-location bucket=aenitto-deploy,bundleType=zip,key=aenitto-dev-build.zip \
           --region ap-northeast-2
