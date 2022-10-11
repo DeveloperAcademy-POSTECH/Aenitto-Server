@@ -64,7 +64,7 @@ jobs:
 
       # 압축파일 형태로 전달
       - name: Make zip file
-        run: zip -r -qq -j ./aenitto-build.zip ./dev
+        run: zip -r -qq -j ./aenitto-dev-build.zip ./dev
 
       # S3 Bucket으로 copy
       - name: Deliver to AWS S3
@@ -75,7 +75,7 @@ jobs:
           aws s3 cp \
           --region ap-northeast-2 \
           --acl private \
-          ./aenitto-build.zip s3://aenitto-deploy/
+          ./aenitto-dev-build.zip s3://aenitto-deploy/
           
       # Deploy
       - name: Deploy
@@ -87,5 +87,5 @@ jobs:
           --application-name aenitto-api \
           --deployment-group-name aenitto-deploy-group \
           --file-exists-behavior OVERWRITE \
-          --s3-location bucket=aenitto-deploy,bundleType=zip,key=aenitto-build.zip \
+          --s3-location bucket=aenitto-deploy,bundleType=zip,key=aenitto-dev-build.zip \
           --region ap-northeast-2
