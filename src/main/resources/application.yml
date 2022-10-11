@@ -11,9 +11,9 @@ spring:
       max-file-size: 150MB
 
   profiles:
-    active: develop # 활성화시킬 프로필
+    active: prod # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      develop: develop, developdb, awss3, env
+      develop: prod , awss3, env
 
   output:
     ansi:
