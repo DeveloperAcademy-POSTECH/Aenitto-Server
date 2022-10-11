@@ -86,6 +86,6 @@ jobs:
           aws deploy create-deployment \
           --application-name aenitto-api \
           --deployment-group-name aenitto-deploy-group \
-          --file-exists-behavior OVERWRITE \
+          --file-exists-behavior RETAIN \
           --s3-location bucket=aenitto-deploy,bundleType=zip,key=aenitto-prod-build.zip \
           --region ap-northeast-2
