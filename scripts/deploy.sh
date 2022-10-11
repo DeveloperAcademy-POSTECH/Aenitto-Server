@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPOSITORY=/home/ec2-user/app/deploy
+REPOSITORY=/home/ec2-user/app/deploy/prod
 
 echo">check running pid"
 
@@ -35,6 +35,6 @@ echo "> give authority to $JAR_NAME"
 chmod +x $JAR_NAME
 
 nohup java -jar \
-    -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/deploy/application-developdb.yml,/home/ec2-user/app/deploy/application-awss3.yml\
-    -Dspring.profiles.active=develop \
+    -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/deploy/application-prod.yml,/home/ec2-user/app/deploy/application-awss3.yml\
+    -Dspring.profiles.active=prod \
     $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
