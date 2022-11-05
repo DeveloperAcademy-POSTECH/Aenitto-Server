@@ -78,7 +78,7 @@ public class Room extends CreationModificationLog {
     }
 
     public boolean cannotStart() {
-        return (5 > participantsCount());
+        return (4 > participantsCount());
     }
     public boolean unAcceptable() {
         return (capacity <= memberRooms.size());
