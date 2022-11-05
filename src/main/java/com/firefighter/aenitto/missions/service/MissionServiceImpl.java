@@ -64,12 +64,12 @@ public class MissionServiceImpl implements MissionService {
     public void setDailyIndividualMission(LocalDate date) throws MissionAlreadySetException, MissionEmptyException {
         List<Room> roomsProcessing = roomRepository.findRoomsByState(RoomState.PROCESSING);
         for (Room room : roomsProcessing) {
+            Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
+                    .orElseThrow(MissionEmptyException::new);
             for (MemberRoom memberRoom : room.getMemberRooms()) {
                 if (memberRoom.didSetDailyIndividualMission(date)) {
                     throw new MissionAlreadySetException();
                 }
-                Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
-                        .orElseThrow(MissionEmptyException::new);
                 memberRoom.addIndividualMission(mission, date);
             }
         }

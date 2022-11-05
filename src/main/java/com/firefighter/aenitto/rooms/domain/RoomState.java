@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum RoomState implements Comparable<RoomState> {
-    PRE(1), PROCESSING(1), POST(2)
+    PRE(2), PROCESSING(1), POST(3)
     ;
 
     private int priority;

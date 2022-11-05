@@ -40,8 +40,7 @@ import java.util.UUID;
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
 import static com.firefighter.aenitto.message.MessageFixture.*;
-import static com.firefighter.aenitto.rooms.RoomFixture.memberRoomFixture1;
-import static com.firefighter.aenitto.rooms.RoomFixture.roomFixture1;
+import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static com.firefighter.aenitto.rooms.domain.RelationFixture.relationFixture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -83,6 +82,10 @@ public class MessageServiceImplTest {
 
     private Member manitto;
     private Member manittee;
+
+    private MemberRoom myManitto;
+    private MemberRoom myManittee;
+
     private Member currentMember;
 
     private MemberRoom memberRoom;
@@ -96,6 +99,7 @@ public class MessageServiceImplTest {
     private MultipartFile image;
 
     List<Message> messages = new ArrayList<>();
+    List<Message> messages2 = new ArrayList<>();
 
 
     @BeforeEach
@@ -442,6 +446,8 @@ public class MessageServiceImplTest {
         List<Message> tempMessage = new ArrayList<>();
         tempMessage.add(message1);
         tempMessage.add(message2);
+        myManittee = memberRoomFixture1(manitto, room);
+        myManitto = memberRoomFixture2(manittee, room);
 
         memberRoom = memberRoomFixture1(currentMember, room);
         doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
@@ -450,6 +456,10 @@ public class MessageServiceImplTest {
                 .findByRoomIdAndManitteeId(room.getId(), currentMember.getId());
         doReturn(Optional.ofNullable(relation)).when(relationRepository)
                 .findByRoomIdAndManittoId(room.getId(), currentMember.getId());
+        doReturn(Optional.ofNullable(myManitto)).when(roomRepository)
+                .findMemberRoomById(manitto.getId(), room.getId());
+        doReturn(Optional.ofNullable(myManittee)).when(roomRepository)
+                .findMemberRoomById(manittee.getId(), room.getId());
         doReturn(tempMessage).when(messageRepository)
                 .getTwoRandomContentReceivedMessages(currentMember.getId(), room.getId());
         doReturn(tempMessage).when(messageRepository)

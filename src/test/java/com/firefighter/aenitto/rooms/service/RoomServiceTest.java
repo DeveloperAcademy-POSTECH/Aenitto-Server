@@ -22,8 +22,7 @@ import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
-import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
-import com.firefighter.aenitto.rooms.repository.RoomRepositoryImpl;
+import com.firefighter.aenitto.rooms.repository.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +41,7 @@ import static com.firefighter.aenitto.auth.CurrentUserDetailFixture.CURRENT_USER
 import static com.firefighter.aenitto.members.MemberFixture.*;
 import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static com.firefighter.aenitto.missions.IndividualMissionFixture.*;
+import static com.firefighter.aenitto.rooms.domain.RelationFixture.relationFixture;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 

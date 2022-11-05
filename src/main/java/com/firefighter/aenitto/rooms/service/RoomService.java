@@ -23,7 +23,7 @@ public interface RoomService {
 
     public RoomDetailResponse getRoomDetail(Member member, Long roomId);
 
-    public void startAenitto(Member member, Long roomId);
+    public RoomDetailResponse.RelationInfo startAenitto(Member member, Long roomId);
 
 
     public RoomParticipantsResponse getRoomParticipants(Member currentMember, Long roomId);
@@ -35,5 +35,4 @@ public interface RoomService {
     public void exitRoom(Member member, Long roomId);
 
     public void endAenitto();
-
 }

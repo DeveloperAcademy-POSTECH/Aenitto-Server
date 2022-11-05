@@ -17,6 +17,8 @@ import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.service.MessageService;
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Room;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +49,7 @@ import static com.firefighter.aenitto.members.MemberFixture.memberFixture3;
 import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
 import static com.firefighter.aenitto.message.MessageFixture.*;
 import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
+import static com.firefighter.aenitto.rooms.RoomFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -78,6 +81,10 @@ public class MessageControllerTest {
     private MockMultipartFile image;
     private Member manitto;
     private Member manittee;
+    private Room room;
+
+    private MemberRoom myManitto;
+    private MemberRoom myManittee;
 
     private Message message1;
     private Message message2;
@@ -104,8 +111,11 @@ public class MessageControllerTest {
 
         objectMapper = new ObjectMapper();
         image = IMAGE;
+        room = roomFixture1();
         manittee = memberFixture2();
         manitto = memberFixture3();
+        myManitto = memberRoomFixture1(manitto, room);
+        myManittee = memberRoomFixture2(manittee, room);
 
         message1 = messageFixture1();
         message2 = messageFixture2();
@@ -341,6 +351,7 @@ public class MessageControllerTest {
                                 fieldWithPath("messages[0].id").description("메세지 id"),
                                 fieldWithPath("messages[0].content").description("메세지 내용"),
                                 fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진"),
+                                fieldWithPath("messages[0].createdDate").description("메세지 생성 날짜"),
                                 fieldWithPath("manittee").description("내 마니띠"),
                                 fieldWithPath("manittee.id").description("마니띠 id"),
                                 fieldWithPath("manittee.nickname").description("내 마니띠 닉네임")
@@ -468,7 +479,8 @@ public class MessageControllerTest {
                                 fieldWithPath("messages").description("보낸 메시지들"),
                                 fieldWithPath("messages[0].id").description("메세지 id"),
                                 fieldWithPath("messages[0].content").description("메세지 내용"),
-                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진")
+                                fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진"),
+                                fieldWithPath("messages[0].createdDate").description("메세지 생성 날짜")
                         )
                 ));
         ;
@@ -531,7 +543,7 @@ public class MessageControllerTest {
 
         final String uri = "/api/v1/rooms/{roomId}/memories";
         when(messageService.getMemories(any(Member.class), anyLong()))
-                .thenReturn(MemoriesResponse.of(manittee, manitto, receivedMessages, sentMessages));
+                .thenReturn(MemoriesResponse.of(myManittee, myManitto, receivedMessages, sentMessages));
 
         //when, then, docs
         mockMvc.perform(RestDocumentationRequestBuilders.get(uri, "1")
@@ -552,17 +564,21 @@ public class MessageControllerTest {
                                 fieldWithPath("memoriesWithManitto").description("마니또와의 추억"),
                                 fieldWithPath("memoriesWithManitto.member").description("내 마니또 정보"),
                                 fieldWithPath("memoriesWithManitto.member.nickname").description("내 마니또의 닉네임"),
+                                fieldWithPath("memoriesWithManitto.member.colorIdx").description("내 마니또의 색상 인덱스"),
                                 fieldWithPath("memoriesWithManitto.messages").description("마니또와 주고 받은 메세지들"),
                                 fieldWithPath("memoriesWithManitto.messages[0].id").description("마니또와 주고 받은 메세지의 아이디"),
                                 fieldWithPath("memoriesWithManitto.messages[0].content").description("마니또와 주고 받은 메세지의 내용"),
                                 fieldWithPath("memoriesWithManitto.messages[0].imageUrl").description("마니또와 주고 받은 메세지의 이미지"),
+                                fieldWithPath("memoriesWithManitto.messages[0].createdDate").description("마니또와 주고 받은 메세지의 생성 날짜"),
                                 fieldWithPath("memoriesWithManittee").description("마니띠와의 추억"),
                                 fieldWithPath("memoriesWithManittee.member").description("내 마니띠 정보"),
                                 fieldWithPath("memoriesWithManittee.member.nickname").description("내 마니띠의 닉네임"),
+                                fieldWithPath("memoriesWithManittee.member.colorIdx").description("내 마니띠의 색상 인덱스"),
                                 fieldWithPath("memoriesWithManittee.messages").description("마니띠와 주고 받은 메세지들"),
                                 fieldWithPath("memoriesWithManittee.messages[0].id").description("마니띠와 주고 받은 메세지의 아이디"),
                                 fieldWithPath("memoriesWithManittee.messages[0].content").description("마니띠와 주고 받은 메세지의 내용"),
-                                fieldWithPath("memoriesWithManittee.messages[0].imageUrl").description("마니띠와 주고 받은 메세지의 이미지")
+                                fieldWithPath("memoriesWithManittee.messages[0].imageUrl").description("마니띠와 주고 받은 메세지의 이미지"),
+                                fieldWithPath("memoriesWithManittee.messages[0].createdDate").description("마니띠와 주고 받은 메세지의 생성 날짜")
                         )
                 ));
     }

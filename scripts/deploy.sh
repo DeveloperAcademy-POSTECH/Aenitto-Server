@@ -1,11 +1,11 @@
 #!/bin/bash
 
-REPOSITORY=/home/ec2-user/app/deploy
+REPOSITORY=/home/ec2-user/app/deploy/dev
 
 echo">check running pid"
 
 
-CURRENT_PID=$(pgrep -f aenitto)
+CURRENT_PID=$(pgrep -f aenitto-dev)
 
 
 echo "> CURRENT_PID"

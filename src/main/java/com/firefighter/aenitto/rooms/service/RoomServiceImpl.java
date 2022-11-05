@@ -24,6 +24,7 @@ import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
 import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
+import com.firefighter.aenitto.rooms.repository.RelationRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,6 +44,10 @@ public class RoomServiceImpl implements RoomService {
 
     @Qualifier("roomRepositoryImpl")
     private final RoomRepository roomRepository;
+
+    @Qualifier("relationRepositoryImpl")
+    private final RelationRepository relationRepository;
+
     @Qualifier("memberRepositoryImpl")
     private final MemberRepository memberRepository;
     @Qualifier("missionRepositoryImpl")
@@ -75,6 +80,7 @@ public class RoomServiceImpl implements RoomService {
         // admin MemberRoom 생성 및 persist
         MemberRoom memberRoom = MemberRoom.builder()
                 .admin(true)
+                .colorIdx(createRoomRequest.getMember().getColorIdx())
                 .build();
 
         memberRoom.setMemberRoom(member, room);
@@ -90,8 +96,6 @@ public class RoomServiceImpl implements RoomService {
         Room findRoom = roomRepository.findByInvitation(invitation)
                 .orElseThrow(InvitationNotFoundException::new);
 
-        // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
-        throwExceptionIfParticipating(member.getId(), findRoom.getId());
 
         return VerifyInvitationResponse.from(findRoom);
     }
@@ -111,6 +115,8 @@ public class RoomServiceImpl implements RoomService {
 
         // 방의 수용인원이 초과했을 경우 -> throw
         if (findRoom.unAcceptable()) throw new RoomCapacityExceededException();
+
+        if(findRoom.isNotPre()) throw new RoomAlreadyStartedException();
 
         MemberRoom memberRoom = request.toEntity();
         memberRoom.setMemberRoom(member, findRoom);
@@ -139,7 +145,9 @@ public class RoomServiceImpl implements RoomService {
                 return RoomDetailResponse.buildPreResponse(room, memberRoom);
             case PROCESSING: {
                 // 마니띠, 룰렛 봤는지, admin 인지, 미션, 읽지 않은 메시지 수
-                Relation relation = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                Relation relationManitto = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                        .orElseThrow(RelationNotFoundException::new);
+                Relation relationManittee = relationRepository.findByRoomIdAndManitteeId(roomId, member.getId())
                         .orElseThrow(RelationNotFoundException::new);
                 IndividualMission individualMission = missionRepository.findIndividualMissionByDate(LocalDate.now(), memberRoom.getId())
                         .orElseThrow(MissionNotFoundException::new);
@@ -150,7 +158,8 @@ public class RoomServiceImpl implements RoomService {
                 }
                 return RoomDetailResponse.buildProcessingResponse(
                         room,
-                        relation,
+                        relationManitto,
+                        relationManittee,
                         memberRoom,
                         didView,
                         individualMission.getMission(),
@@ -187,7 +196,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public void startAenitto(Member member, Long roomId) {
+    public RoomDetailResponse.RelationInfo startAenitto(Member member, Long roomId) {
         // 참여 중인 방이 아닐 경우 -> throw Exception
         MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
         // 방장이 아닌 경우 -> throw Exception
@@ -211,6 +220,9 @@ public class RoomServiceImpl implements RoomService {
 
         // RoomState 수정
         room.setState(RoomState.PROCESSING);
+        Relation adminManitteeRelation = roomRepository.findRelationByManittoId(member.getId(), roomId)
+                .orElseThrow(RelationNotFoundException::new);
+        return RoomDetailResponse.RelationInfo.ofManittee(adminManitteeRelation);
     }
 
     @Override
@@ -248,8 +260,8 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public void endAenitto() {
-        roomRepository.findAllRooms()
-                .stream().filter(Room::isExpired)
+        roomRepository.findAllRooms().stream()
+                .filter(Room::isProcessingAndExpired)
                 .forEach(room -> {
                     room.setState(RoomState.POST);
                 });

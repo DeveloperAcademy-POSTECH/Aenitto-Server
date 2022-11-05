@@ -3,6 +3,10 @@ package com.firefighter.aenitto.message;
 import com.firefighter.aenitto.messages.domain.Message;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 public class MessageFixture {
     public static Message messageFixture1() {
         return baseMessageFixture(1, true);
@@ -45,9 +49,11 @@ public class MessageFixture {
     }
 
     public static Message transientMessageFixture(int number) {
-        return Message.builder()
+        Message message = Message.builder()
                 .content("메시지내용" + number)
                 .imgUrl("url" + number)
                 .build();
+        ReflectionTestUtils.setField(message, "createdAt", LocalDateTime.now());
+        return message;
     }
 }

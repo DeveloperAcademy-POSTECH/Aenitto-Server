@@ -13,6 +13,7 @@ import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
 import com.firefighter.aenitto.auth.token.Token;
 import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
 import com.firefighter.aenitto.common.exception.auth.InvalidUserTokenException;
+import com.firefighter.aenitto.common.exception.auth.TokenNotExpired;
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -43,13 +44,22 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ReissueTokenResponse reissueAccessToken(ReissueTokenRequest reissueTokenRequest) {
         Long refreshTokenTime = tokenService.verifyRefreshToken(reissueTokenRequest.getRefreshToken());
+        System.out.println("after verifying refresh token");
         String socialId = tokenService.getSocialId(reissueTokenRequest.getAccessToken());
+        System.out.println("social Id 가져오기");
         Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
+        System.out.println("memberRepo 소셜 id 찾기");
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(InvalidTokenException::new);
 
         if (!refreshToken.getRefreshToken().equals(reissueTokenRequest.getRefreshToken())) {
             throw new InvalidUserTokenException();
+        }
+        if (tokenService.checkTokenExpired(reissueTokenRequest.getAccessToken())){
+            return ReissueTokenResponse.builder()
+                    .accessToken(reissueTokenRequest.getAccessToken())
+                    .refreshToken(reissueTokenRequest.getRefreshToken())
+                    .build();
         }
 
         Token token = tokenService.generateToken(socialId, "USER");
@@ -73,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
         Optional<Member> member = memberRepository.findBySocialId(socialId);
         if (member.isEmpty()) {
             return signIn(socialId);
-        }else {
+        } else {
             return logIn(socialId, member.get());
         }
     }
@@ -89,6 +99,7 @@ public class AuthServiceImpl implements AuthService {
                         .refreshToken(token.getRefreshToken()).memberId(member.getId()).build());
 
         return LoginResponse.builder().accessToken(token.getAccessToken())
+                .nickname(member.getNickname())
                 .refreshToken(token.getRefreshToken()).isNewMember(true)
                 .userSettingDone(false).build();
     }
@@ -102,6 +113,7 @@ public class AuthServiceImpl implements AuthService {
         refreshToken.updateRefreshToken(token.getRefreshToken());
 
         return LoginResponse.builder().accessToken(token.getAccessToken())
+                .nickname(member.getNickname())
                 .refreshToken(token.getRefreshToken()).isNewMember(false)
                 .userSettingDone(member.getNickname() != null).build();
     }

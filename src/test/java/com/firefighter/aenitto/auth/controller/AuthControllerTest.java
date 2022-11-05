@@ -219,6 +219,7 @@ public class AuthControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("accessToken").description("토큰"),
+                                fieldWithPath("nickname").description("닉네임"),
                                 fieldWithPath("refreshToken").description("재발급 토큰"),
                                 fieldWithPath("isNewMember").description("새로운 멤버인지 기존 멤버인지"),
                                 fieldWithPath("userSettingDone").description("닉네임 정보 입력했는지 여부")

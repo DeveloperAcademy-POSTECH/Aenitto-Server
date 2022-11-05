@@ -81,6 +81,7 @@ task copyDocument(type: Copy) {
 }
 
 bootJar {
+	archiveFileName = 'aenitto-dev.jar'
 	dependsOn asciidoctor
 	copy {
 		from "${asciidoctor.outputDir}"
