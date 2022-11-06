@@ -54,7 +54,7 @@ public class CreateRoomRequest {
         @Size(min = 1, max = 8)
         private final String title;
         @NotNull
-        @Min(5) @Max(15)
+        @Min(4) @Max(15)
         private final int capacity;
         @NotNull
         @CustomDate(groups = SubOrderedConstraints.class)
