@@ -18,7 +18,7 @@ public class UpdateRoomRequest {
     @Size(min = 1, max = 8)
     private final String title;
 
-    @Min(5) @Max(15)
+    @Min(4) @Max(15)
     private final Integer capacity;
 
     @CustomDate
