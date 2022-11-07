@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.firefighter.aenitto.members.MemberFixture.memberFixture;
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -43,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(MockitoExtension.class)
 @Transactional
-public class AuthServiceImplTest {
+public class AuthServiceImplV1Test {
 
     private final UUID memberId = UUID.fromString("b48617b2-090d-4ee6-9033-b99f99d98304");
     private final String socialId = "socialId";
@@ -55,7 +54,7 @@ public class AuthServiceImplTest {
     private MemberRepository memberRepository;
 
     @InjectMocks
-    private AuthServiceImpl target;
+    private AuthServiceImplV1 target;
 
     @Mock
     private ClientProxy clientProxy;
