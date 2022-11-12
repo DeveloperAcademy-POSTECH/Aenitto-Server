@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -59,6 +60,33 @@ public class RoomIntegrationTest extends IntegrationTest {
         Member member = em.find(Member.class, MOCK_USER_ID);
         assertThat(member.getMemberRooms()).hasSize(1);
     }
+
+    @Sql({
+        SqlPath.ROOM_PARTICIPATE
+    })
+    @DisplayName("방 생성 (4인) -> 성공")
+    @WithMockCustomMember
+    @Test
+    void create_room_4_success() throws Exception {
+        // given
+        CreateRoomRequest roomRequest = RoomRequestDtoBuilder.createRoomRequest();
+        ReflectionTestUtils.setField(roomRequest.getRoom(), "capacity", 4);
+
+        // when, then
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms")
+                .content(objectMapper.writeValueAsString(roomRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isCreated())
+            .andExpect(header().exists("Location"));
+
+        flushAndClear();
+
+        Member member = em.find(Member.class, MOCK_USER_ID);
+        assertThat(member.getMemberRooms()).hasSize(1);
+        assertThat(member.getMemberRooms().get(0).getRoom().getCapacity()).isEqualTo(4);
+    }
+
 
     @Sql({
             SqlPath.MEMBER,
@@ -105,6 +133,42 @@ public class RoomIntegrationTest extends IntegrationTest {
                 .forEach(mr -> {
                     assertThat(mr.getIndividualMissions()).hasSize(1);
                 });
+    }
+
+    @Sql({
+        SqlPath.MEMBER,
+        SqlPath.ROOM_PRE,
+        SqlPath.MEMBER_ROOM,
+        SqlPath.COMMON_MISSION,
+    })
+    @DisplayName("게임 시작 (최소 인원 4인) -> 성공")
+    @WithMockCustomMember
+    @Test
+    void startAenitto_4_success() throws Exception {
+        // given
+        final Long roomId = 2L;
+        final String url = "/api/v1/rooms/{roomId}/state";
+
+        MemberRoom memberRoom = em.find(MemberRoom.class, 5L);
+        Room room = em.find(Room.class, 2L);
+        ReflectionTestUtils.setField(room, "capacity", 4);
+
+        em.remove(memberRoom);
+        flushAndClear();
+
+        // when
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.patch(url, roomId)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+        );
+
+        // then
+        perform
+            .andDo(print())
+            .andExpect(status().isOk());
+        Room startedRoom = em.find(Room.class, 2L);
+        assertThat(startedRoom.getMemberRooms()).hasSize(4);
+        assertThat(startedRoom.getState()).isEqualTo(RoomState.PROCESSING);
     }
 
     @DisplayName("초대코드 검증 -> 성공")

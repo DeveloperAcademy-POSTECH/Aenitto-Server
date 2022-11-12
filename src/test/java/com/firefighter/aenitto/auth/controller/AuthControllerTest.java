@@ -2,10 +2,12 @@ package com.firefighter.aenitto.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.firefighter.aenitto.auth.dto.request.LoginRequestV2;
 import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
 import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
 
 import com.firefighter.aenitto.auth.service.AuthService;
+import com.firefighter.aenitto.auth.service.AuthServiceV2;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 import com.firefighter.aenitto.common.exception.auth.AuthErrorCode;
 import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
@@ -72,6 +74,10 @@ public class AuthControllerTest {
     @Mock
     @Qualifier("authServiceImpl")
     private AuthService authService;
+
+    @Mock
+    @Qualifier("authServiceImplV2")
+    private AuthServiceV2 authServiceV2;
 
     @BeforeEach
     void init(RestDocumentationContextProvider restDocumentation) {
