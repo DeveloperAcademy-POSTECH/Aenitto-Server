@@ -1,5 +1,7 @@
 package com.firefighter.aenitto.messages.service;
 
+import java.io.IOException;
+
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
