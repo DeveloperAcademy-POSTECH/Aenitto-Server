@@ -20,8 +20,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FcmService implements NotificationService {
-    @Value("{fcm.key.path}")
-    private final String API_URL;
+    @Value("${fcm.key.path}")
+    private String API_URL;
     private final ObjectMapper objectMapper;
 
     public void sendMessage(String targetToken, String title, String body)
