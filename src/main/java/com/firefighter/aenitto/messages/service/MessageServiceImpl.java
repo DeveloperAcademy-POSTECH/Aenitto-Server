@@ -78,8 +78,11 @@ public class MessageServiceImpl implements MessageService {
             message.setImgUrl(imageUrl);
         }
 
-        notificationService.sendMessage(relation.getManittee().getFcmToken(),
-            "마니띠로부터 메시지가 도착하였습니다.", message.getContent());
+        if(relation.getManittee().getFcmToken() != null){
+            notificationService.sendMessage(relation.getManittee().getFcmToken(),
+                "마니띠로부터 메시지가 도착하였습니다.", message.getContent());
+        }
+
         return messageRepository.saveMessage(message).getId();
     }
 
