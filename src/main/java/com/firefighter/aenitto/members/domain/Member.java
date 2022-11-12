@@ -24,16 +24,23 @@ public class Member extends CreationModificationLog {
 
     private String socialId;
 
+    private String fcmToken;
+
     @OneToMany(mappedBy = "member")
     private List<MemberRoom> memberRooms = new ArrayList<>();
 
     @Builder
-    public Member(String nickname, String socialId) {
+    public Member(String nickname, String socialId, String fcmToken) {
         this.nickname = nickname;
         this.socialId = socialId;
+        this.fcmToken = fcmToken;
     }
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

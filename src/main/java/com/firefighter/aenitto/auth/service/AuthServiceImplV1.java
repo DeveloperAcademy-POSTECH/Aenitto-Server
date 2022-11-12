@@ -13,7 +13,6 @@ import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
 import com.firefighter.aenitto.auth.token.Token;
 import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
 import com.firefighter.aenitto.common.exception.auth.InvalidUserTokenException;
-import com.firefighter.aenitto.common.exception.auth.TokenNotExpired;
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -23,14 +22,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Ref;
 import java.util.Optional;
 
 @Service
-@Qualifier(value = "authServiceImpl")
+@Qualifier(value = "authServiceImplV1 ")
 @Transactional
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImplV1 implements AuthService {
 
     @Qualifier("RefreshTokenRepositoryImpl")
     private final RefreshTokenRepository refreshTokenRepository;
