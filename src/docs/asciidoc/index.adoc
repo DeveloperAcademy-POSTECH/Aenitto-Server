@@ -9,7 +9,13 @@
 [[Member-API]]
 == Auth API
 === 회원가입 및 로그인V1
-operation::회원가입 및 로그인V1[snippets='http-request,http-response,request-fields,response-fields']
+operation::회원가입 및 로그인V1[snippets='http-request,request-fields']
+==== 성공 response
+operation::회원가입 및 로그인V1[snippets='http-response,response-fields']
+==== 실패 response1 - 유효하지 않은 identityToken
+operation::회원가입 및 로그인V1 - 실패 (유효하지 않은 identityToken)[snippets='http-response']
+
+
 === 회원가입 및 로그인V2
 operation::회원가입 및 로그인V2[snippets='http-request,http-response,request-fields,response-fields']
 === 토큰 재발급
@@ -21,7 +27,14 @@ operation::토큰 재발급[snippets='http-request,http-response,request-fields,
 
 [[Member-닉네임-수정]]
 === Member 닉네임 수정
-operation::change-nickname[snippets='http-request,http-response,request-fields']
+operation::change-nickname[snippets='http-request,request-fields']
+==== 성공 response
+operation::change-nickname[snippets='http-response']
+==== 실패 response1 - 닉네임 4자 이상
+operation::닉네임 변경 - 실패 (제약조건을 지키지 않은 경우)[snippets='http-response']
+==== 실패 response2 - 존재하지 않는 유저
+operation::닉네임 변경 - 실패 (존재하지 않는 유저의 경우)[snippets='http-response']
+
 
 [[Main-API]]
 == Main API
@@ -60,6 +73,18 @@ operation::초대코드 검증[snippets='request-headers,http-request,request-fi
 
 [[Message-API]]
 == 메시지 API
+
+=== 메세지 보내기
+//operation::메세지 생성 - 성공[snippets='http-request']
+==== 성공 response
+operation::메세지 생성 - 성공[snippets='http-response']
+==== 실패 response1 - 내 마니띠가 아님
+operation::메세지 생성 - 실패 (내 마니띠가 아님)[snippets='http-response']
+==== 실패 response2 - 참여하고 있지 않은 방
+operation::메세지 생성 - 실패 (참여하고 있지 않은 방)[snippets='http-response']
+==== 실패 response3 - 이미지 확장자가 존재하지 않음
+operation::메세지 생성 - 실패 (확장자가 존재하지 않음)[snippets='http-response']
+
 === 보낸 메시지 가져오기
 operation::보낸 메시지 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
 

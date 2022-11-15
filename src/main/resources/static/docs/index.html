@@ -435,15 +435,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body class="book">
+<body class="article toc2 toc-left">
 <div id="header">
 <h1>애니또 API</h1>
 <div class="details">
 <span id="revnumber">version 0.0.1-SNAPSHOT</span>
 </div>
-<div id="toc" class="toc">
+<div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#Member-API">Auth API</a>
@@ -478,6 +477,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#Message-API">메시지 API</a>
 <ul class="sectlevel2">
+<li><a href="#_메세지_보내기">메세지 보내기</a></li>
 <li><a href="#_보낸_메시지_가져오기">보낸 메시지 가져오기</a></li>
 <li><a href="#_메세지_읽음으로_상태변경">메세지 읽음으로 상태변경</a></li>
 <li><a href="#_받은_메시지_가져오기">받은 메시지 가져오기</a></li>
@@ -509,24 +509,6 @@ Host: localhost:8080
 </div>
 </div>
 <div class="sect3">
-<h4 id="_회원가입_및_로그인v1_http_response"><a class="link" href="#_회원가입_및_로그인v1_http_response">HTTP response</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 143
-
-{
-  "accessToken" : "accessToken",
-  "refreshToken" : "refreshToken",
-  "nickname" : null,
-  "isNewMember" : true,
-  "userSettingDone" : true
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
 <h4 id="_회원가입_및_로그인v1_request_fields"><a class="link" href="#_회원가입_및_로그인v1_request_fields">Request fields</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -551,7 +533,27 @@ Content-Length: 143
 </table>
 </div>
 <div class="sect3">
-<h4 id="_회원가입_및_로그인v1_response_fields"><a class="link" href="#_회원가입_및_로그인v1_response_fields">Response fields</a></h4>
+<h4 id="_성공_response"><a class="link" href="#_성공_response">성공 response</a></h4>
+<div class="sect4">
+<h5 id="_성공_response_http_response"><a class="link" href="#_성공_response_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 143
+
+{
+  "accessToken" : "accessToken",
+  "refreshToken" : "refreshToken",
+  "nickname" : null,
+  "isNewMember" : true,
+  "userSettingDone" : true
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_성공_response_response_fields"><a class="link" href="#_성공_response_response_fields">Response fields</a></h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -593,6 +595,27 @@ Content-Length: 143
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_실패_response1_유효하지_않은_identitytoken"><a class="link" href="#_실패_response1_유효하지_않은_identitytoken">실패 response1 - 유효하지 않은 identityToken</a></h4>
+<div class="sect4">
+<h5 id="_실패_response1_유효하지_않은_identitytoken_http_response"><a class="link" href="#_실패_response1_유효하지_않은_identitytoken_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 157
+
+{
+  "timestamp" : [ 2022, 11, 15, 17, 1, 44, 988556000 ],
+  "status" : 400,
+  "message" : "유효하지 않은 identity 토큰입니다.",
+  "errors" : [ ]
+}</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -821,14 +844,6 @@ Host: localhost:8080
 </div>
 </div>
 <div class="sect3">
-<h4 id="Member-닉네임-수정_http_response"><a class="link" href="#Member-닉네임-수정_http_response">HTTP response</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
 <h4 id="Member-닉네임-수정_request_fields"><a class="link" href="#Member-닉네임-수정_request_fields">Request fields</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -851,6 +866,61 @@ Host: localhost:8080
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sect3">
+<h4 id="_성공_response_2"><a class="link" href="#_성공_response_2">성공 response</a></h4>
+<div class="sect4">
+<h5 id="_성공_response_2_http_response"><a class="link" href="#_성공_response_2_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_실패_response1_닉네임_4자_이상"><a class="link" href="#_실패_response1_닉네임_4자_이상">실패 response1 - 닉네임 4자 이상</a></h4>
+<div class="sect4">
+<h5 id="_실패_response1_닉네임_4자_이상_http_response"><a class="link" href="#_실패_response1_닉네임_4자_이상_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 281
+
+{
+  "timestamp" : [ 2022, 11, 15, 17, 1, 47, 922891000 ],
+  "status" : 400,
+  "message" : "입력 조건에 대한 예외입니다",
+  "errors" : [ {
+    "field" : "nickname",
+    "value" : "다섯글자이상",
+    "reason" : "성함은 5자 이하로 작성해주세요."
+  } ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_실패_response2_존재하지_않는_유저"><a class="link" href="#_실패_response2_존재하지_않는_유저">실패 response2 - 존재하지 않는 유저</a></h4>
+<div class="sect4">
+<h5 id="_실패_response2_존재하지_않는_유저_http_response"><a class="link" href="#_실패_response2_존재하지_않는_유저_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 152
+
+{
+  "timestamp" : [ 2022, 11, 15, 17, 1, 47, 964035000 ],
+  "status" : 404,
+  "message" : "존재하지 않는 사용자 입니다.",
+  "errors" : [ ]
+}</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1185,7 +1255,7 @@ Content-Length: 621
   "participants" : {
     "count" : 1,
     "members" : [ {
-      "id" : "18896b8e-facb-4cc5-88d5-5c05847e1eb0",
+      "id" : "e70a4dc5-9c00-44f9-bf13-6390823fc6cb",
       "nickname" : "멤버1"
     } ]
   },
@@ -1954,6 +2024,12 @@ Content-Length: 145
 <h2 id="Message-API"><a class="link" href="#Message-API">메시지 API</a></h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="_메세지_보내기"><a class="link" href="#_메세지_보내기">메세지 보내기</a></h3>
+<div class="paragraph">
+<p>operation::메세지 생성 - 성공</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_보낸_메시지_가져오기"><a class="link" href="#_보낸_메시지_가져오기">보낸 메시지 가져오기</a></h3>
 <div class="sect3">
 <h4 id="_보낸_메시지_가져오기_path_parameters"><a class="link" href="#_보낸_메시지_가져오기_path_parameters">Path parameters</a></h4>
@@ -2046,7 +2122,7 @@ Content-Length: 711
     "createdDate" : "2022.11.15"
   } ],
   "manittee" : {
-    "id" : "57716104-ce11-4d81-a0fe-3f49a4577806",
+    "id" : "541e09f8-64e8-4044-8302-55aa4878ca6d",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -2346,7 +2422,7 @@ Content-Length: 1259
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-11-14 01:46:14 +0900
+Last updated 2022-11-15 17:01:21 +0900
 </div>
 </div>
 </body>
