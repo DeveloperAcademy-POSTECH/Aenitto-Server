@@ -39,7 +39,14 @@ operation::닉네임 변경 - 실패 (존재하지 않는 유저의 경우)[snip
 [[Main-API]]
 == Main API
 === 함께하는 친구들 가져오기 API
-operation::함께하는 친구들 리스트[snippets='http-request,http-response,path-parameters,response-fields']
+operation::함께하는 친구들 리스트[snippets='http-request,http-response,response-fields']
+
+=== 공통미션 가져오기 API
+operation::공통미션 가져오기[snippets='http-request']
+==== 성공 response
+operation::공통미션 가져오기[snippets='http-response,response-fields']
+==== 실패 response1 - 오늘의 공통미션 없음
+operation::공통미션 가져오기 - 실패 (오늘의 공통미션 없음)[snippets='http-response']
 
 [[Room-API]]
 == Room API
@@ -61,6 +68,12 @@ operation::방 수정하기[snippets='path-parameters,http-request,request-field
 
 === 방 생성
 operation::방 생성[snippets='request-headers,http-request,request-fields,http-response']
+==== 성공 response
+operation::방 생성[snippets='http-response']
+==== 실패 response1
+operation::방 생성 - 실패 (시작일이 올바르게 설정되어 있지 않음)[snippets='http-response']
+==== 실패 response2
+operation::방 생성 - 실패 (제약 조건을 지키지 않은 경우)[snippets='http-response']
 
 === 방 참여
 operation::방 참여[snippets='path-parameters,request-headers,http-request,request-fields,http-response']
