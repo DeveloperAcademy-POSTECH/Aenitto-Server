@@ -84,15 +84,30 @@ operation::메세지 생성 - 실패 (내 마니띠가 아님)[snippets='http-re
 operation::메세지 생성 - 실패 (참여하고 있지 않은 방)[snippets='http-response']
 ==== 실패 response3 - 이미지 확장자가 존재하지 않음
 operation::메세지 생성 - 실패 (확장자가 존재하지 않음)[snippets='http-response']
+==== 실패 response4 - 제약 조건을 지키지 않음
+operation::메세지 생성 - 실패 (제약 조건을 지키지 않음)[snippets='http-response']
 
 === 보낸 메시지 가져오기
-operation::보낸 메시지 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+operation::보낸 메시지 가져오기[snippets='path-parameters,request-headers,http-request']
+==== 성공 response
+operation::보낸 메시지 가져오기[snippets='http-response']
+==== 실패 response1 - 마니띠가 존재하지 않음
+operation::보낸 메시지 가져오기 - 실패 (마니띠가 존재하지 않음)[snippets='http-response']
+==== 실패 response2 - 참여중인 방이 아님
+operation::보낸 메시지 가져오기 - 실패 (참여중인 방이 아님)[snippets='http-response']
 
-=== 메세지 읽음으로 상태변경
+=== 메세지 읽음으로 상태변경 -> deprecated
 operation::메세지 읽음으로 상태 변경[snippets='path-parameters,request-headers,http-request,http-response']
 
 === 받은 메시지 가져오기
-operation::받은 메시지 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+operation::받은 메시지 가져오기[snippets='path-parameters,request-headers,http-request']
+==== 성공 response
+operation::받은 메시지 가져오기[snippets='http-response']
+===== 실패 response1 - 마니띠가 존재하지 않음
+operation::받은 메시지 가져오기 - 실패 (마니띠가 존재하지 않음)[snippets='http-response']
+===== 실패 response2 - 참여중인 방이 아님
+operation::받은 메시지 가져오기 - 실패 (참여중인 방이 아님)[snippets='http-response']
+
 
 === 추억 가져오기
 operation::추억 가져오기[snippets='path-parameters,request-headers,http-request,http-response']

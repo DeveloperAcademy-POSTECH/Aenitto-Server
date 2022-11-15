@@ -252,13 +252,13 @@ public class MessageControllerTest {
 			.andDo(print())
 			.andExpect(status().isCreated())
 			.andExpect(header().exists("Location"))
-            .andDo(document("메세지 생성 - 성공",
-                // preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())
-                // requestPartFields(
-                //     ""
-                // )
-            ));
+			.andDo(document("메세지 생성 - 성공",
+				// preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())
+				// requestPartFields(
+				//     ""
+				// )
+			));
 	}
 
 	//    TODO: 이미지 용량 체크 테스트 만들기 - 다온
@@ -307,7 +307,20 @@ public class MessageControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status", 400).exists())
 			.andExpect(jsonPath("$.message", "입력 조건에 대한 예외입니다").exists())
-			.andExpect(jsonPath("$.errors[0].field", "manitteeId").exists());
+			.andExpect(jsonPath("$.errors[0].field", "manitteeId").exists())
+			.andDo(document("메세지 생성 - 실패 (제약 조건을 지키지 않음)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러"),
+					fieldWithPath("errors[0].field").description("애러 발생 필드"),
+					fieldWithPath("errors[0].value").description("애러 발생 필드 값"),
+					fieldWithPath("errors[0].reason").description("애러 발생 이유")
+				)
+			));
+		;
 
 	}
 
@@ -329,7 +342,16 @@ public class MessageControllerTest {
 			.andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
 			.andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.errors").exists());
+			.andExpect(jsonPath("$.errors").exists())
+			.andDo(document("보낸 메시지 가져오기 - 실패 (참여중인 방이 아님)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러")
+				)
+			));
 	}
 
 	@DisplayName("보낸 메시지 가져오기 - 마니띠가 존재하지 않음")
@@ -350,7 +372,16 @@ public class MessageControllerTest {
 			.andExpect(jsonPath("$.message", RoomErrorCode.RELATION_NOT_FOUND.getMessage()).exists())
 			.andExpect(jsonPath("$.status", RoomErrorCode.RELATION_NOT_FOUND.getStatus()).exists())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.errors").exists());
+			.andExpect(jsonPath("$.errors").exists())
+			.andDo(document("보낸 메시지 가져오기 - 실패 (마니띠가 존재하지 않음)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러")
+				)
+			));
 	}
 
 	@DisplayName("보낸 메시지 가져오기 - 성공")
@@ -458,7 +489,16 @@ public class MessageControllerTest {
 			.andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
 			.andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.errors").exists());
+			.andExpect(jsonPath("$.errors").exists())
+			.andDo(document("받은 메시지 가져오기 - 실패 (참여중인 방이 아님)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러")
+				)
+			));
 	}
 
 	@DisplayName("받은 메시지 가져오기 - 마니또가 존재하지 않음")
@@ -479,7 +519,16 @@ public class MessageControllerTest {
 			.andExpect(jsonPath("$.message", RoomErrorCode.RELATION_NOT_FOUND.getMessage()).exists())
 			.andExpect(jsonPath("$.status", RoomErrorCode.RELATION_NOT_FOUND.getStatus()).exists())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.errors").exists());
+			.andExpect(jsonPath("$.errors").exists())
+			.andDo(document("받은 메시지 가져오기 - 실패 (마니띠가 존재하지 않음)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러")
+				)
+			));
 	}
 
 	@DisplayName("받은 메시지 가져오기 - 성공")
