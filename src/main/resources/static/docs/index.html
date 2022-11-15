@@ -481,6 +481,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_보낸_메시지_가져오기">보낸 메시지 가져오기</a></li>
 <li><a href="#_메세지_읽음으로_상태변경_deprecated">메세지 읽음으로 상태변경 &#8594; deprecated</a></li>
 <li><a href="#_받은_메시지_가져오기">받은 메시지 가져오기</a></li>
+<li><a href="#_추억_가져오기">추억 가져오기</a></li>
 </ul>
 </li>
 </ul>
@@ -607,7 +608,7 @@ Content-Type: application/json
 Content-Length: 157
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 2, 626040000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 36, 564300000 ],
   "status" : 400,
   "message" : "유효하지 않은 identity 토큰입니다.",
   "errors" : [ ]
@@ -888,7 +889,7 @@ Content-Type: application/json
 Content-Length: 281
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 5, 156324000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 39, 590448000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -912,7 +913,7 @@ Content-Type: application/json
 Content-Length: 152
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 5, 205180000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 39, 639219000 ],
   "status" : 404,
   "message" : "존재하지 않는 사용자 입니다.",
   "errors" : [ ]
@@ -1254,7 +1255,7 @@ Content-Length: 621
   "participants" : {
     "count" : 1,
     "members" : [ {
-      "id" : "54065995-f53e-428c-8948-a3f7568485ea",
+      "id" : "b583c3f7-3a13-4794-a417-0769da4a0c00",
       "nickname" : "멤버1"
     } ]
   },
@@ -2044,10 +2045,10 @@ Location: /api/v1/rooms/1/messages/0</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json
-Content-Length: 188
+Content-Length: 189
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 4, 59478000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 37, 957862000 ],
   "status" : 400,
   "message" : "내 마니띠가 아닌 사용자에게 메시지를 보낼 수 없습니다.",
   "errors" : [ ]
@@ -2067,7 +2068,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 4, 587566000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 38, 524378000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2087,7 +2088,7 @@ Content-Type: application/json
 Content-Length: 163
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 4, 499572000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 38, 416536000 ],
   "status" : 415,
   "message" : "이미지 확장자 명을 찾을 수 없습니다.",
   "errors" : [ ]
@@ -2104,10 +2105,10 @@ Content-Length: 163
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json
-Content-Length: 263
+Content-Length: 262
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 4, 159600000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 38, 60562000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2216,7 +2217,7 @@ Content-Length: 711
     "createdDate" : "2022.11.15"
   } ],
   "manittee" : {
-    "id" : "38969519-3876-4706-b742-e56e03e5bdd0",
+    "id" : "39ad8be2-b7f8-4a12-a6fe-c3ad31aa6be6",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -2235,7 +2236,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 4, 241326000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 38, 139409000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2255,7 +2256,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2022, 11, 15, 18, 51, 4, 209597000 ],
+  "timestamp" : [ 2022, 11, 15, 19, 5, 38, 104969000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2429,15 +2430,167 @@ Content-Length: 611
 </div>
 </div>
 <div class="sect4">
-<h5 id="_실패_response"><a class="link" href="#_실패_response">실패 response</a></h5>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">operation</dt>
-<dd>
-<p>=== 추억 가져오기
-operation::추억 가져오기[snippets='path-parameters,request-headers,http-request,http-response']</p>
-</dd>
-</dl>
+<h5 id="_실패_response1_마니띠가_존재하지_않음_2"><a class="link" href="#_실패_response1_마니띠가_존재하지_않음_2">실패 response1 - 마니띠가 존재하지 않음</a></h5>
+<div class="sect5">
+<h6 id="_실패_response1_마니띠가_존재하지_않음_2_http_response"><a class="link" href="#_실패_response1_마니띠가_존재하지_않음_2_http_response">HTTP response</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 171
+
+{
+  "timestamp" : [ 2022, 11, 15, 19, 5, 38, 204961000 ],
+  "status" : 404,
+  "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
+  "errors" : [ ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_실패_response2_참여중인_방이_아님_2"><a class="link" href="#_실패_response2_참여중인_방이_아님_2">실패 response2 - 참여중인 방이 아님</a></h5>
+<div class="sect5">
+<h6 id="_실패_response2_참여중인_방이_아님_2_http_response"><a class="link" href="#_실패_response2_참여중인_방이_아님_2_http_response">HTTP response</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json
+Content-Length: 179
+
+{
+  "timestamp" : [ 2022, 11, 15, 19, 5, 38, 341055000 ],
+  "status" : 403,
+  "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
+  "errors" : [ ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_추억_가져오기"><a class="link" href="#_추억_가져오기">추억 가져오기</a></h3>
+<div class="sect3">
+<h4 id="_추억_가져오기_path_parameters"><a class="link" href="#_추억_가져오기_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /api/v1/rooms/{roomId}/memories</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방 id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_추억_가져오기_request_headers"><a class="link" href="#_추억_가져오기_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 인증 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_추억_가져오기_http_request"><a class="link" href="#_추억_가져오기_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms/1/memories HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer testAccessToken
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_추억_가져오기_http_response"><a class="link" href="#_추억_가져오기_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 1259
+
+{
+  "memoriesWithManitto" : {
+    "member" : {
+      "nickname" : "멤버2",
+      "colorIdx" : 2
+    },
+    "messages" : [ {
+      "id" : 1,
+      "content" : "메시지내용1",
+      "imageUrl" : "url1",
+      "createdDate" : "2022.11.15"
+    }, {
+      "id" : 2,
+      "content" : "메시지내용2",
+      "imageUrl" : "url2",
+      "createdDate" : "2022.11.15"
+    }, {
+      "id" : 3,
+      "content" : "메시지내용3",
+      "imageUrl" : "url3",
+      "createdDate" : "2022.11.15"
+    }, {
+      "id" : 4,
+      "content" : "메시지내용4",
+      "imageUrl" : "url4",
+      "createdDate" : "2022.11.15"
+    } ]
+  },
+  "memoriesWithManittee" : {
+    "member" : {
+      "nickname" : "멤버3",
+      "colorIdx" : 1
+    },
+    "messages" : [ {
+      "id" : 1,
+      "content" : "메시지내용1",
+      "imageUrl" : "url1",
+      "createdDate" : "2022.11.15"
+    }, {
+      "id" : 2,
+      "content" : "메시지내용2",
+      "imageUrl" : "url2",
+      "createdDate" : "2022.11.15"
+    }, {
+      "id" : 3,
+      "content" : "메시지내용3",
+      "imageUrl" : "url3",
+      "createdDate" : "2022.11.15"
+    }, {
+      "id" : 4,
+      "content" : "메시지내용4",
+      "imageUrl" : "url4",
+      "createdDate" : "2022.11.15"
+    } ]
+  }
+}</code></pre>
 </div>
 </div>
 </div>
@@ -2448,7 +2601,7 @@ operation::추억 가져오기[snippets='path-parameters,request-headers,http-re
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-11-15 18:50:06 +0900
+Last updated 2022-11-15 18:53:13 +0900
 </div>
 </div>
 </body>

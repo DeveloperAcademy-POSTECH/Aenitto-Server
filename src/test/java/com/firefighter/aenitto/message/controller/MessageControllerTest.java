@@ -587,7 +587,16 @@ public class MessageControllerTest {
 			.andExpect(jsonPath("$.message", RoomErrorCode.ROOM_NOT_PARTICIPATING.getMessage()).exists())
 			.andExpect(jsonPath("$.status", RoomErrorCode.ROOM_NOT_PARTICIPATING.getStatus()).exists())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.errors").exists());
+			.andExpect(jsonPath("$.errors").exists())
+			.andDo(document("추억 가져오기 - 실패 (마니띠가 존재하지 않음)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러")
+				)
+			));
 	}
 
 	@DisplayName("추억 가져오기 - 마니또가 존재하지 않음")
@@ -608,7 +617,16 @@ public class MessageControllerTest {
 			.andExpect(jsonPath("$.message", RoomErrorCode.RELATION_NOT_FOUND.getMessage()).exists())
 			.andExpect(jsonPath("$.status", RoomErrorCode.RELATION_NOT_FOUND.getStatus()).exists())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.errors").exists());
+			.andExpect(jsonPath("$.errors").exists())
+			.andDo(document("추억 가져오기 - 실패 (마니또가 존재하지 않음)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러")
+				)
+			));
 	}
 
 	@DisplayName("추억 가져오기 - 성공")

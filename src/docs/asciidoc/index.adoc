@@ -110,4 +110,10 @@ operation::받은 메시지 가져오기 - 실패 (참여중인 방이 아님)[s
 
 
 === 추억 가져오기
-operation::추억 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+operation::추억 가져오기[snippets='path-parameters,request-headers,http-request']
+==== 성공 response
+operation::추억 가져오기[snippets='http-response']
+==== 실패 response1 - 마니또가 존재하지 않음
+operation::추억 가져오기 - 실패 (마니또가 존재하지 않음)[snippets='http-response']
+==== 실패 response2 - 마니띠가 존재하지 않음
+operation::추억 가져오기 - 실패 (마니띠가 존재하지 않음)[snippets='http-response']
