@@ -609,7 +609,7 @@ Content-Type: application/json
 Content-Length: 158
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 25, 223767000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 29, 814152000 ],
   "status" : 400,
   "message" : "유효하지 않은 identity 토큰입니다.",
   "errors" : [ ]
@@ -890,7 +890,7 @@ Content-Type: application/json
 Content-Length: 282
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 28, 785270000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 32, 507697000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -914,7 +914,7 @@ Content-Type: application/json
 Content-Length: 153
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 28, 831906000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 32, 549666000 ],
   "status" : 404,
   "message" : "존재하지 않는 사용자 입니다.",
   "errors" : [ ]
@@ -1066,7 +1066,7 @@ Content-Type: application/json
 Content-Length: 161
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 24, 586511000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 29, 211593000 ],
   "status" : 404,
   "message" : "오늘의 미션이 설정되지 않았습니다",
   "errors" : [ ]
@@ -1325,7 +1325,7 @@ Content-Length: 621
   "participants" : {
     "count" : 1,
     "members" : [ {
-      "id" : "9f5a6dc2-ecfc-4560-b34a-6db11e86a387",
+      "id" : "b47af3cc-a3d7-44e6-9a06-6c1eb85d70c3",
       "nickname" : "멤버1"
     } ]
   },
@@ -1730,6 +1730,70 @@ Location: /api/v1/rooms/1</code></pre>
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_성공_response_4"><a class="link" href="#_성공_response_4">성공 response</a></h4>
+<div class="sect4">
+<h5 id="_성공_response_4_http_response"><a class="link" href="#_성공_response_4_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
+Location: /api/v1/rooms/1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_실패_response1_시작일이_올바르게_설정되어_있지_않음"><a class="link" href="#_실패_response1_시작일이_올바르게_설정되어_있지_않음">실패 response1 - 시작일이 올바르게 설정되어 있지 않음</a></h4>
+<div class="sect4">
+<h5 id="_실패_response1_시작일이_올바르게_설정되어_있지_않음_http_response"><a class="link" href="#_실패_response1_시작일이_올바르게_설정되어_있지_않음_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 484
+
+{
+  "timestamp" : [ 2022, 11, 15, 21, 36, 34, 685898000 ],
+  "status" : 400,
+  "message" : "입력 조건에 대한 예외입니다",
+  "errors" : [ {
+    "field" : "room.startDate",
+    "value" : "1999.10.01",
+    "reason" : "년도는 2000 ~ 2023 사이의 값을 입력해주세요. \n현재 입력 값: 1999.10.01"
+  }, {
+    "field" : "room.endDate",
+    "value" : "2022.2.31",
+    "reason" : "존재하지 않는 연/월/일 값입니다. \n현재 입력 값: 2022.2.31"
+  } ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_실패_response2_제약_조건을_지키지_않은_경우"><a class="link" href="#_실패_response2_제약_조건을_지키지_않은_경우">실패 response2 - 제약 조건을 지키지 않은 경우</a></h4>
+<div class="sect4">
+<h5 id="_실패_response2_제약_조건을_지키지_않은_경우_http_response"><a class="link" href="#_실패_response2_제약_조건을_지키지_않은_경우_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 264
+
+{
+  "timestamp" : [ 2022, 11, 15, 21, 36, 35, 68207000 ],
+  "status" : 400,
+  "message" : "입력 조건에 대한 예외입니다",
+  "errors" : [ {
+    "field" : "room.title",
+    "value" : "qqqqqqqqqqqqqqq",
+    "reason" : "size must be between 1 and 8"
+  } ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_방_참여"><a class="link" href="#_방_참여">방 참여</a></h3>
@@ -2019,8 +2083,10 @@ Host: localhost:8080
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_초대코드_검증_http_response"><a class="link" href="#_초대코드_검증_http_response">HTTP response</a></h4>
+<div class="sect4">
+<h5 id="_성공_response_5"><a class="link" href="#_성공_response_5">성공 response</a></h5>
+<div class="sect5">
+<h6 id="_성공_response_5_http_response"><a class="link" href="#_성공_response_5_http_response">HTTP response</a></h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
@@ -2038,8 +2104,8 @@ Content-Length: 145
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_초대코드_검증_response_fields"><a class="link" href="#_초대코드_검증_response_fields">Response fields</a></h4>
+<div class="sect5">
+<h6 id="_성공_response_5_response_fields"><a class="link" href="#_성공_response_5_response_fields">Response fields</a></h6>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -2088,6 +2154,11 @@ Content-Length: 145
 </table>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_실패_response1"><a class="link" href="#_실패_response1">실패 response1 -</a></h4>
+
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2096,9 +2167,9 @@ Content-Length: 145
 <div class="sect2">
 <h3 id="_메세지_보내기"><a class="link" href="#_메세지_보내기">메세지 보내기</a></h3>
 <div class="sect3">
-<h4 id="_성공_response_4"><a class="link" href="#_성공_response_4">성공 response</a></h4>
+<h4 id="_성공_response_6"><a class="link" href="#_성공_response_6">성공 response</a></h4>
 <div class="sect4">
-<h5 id="_성공_response_4_http_response"><a class="link" href="#_성공_response_4_http_response">HTTP response</a></h5>
+<h5 id="_성공_response_6_http_response"><a class="link" href="#_성공_response_6_http_response">HTTP response</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
@@ -2115,10 +2186,10 @@ Location: /api/v1/rooms/1/messages/0</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json
-Content-Length: 189
+Content-Length: 190
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 73166000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 296693000 ],
   "status" : 400,
   "message" : "내 마니띠가 아닌 사용자에게 메시지를 보낼 수 없습니다.",
   "errors" : [ ]
@@ -2138,7 +2209,7 @@ Content-Type: application/json
 Content-Length: 180
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 978638000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 899678000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2158,7 +2229,7 @@ Content-Type: application/json
 Content-Length: 164
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 854346000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 783595000 ],
   "status" : 415,
   "message" : "이미지 확장자 명을 찾을 수 없습니다.",
   "errors" : [ ]
@@ -2178,7 +2249,7 @@ Content-Type: application/json
 Content-Length: 264
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 380006000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 399644000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2249,9 +2320,9 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_성공_response_5"><a class="link" href="#_성공_response_5">성공 response</a></h4>
+<h4 id="_성공_response_7"><a class="link" href="#_성공_response_7">성공 response</a></h4>
 <div class="sect4">
-<h5 id="_성공_response_5_http_response"><a class="link" href="#_성공_response_5_http_response">HTTP response</a></h5>
+<h5 id="_성공_response_7_http_response"><a class="link" href="#_성공_response_7_http_response">HTTP response</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
@@ -2287,7 +2358,7 @@ Content-Length: 711
     "createdDate" : "2022.11.15"
   } ],
   "manittee" : {
-    "id" : "7349925c-c515-4a91-b943-e0e8b10af551",
+    "id" : "af480ef0-9f32-43f8-9a51-f24310a013c9",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -2306,7 +2377,7 @@ Content-Type: application/json
 Content-Length: 172
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 460586000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 467210000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2326,7 +2397,7 @@ Content-Type: application/json
 Content-Length: 180
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 425888000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 436186000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2458,9 +2529,9 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_성공_response_6"><a class="link" href="#_성공_response_6">성공 response</a></h4>
+<h4 id="_성공_response_8"><a class="link" href="#_성공_response_8">성공 response</a></h4>
 <div class="sect4">
-<h5 id="_성공_response_6_http_response"><a class="link" href="#_성공_response_6_http_response">HTTP response</a></h5>
+<h5 id="_성공_response_8_http_response"><a class="link" href="#_성공_response_8_http_response">HTTP response</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
@@ -2510,7 +2581,7 @@ Content-Type: application/json
 Content-Length: 172
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 529156000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 531232000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2530,7 +2601,7 @@ Content-Type: application/json
 Content-Length: 180
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 762005000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 690312000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2598,9 +2669,9 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_성공_response_7"><a class="link" href="#_성공_response_7">성공 response</a></h4>
+<h4 id="_성공_response_9"><a class="link" href="#_성공_response_9">성공 response</a></h4>
 <div class="sect4">
-<h5 id="_성공_response_7_http_response"><a class="link" href="#_성공_response_7_http_response">HTTP response</a></h5>
+<h5 id="_성공_response_9_http_response"><a class="link" href="#_성공_response_9_http_response">HTTP response</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
@@ -2678,7 +2749,7 @@ Content-Type: application/json
 Content-Length: 172
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 907309000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 827213000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2698,7 +2769,7 @@ Content-Type: application/json
 Content-Length: 180
 
 {
-  "timestamp" : [ 2022, 11, 15, 19, 59, 27, 805527000 ],
+  "timestamp" : [ 2022, 11, 15, 21, 36, 31, 734873000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2714,7 +2785,7 @@ Content-Length: 180
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-11-15 19:49:02 +0900
+Last updated 2022-11-15 21:35:31 +0900
 </div>
 </div>
 </body>

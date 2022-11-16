@@ -303,6 +303,18 @@ class RoomControllerTest {
 
 		// then
 		perform.andExpect(status().isBadRequest());
+		perform.andDo(document("초대코드 검증 - 실패 (초대코드가 6자가 아닌 경우)",
+			preprocessResponse(prettyPrint()),
+			responseFields(
+				fieldWithPath("message").description("메시지"),
+				fieldWithPath("status").description("상태 코드"),
+				fieldWithPath("timestamp").description("시간"),
+				fieldWithPath("errors").description("애러"),
+				fieldWithPath("errors[0].field").description("애러 발생 필드"),
+				fieldWithPath("errors[0].value").description("애러 발생 필드 값"),
+				fieldWithPath("errors[0].reason").description("애러 발생 이유")
+			)
+		));
 	}
 
 	@DisplayName("방 참여 - 성공")
