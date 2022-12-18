@@ -217,7 +217,7 @@ public class AuthControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").exists())
-                .andDo(document("회원가입 및 로그인",
+                .andDo(document("회원가입 및 로그인V1",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(

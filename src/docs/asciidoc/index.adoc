@@ -1,15 +1,17 @@
 = 애니또 API
+:toc: left
+
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs // 문서에 표기되는 코드들의 하이라이팅을 highlightjs를 사용
-:toc: left // toc (Table Of Contents)를 문서의 좌측에 두기
-:toclevels: 2
 :sectlinks:
 
 [[Member-API]]
 == Auth API
-=== 회원가입 및 로그인
-operation::회원가입 및 로그인[snippets='http-request,http-response,request-fields,response-fields']
+=== 회원가입 및 로그인V1
+operation::회원가입 및 로그인V1[snippets='http-request,http-response,request-fields,response-fields']
+=== 회원가입 및 로그인V2
+operation::회원가입 및 로그인V2[snippets='http-request,http-response,request-fields,response-fields']
 === 토큰 재발급
 operation::토큰 재발급[snippets='http-request,http-response,request-fields,response-fields']
 
