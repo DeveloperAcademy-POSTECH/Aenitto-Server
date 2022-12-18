@@ -52,6 +52,11 @@ dependencies {
 	implementation group: 'org.json', name: 'json', version: '20090211'
 	implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
 
+	//FCM
+	implementation 'com.google.firebase:firebase-admin:9.0.0'
+	implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
+
 }
 
 

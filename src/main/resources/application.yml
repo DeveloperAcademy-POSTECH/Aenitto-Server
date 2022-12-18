@@ -13,7 +13,7 @@ spring:
   profiles:
     active: develop # 활성화시킬 프로필
     group: # 포함시킬 하위 프로필명
-      develop: develop, developdb, awss3, env
+      develop: develop, developdb, awss3, env, fcm
 
   output:
     ansi:
@@ -47,3 +47,11 @@ spring:
 
   session:
     store-type: jdbc
+---
+spring:
+  config:
+    activate:
+      on-profile: fcm
+fcm:
+  key:
+    path: https://fcm.googleapis.com/v1/projects/aenitto-350c7/messages:send
