@@ -9,7 +9,13 @@
 [[Member-API]]
 == Auth API
 === 회원가입 및 로그인V1
-operation::회원가입 및 로그인V1[snippets='http-request,http-response,request-fields,response-fields']
+operation::회원가입 및 로그인V1[snippets='http-request,request-fields']
+==== 성공 response
+operation::회원가입 및 로그인V1[snippets='http-response,response-fields']
+==== 실패 response1 - 유효하지 않은 identityToken
+operation::회원가입 및 로그인V1 - 실패 (유효하지 않은 identityToken)[snippets='http-response']
+
+
 === 회원가입 및 로그인V2
 operation::회원가입 및 로그인V2[snippets='http-request,http-response,request-fields,response-fields']
 === 토큰 재발급
@@ -21,12 +27,26 @@ operation::토큰 재발급[snippets='http-request,http-response,request-fields,
 
 [[Member-닉네임-수정]]
 === Member 닉네임 수정
-operation::change-nickname[snippets='http-request,http-response,request-fields']
+operation::change-nickname[snippets='http-request,request-fields']
+==== 성공 response
+operation::change-nickname[snippets='http-response']
+==== 실패 response1 - 닉네임 4자 이상
+operation::닉네임 변경 - 실패 (제약조건을 지키지 않은 경우)[snippets='http-response']
+==== 실패 response2 - 존재하지 않는 유저
+operation::닉네임 변경 - 실패 (존재하지 않는 유저의 경우)[snippets='http-response']
+
 
 [[Main-API]]
 == Main API
 === 함께하는 친구들 가져오기 API
-operation::함께하는 친구들 리스트[snippets='http-request,http-response,path-parameters,response-fields']
+operation::함께하는 친구들 리스트[snippets='http-request,http-response,response-fields']
+
+=== 공통미션 가져오기 API
+operation::공통미션 가져오기[snippets='http-request']
+==== 성공 response
+operation::공통미션 가져오기[snippets='http-response,response-fields']
+==== 실패 response1 - 오늘의 공통미션 없음
+operation::공통미션 가져오기 - 실패 (오늘의 공통미션 없음)[snippets='http-response']
 
 [[Room-API]]
 == Room API
@@ -48,6 +68,12 @@ operation::방 수정하기[snippets='path-parameters,http-request,request-field
 
 === 방 생성
 operation::방 생성[snippets='request-headers,http-request,request-fields,http-response']
+==== 성공 response
+operation::방 생성[snippets='http-response']
+==== 실패 response1 - 시작일이 올바르게 설정되어 있지 않음
+operation::방 생성 - 실패 (시작일이 올바르게 설정되어 있지 않음)[snippets='http-response']
+==== 실패 response2 - 제약 조건을 지키지 않은 경우
+operation::방 생성 - 실패 (제약 조건을 지키지 않은 경우)[snippets='http-response']
 
 === 방 참여
 operation::방 참여[snippets='path-parameters,request-headers,http-request,request-fields,http-response']
@@ -56,18 +82,54 @@ operation::방 참여[snippets='path-parameters,request-headers,http-request,req
 operation::참여 중인 방 조회[snippets='request-parameters,request-headers,http-request,http-response,response-fields']
 
 === 초대코드 검증
-operation::초대코드 검증[snippets='request-headers,http-request,request-fields,http-response,response-fields']
+operation::초대코드 검증[snippets='request-headers,http-request,request-fields']
+===== 성공 response
+operation::초대코드 검증[snippets='http-response,response-fields']
+==== 실패 response1 - 초대코드가 6자가 아닌 경우
+operation::초대코드 검증 - 실패 (초대코드가 6자가 아닌 경우)[snippets='http-response']
 
 [[Message-API]]
 == 메시지 API
-=== 보낸 메시지 가져오기
-operation::보낸 메시지 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+=== 메세지 보내기
+//operation::메세지 생성 - 성공[snippets='http-request']
+==== 성공 response
+operation::메세지 생성 - 성공[snippets='http-response']
+==== 실패 response1 - 내 마니띠가 아님
+operation::메세지 생성 - 실패 (내 마니띠가 아님)[snippets='http-response']
+==== 실패 response2 - 참여하고 있지 않은 방
+operation::메세지 생성 - 실패 (참여하고 있지 않은 방)[snippets='http-response']
+==== 실패 response3 - 이미지 확장자가 존재하지 않음
+operation::메세지 생성 - 실패 (확장자가 존재하지 않음)[snippets='http-response']
+==== 실패 response4 - 제약 조건을 지키지 않음
+operation::메세지 생성 - 실패 (제약 조건을 지키지 않음)[snippets='http-response']
 
-=== 메세지 읽음으로 상태변경
+=== 보낸 메시지 가져오기
+operation::보낸 메시지 가져오기[snippets='path-parameters,request-headers,http-request']
+==== 성공 response
+operation::보낸 메시지 가져오기[snippets='http-response']
+==== 실패 response1 - 마니띠가 존재하지 않음
+operation::보낸 메시지 가져오기 - 실패 (마니띠가 존재하지 않음)[snippets='http-response']
+==== 실패 response2 - 참여중인 방이 아님
+operation::보낸 메시지 가져오기 - 실패 (참여중인 방이 아님)[snippets='http-response']
+
+=== 메세지 읽음으로 상태변경 -> deprecated
 operation::메세지 읽음으로 상태 변경[snippets='path-parameters,request-headers,http-request,http-response']
 
 === 받은 메시지 가져오기
-operation::받은 메시지 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+operation::받은 메시지 가져오기[snippets='path-parameters,request-headers,http-request']
+==== 성공 response
+operation::받은 메시지 가져오기[snippets='http-response']
+===== 실패 response1 - 마니띠가 존재하지 않음
+operation::받은 메시지 가져오기 - 실패 (마니띠가 존재하지 않음)[snippets='http-response']
+===== 실패 response2 - 참여중인 방이 아님
+operation::받은 메시지 가져오기 - 실패 (참여중인 방이 아님)[snippets='http-response']
+
 
 === 추억 가져오기
-operation::추억 가져오기[snippets='path-parameters,request-headers,http-request,http-response']
+operation::추억 가져오기[snippets='path-parameters,request-headers,http-request']
+==== 성공 response
+operation::추억 가져오기[snippets='http-response']
+==== 실패 response1 - 마니또가 존재하지 않음
+operation::추억 가져오기 - 실패 (마니또가 존재하지 않음)[snippets='http-response']
+==== 실패 response2 - 마니띠가 존재하지 않음
+operation::추억 가져오기 - 실패 (마니띠가 존재하지 않음)[snippets='http-response']
