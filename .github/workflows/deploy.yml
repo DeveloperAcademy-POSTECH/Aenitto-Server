@@ -41,7 +41,14 @@ jobs:
         env:
           IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
           IMAGE_SECRET_KEY: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
-
+          
+      - name: firebase.json 생성
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "firebase_service_key.json"
+          json: ${{ secrets.FIREBASE_SERVICE_KEY }}
+          dir: 'src/main/resources/'
+          
       # Build
       - name: Build with Gradle
         run: ./gradlew clean build --info
