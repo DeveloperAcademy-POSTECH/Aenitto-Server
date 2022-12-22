@@ -38,6 +38,7 @@ public class SecurityConfig {
                         "/api/v1/auth/**"
                         ,"/api/v1/temp-login"
                         ,"/api/v1/login"
+                        ,"/api/v2/login"
                         ).permitAll()
                 .anyRequest().authenticated()
                 .and()
