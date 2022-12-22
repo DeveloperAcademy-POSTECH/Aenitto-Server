@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.channels.MulticastChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,7 +211,7 @@ public class MessageServiceImplTest {
 
     @DisplayName("메세지 생성 - 성공")
     @Test
-    void create_message_success() {
+    void create_message_success() throws IOException {
         //given
         Long roomId = 1L;
         doReturn(Optional.of(relation)).when(relationRepository)

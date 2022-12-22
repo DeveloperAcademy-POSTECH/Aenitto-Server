@@ -2,13 +2,17 @@ package com.firefighter.aenitto.notification.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firefighter.aenitto.common.exception.notification.FailedSendingNotificationException;
 import com.firefighter.aenitto.notification.dto.FcmMessage;
 import com.google.auth.oauth2.GoogleCredentials;
+
 import lombok.RequiredArgsConstructor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
@@ -19,44 +23,47 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Qualifier("fcmNotificationService")
 public class FcmService implements NotificationService {
-    @Value("${fcm.key.path}")
-    private String API_URL;
-    private final ObjectMapper objectMapper;
+	@Value("${fcm.key.path}")
+	private String API_URL;
+	private final ObjectMapper objectMapper;
 
-    public void sendMessage(String targetToken, String title, String body)
-            throws IOException {
-        String message = makeMessage(targetToken, title, body);
+	public void sendMessage(String targetToken, String title, String body) {
+		try {
+            String message = makeMessage(targetToken, title, body);
 
-        OkHttpClient okHttpClient = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(message,
+            OkHttpClient okHttpClient = new OkHttpClient();
+            RequestBody requestBody = RequestBody.create(message,
                 MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder()
+            Request request = new Request.Builder()
                 .url(API_URL)
                 .post(requestBody)
                 .addHeader(HttpHeaders.AUTHORIZATION,
-                        "Bearer " + getAccessToken())
+                    "Bearer " + getAccessToken())
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
-    }
+		} catch (IOException e) {
+            throw new FailedSendingNotificationException();
+        }
 
-    private String makeMessage(String targetToken, String title, String body)
-            throws JsonProcessingException {
+	}
 
-        FcmMessage fcmMessage = FcmMessage.builder()
-                .title(title).body(body).targetToken(targetToken).build();
+	private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
 
-        return objectMapper.writeValueAsString(fcmMessage);
-    }
+		FcmMessage fcmMessage = FcmMessage.builder()
+			.title(title).body(body).targetToken(targetToken).build();
+		return objectMapper.writeValueAsString(fcmMessage);
+	}
 
-    private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "firebase/firebase_service_key.json";
+	private String getAccessToken() throws IOException {
+		String firebaseConfigPath = "firebase/firebase_service_key.json";
 
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
-        googleCredentials.refreshIfExpired();
+		GoogleCredentials googleCredentials = GoogleCredentials
+			.fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
+			.createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+		googleCredentials.refreshIfExpired();
 
-        return googleCredentials.getAccessToken().getTokenValue();
-    }
+		return googleCredentials.getAccessToken().getTokenValue();
+	}
 }
