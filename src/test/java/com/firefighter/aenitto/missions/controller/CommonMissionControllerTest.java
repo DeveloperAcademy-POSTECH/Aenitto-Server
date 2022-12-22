@@ -8,6 +8,7 @@ import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
 import com.firefighter.aenitto.missions.service.MissionService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,8 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDate;
-
 import static com.firefighter.aenitto.missions.CommonMissionFixture.commonMissionFixture1;
 import static com.firefighter.aenitto.missions.MissionFixture.missionFixture1_Common;
 import static org.hamcrest.Matchers.is;
@@ -48,89 +47,98 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs
 public class CommonMissionControllerTest {
-    public static final String AUTHTOKEN = "Bearer testAccessToken";
-    @Mock
-    @Qualifier("missionServiceImpl")
-    MissionService missionService;
-    CommonMission commonMission;
+	public static final String AUTHTOKEN = "Bearer testAccessToken";
+	@Mock
+	@Qualifier("missionServiceImpl")
+	MissionService missionService;
+	CommonMission commonMission;
 
-    Mission mission_common;
-    @Autowired
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
-    @InjectMocks
-    private CommonMissionController target;
+	Mission mission_common;
+	@Autowired
+	private MockMvc mockMvc;
+	private ObjectMapper objectMapper;
+	@InjectMocks
+	private CommonMissionController target;
 
-    @BeforeEach
-    void init(RestDocumentationContextProvider restDocumentation) {
-        mockMvc = MockMvcBuilders.standaloneSetup(target)
-                .setControllerAdvice(GlobalExceptionHandler.class)
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
+	@BeforeEach
+	void init(RestDocumentationContextProvider restDocumentation) {
+		mockMvc = MockMvcBuilders.standaloneSetup(target)
+			.setControllerAdvice(GlobalExceptionHandler.class)
+			.apply(documentationConfiguration(restDocumentation))
+			.build();
 
-        objectMapper = new ObjectMapper();
+		objectMapper = new ObjectMapper();
 
-        mission_common = missionFixture1_Common();
-        commonMission = commonMissionFixture1();
-        ReflectionTestUtils.setField(commonMission, "mission", mission_common);
-    }
+		mission_common = missionFixture1_Common();
+		commonMission = commonMissionFixture1();
+		ReflectionTestUtils.setField(commonMission, "mission", mission_common);
+	}
 
-    @DisplayName("공통미션 가져오기 - 성공")
-    @Test
-    void getCommonMission_success() throws Exception {
-        //given
-        final String url = "/api/v1/missions/common";
-        when(missionService.getDailyCommonMission())
-                .thenReturn(DailyCommonMissionResponse.of(commonMission));
+	@DisplayName("공통미션 가져오기 - 성공")
+	@Test
+	void getCommonMission_success() throws Exception {
+		//given
+		final String url = "/api/v1/missions/common";
+		when(missionService.getDailyCommonMission())
+			.thenReturn(DailyCommonMissionResponse.of(commonMission));
 
-        // when
-        ResultActions perform = mockMvc.perform(
-                RestDocumentationRequestBuilders.get(url)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
+		// when
+		ResultActions perform = mockMvc.perform(
+			RestDocumentationRequestBuilders.get(url)
+				.header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
+				.contentType(MediaType.APPLICATION_JSON)
+		);
 
-        //then, docs
-        perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.mission", is(commonMission
-                        .getMission().getContent()))
-                )
-                .andDo(document("공통미션 가져오기",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
-                        )
-                        ,
-                        responseFields(
-                                fieldWithPath("mission").description("미션")
-                        )
-                ));
+		//then, docs
+		perform.andExpect(status().isOk())
+			.andExpect(jsonPath("$.mission", is(commonMission
+				.getMission().getContent()))
+			)
+			.andDo(document("공통미션 가져오기",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName(HttpHeaders.AUTHORIZATION).description("JWT Access Token")
+				)
+				,
+				responseFields(
+					fieldWithPath("mission").description("미션")
+				)
+			));
 
-        verify(missionService, times(1)).getDailyCommonMission();
-    }
+		verify(missionService, times(1)).getDailyCommonMission();
+	}
 
-    @DisplayName("해당 일자 공통미션 가져오기 - 실패 / 오늘의 공통미션 없음")
-    @Test
-    void getCommonMission_failure_daily_common_mission_not_found() throws Exception {
-        //given
-        final String url = "/api/v1/missions/common";
-        when(missionService.getDailyCommonMission())
-                .thenThrow(new MissionNotFoundException());
+	@DisplayName("해당 일자 공통미션 가져오기 - 실패 / 오늘의 공통미션 없음")
+	@Test
+	void getCommonMission_failure_daily_common_mission_not_found() throws Exception {
+		//given
+		final String url = "/api/v1/missions/common";
+		when(missionService.getDailyCommonMission())
+			.thenThrow(new MissionNotFoundException());
 
-        // when
-        ResultActions perform = mockMvc.perform(
-                RestDocumentationRequestBuilders.get(url)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
+		// when
+		ResultActions perform = mockMvc.perform(
+			RestDocumentationRequestBuilders.get(url)
+				.header(HttpHeaders.AUTHORIZATION, AUTHTOKEN)
+				.contentType(MediaType.APPLICATION_JSON)
+		);
 
-        //then
-        perform.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.timestamp").exists())
-                .andExpect(jsonPath("$.status", is(MissionErrorCode.MISSION_NOT_FOUND.getStatus().value())))
-                .andExpect(jsonPath("$.message", is(MissionErrorCode.MISSION_NOT_FOUND.getMessage())));
-        verify(missionService, times(1)).getDailyCommonMission();
-    }
+		//then
+		perform.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.status", is(MissionErrorCode.MISSION_NOT_FOUND.getStatus().value())))
+			.andExpect(jsonPath("$.message", is(MissionErrorCode.MISSION_NOT_FOUND.getMessage())))
+			.andDo(document("공통미션 가져오기 - 실패 (오늘의 공통미션 없음)",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("message").description("메시지"),
+					fieldWithPath("status").description("상태 코드"),
+					fieldWithPath("timestamp").description("시간"),
+					fieldWithPath("errors").description("애러")
+				)
+			));
+		verify(missionService, times(1)).getDailyCommonMission();
+	}
 
 }

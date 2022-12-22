@@ -2,7 +2,6 @@ package com.firefighter.aenitto.messages.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 public interface StorageService {
