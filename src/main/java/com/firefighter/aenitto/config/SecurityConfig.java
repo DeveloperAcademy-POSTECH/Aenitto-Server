@@ -21,10 +21,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/static/docs/index.html");
-    }
+//     @Bean
+//     public WebSecurityCustomizer webSecurityCustomizer() {
+//         return (web) -> web.ignoring().antMatchers("/static/docs/index.html");
+//     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, TokenService tokenService) throws
