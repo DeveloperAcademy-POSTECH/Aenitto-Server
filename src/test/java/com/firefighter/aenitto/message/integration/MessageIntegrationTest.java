@@ -1,25 +1,29 @@
 package com.firefighter.aenitto.message.integration;
 
-import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
-import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.common.utils.SqlPath;
-import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
-import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
-import com.firefighter.aenitto.support.IntegrationTest;
-import com.firefighter.aenitto.support.security.WithMockCustomMember;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
+import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
+
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
-import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
+import com.firefighter.aenitto.common.utils.SqlPath;
+import com.firefighter.aenitto.messages.domain.Message;
+import com.firefighter.aenitto.support.IntegrationTest;
+import com.firefighter.aenitto.support.security.WithMockCustomMember;
 
 @WithMockCustomMember
 public class MessageIntegrationTest extends IntegrationTest {

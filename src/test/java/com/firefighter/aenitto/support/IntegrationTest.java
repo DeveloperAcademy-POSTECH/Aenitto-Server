@@ -35,48 +35,48 @@ import com.firefighter.aenitto.messages.service.StorageS3ServiceImpl;
 @Transactional
 @ActiveProfiles("test")
 public class IntegrationTest {
-    @Autowired
-    protected EntityManager em;
-    @Autowired
-    protected ObjectMapper objectMapper;
-    @MockBean
-    protected StorageS3ServiceImpl storageS3Service;
-    @Autowired
-    WebApplicationContext webApplicationContext;
-    protected MockMvc mockMvc;
+	@Autowired
+	protected EntityManager em;
+	@Autowired
+	protected ObjectMapper objectMapper;
+	@MockBean
+	protected StorageS3ServiceImpl storageS3Service;
+	@Autowired
+	WebApplicationContext webApplicationContext;
+	protected MockMvc mockMvc;
 
-    protected static final UUID MOCK_USER_ID = UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e");
-    protected static final String STORAGE_SAVED_IMG_URL = "sampleUrl";
+	protected static final UUID MOCK_USER_ID = UUID.fromString("f383cdb3-a871-4410-b146-fb1f7b447b9e");
+	protected static final String STORAGE_SAVED_IMG_URL = "sampleUrl";
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .alwaysDo(print())
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))
-                .build();
-    }
+	@BeforeEach
+	void setUp() {
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+			.apply(springSecurity())
+			.alwaysDo(print())
+			.addFilters(new CharacterEncodingFilter("UTF-8", true))
+			.build();
+	}
 
-    @BeforeEach
-    void stubS3StorageService() {
-        when(storageS3Service.getUrl(anyString()))
-            .thenReturn(STORAGE_SAVED_IMG_URL);
-        doNothing()
-            .when(storageS3Service).upload(anyString(), any(InputStream.class), any(ObjectMetadata.class));
-    }
+	@BeforeEach
+	void stubS3StorageService() {
+		when(storageS3Service.getUrl(anyString()))
+			.thenReturn(STORAGE_SAVED_IMG_URL);
+		doNothing()
+			.when(storageS3Service).upload(anyString(), any(InputStream.class), any(ObjectMetadata.class));
+	}
 
-    protected void flushAndClear() {
-        em.flush();
-        em.clear();
-    }
+	protected void flushAndClear() {
+		em.flush();
+		em.clear();
+	}
 
-    protected MockMultipartFile createJsonFile(Object request) throws JsonProcessingException {
-        return new MockMultipartFile(
-                "request",
-                "",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsString(request).getBytes()
-        );
-    }
+	protected MockMultipartFile createJsonFile(Object request) throws JsonProcessingException {
+		return new MockMultipartFile(
+			"request",
+			"",
+			MediaType.APPLICATION_JSON_VALUE,
+			objectMapper.writeValueAsString(request).getBytes()
+		);
+	}
 }
 
