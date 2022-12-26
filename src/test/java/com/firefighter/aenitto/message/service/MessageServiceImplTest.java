@@ -472,10 +472,39 @@ public class MessageServiceImplTest {
         //when
         MemoriesResponse response = target.getMemories(currentMember, room.getId());
 
-        //then
-        assertThat(response.getMemoriesWithManittee().getMessages().size()).isEqualTo(4);
-        assertThat(response.getMemoriesWithManitto().getMessages().size()).isEqualTo(4);
-        assertThat(response.getMemoriesWithManittee().getMember().getNickname()).isNotNull();
-        assertThat(response.getMemoriesWithManitto().getMember().getNickname()).isNotNull();
-    }
+		//then
+		assertThat(response.getMemoriesWithManittee().getMessages().size()).isEqualTo(4);
+		assertThat(response.getMemoriesWithManitto().getMessages().size()).isEqualTo(4);
+		assertThat(response.getMemoriesWithManittee().getMember().getNickname()).isNotNull();
+		assertThat(response.getMemoriesWithManitto().getMember().getNickname()).isNotNull();
+	}
+
+	@DisplayName("throwIfIdNotIdentical - 실패 (UUID 가 서로 같지 않음)")
+	@Test
+	void throwIfIdNotIdentical_fail_not_identical() {
+		// given
+		final String METHOD_NAME = "throwIfIdNotIdentical";
+		UUID uuid1 = UUID.randomUUID();
+		UUID uuid2 = UUID.randomUUID();
+
+		// when, then
+		assertThatThrownBy(() -> {
+			ReflectionTestUtils.invokeMethod(target, METHOD_NAME, uuid1, uuid2);
+		})
+			.isInstanceOf(NotManitteeException.class);
+	}
+
+	@DisplayName("throwIfIdNotIdentical - 성공")
+	@Test
+	void throwIfIdNotIdentical_success() {
+		// given
+		final String METHOD_NAME = "throwIfIdNotIdentical";
+		UUID uuid = UUID.randomUUID();
+
+		// when, then
+		assertThatNoException()
+			.isThrownBy(() -> {
+				ReflectionTestUtils.invokeMethod(target, METHOD_NAME, uuid, uuid);
+			});
+	}
 }
