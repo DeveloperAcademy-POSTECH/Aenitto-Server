@@ -50,7 +50,6 @@ import com.firefighter.aenitto.rooms.repository.RoomRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class MessageServiceImplTest {
-
 	@InjectMocks
 	MessageServiceImpl target;
 

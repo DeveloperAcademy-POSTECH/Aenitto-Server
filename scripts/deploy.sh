@@ -5,7 +5,7 @@ REPOSITORY=/home/ec2-user/app/deploy/dev
 echo">check running pid"
 
 
-CURRENT_PID=$(pgrep -f aenitto-dev)
+CURRENT_PID=$(pgrep -f java)
 
 
 echo "> CURRENT_PID"
