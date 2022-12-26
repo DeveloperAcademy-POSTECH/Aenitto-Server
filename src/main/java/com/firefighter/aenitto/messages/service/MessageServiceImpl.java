@@ -51,31 +51,17 @@ public class MessageServiceImpl implements MessageService {
     @Qualifier("StorageS3ServiceImpl")
     private final StorageService storageService;
 
-    @Override
-    @Transactional
-    public long sendMessageSeparate(Member currentMember, Long roomId, String manitteeId,
-                                    String messageContent, MultipartFile image) {
+	@Override
+	@Transactional
+	public long sendMessageSeparate(Member currentMember, SendMessageApiDto dto) {
+		Relation relation = relationRepository.findByRoomIdAndManittoId(dto.getRoomId(), currentMember.getId())
+			.orElseThrow(RoomNotParticipatingException::new);
 
-        Relation relation = relationRepository.findByRoomIdAndManittoId(roomId, currentMember.getId())
-                .orElseThrow(RoomNotParticipatingException::new);
+		throwIfIdNotIdentical(relation.getManittee().getId(), dto.getManitteeId());
 
-        if (!Objects.equals(relation.getManittee().getId(), UUID.fromString(manitteeId))) {
-            throw new NotManitteeException();
-        }
-
-        // TODO: 메시지 생성 메서드
-        Message message = Message.builder().content(messageContent).build();
-        message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
-
-        if (image != null) {
-            String renameImageName = getRenameImage(image);
-            uploadToFileStorage(image, renameImageName);
-            String imageUrl = storageService.getUrl(renameImageName);
-            message.setImgUrl(imageUrl);
-        }
-
-        return messageRepository.saveMessage(message).getId();
-    }
+		Message message = initializeMessage(relation, dto);
+		return messageRepository.saveMessage(message).getId();
+	}
 
 	@Deprecated
 	@Override
@@ -157,23 +143,35 @@ public class MessageServiceImpl implements MessageService {
         return ReceivedMessagesResponse.of(messages);
     }
 
-    private String getImageExtension(String originalImageName) {
-        try {
-            return originalImageName.substring(originalImageName.lastIndexOf("."));
-        } catch (StringIndexOutOfBoundsException e) {
-            throw new ImageExtensionNotFoundException();
-        }
-    }
+	private Message initializeMessage(Relation relation, SendMessageApiDto dto) {
+		Message message = Message.initializeMessageRelationship(dto.getMessageContent(), relation);
+		if (dto.isImageNotNull()) {
+			String imgUrl = uploadAndGetSavedImgUrl(dto.getImage());
+			message.setImgUrl(imgUrl);
+		}
+		return message;
+	}
 
-    // 이미지 구별 위해 rename
-    private String getRenameImage(MultipartFile image) {
-        return UUID.randomUUID()
-                .toString()
-                .concat(image.getOriginalFilename())
-                .concat(getImageExtension(
-                        Objects.requireNonNull(image.getOriginalFilename())
-                ));
-    }
+	private String uploadAndGetSavedImgUrl(MultipartFile image) {
+		String imageName = getIdentifiableImageName(image);
+		uploadToFileStorage(image, imageName);
+		return storageService.getUrl(imageName);
+	}
+
+	private String getImageExtension(String originalImageName) {
+		try {
+			return originalImageName.substring(originalImageName.lastIndexOf("."));
+		} catch (StringIndexOutOfBoundsException e) {
+			throw new ImageExtensionNotFoundException();
+		}
+	}
+
+	private String getIdentifiableImageName(MultipartFile image) {
+		return UUID.randomUUID()
+			.toString()
+			.concat(image.getOriginalFilename())
+			.concat(getImageExtension(Objects.requireNonNull(image.getOriginalFilename())));
+	}
 
     private void uploadToFileStorage(MultipartFile image, String renamedImageName) {
         ObjectMetadata objectMetaData = new ObjectMetadata();
@@ -186,10 +184,15 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
-    private MemberRoom throwExceptionIfNotParticipating(UUID memberId, Long roomId) {
-        return roomRepository.findMemberRoomById(memberId, roomId)
-                .orElseThrow(RoomNotParticipatingException::new);
-    }
+	private void throwIfIdNotIdentical(UUID idFromRepository, UUID idFromRequest) throws NotManitteeException {
+		if (!Objects.equals(idFromRepository, idFromRequest)) {
+			throw new NotManitteeException();
+		}
+	}
+
+	private MemberRoom throwExceptionIfNotParticipating(UUID memberId, Long roomId) {
+		return roomRepository.findMemberRoomById(memberId, roomId).orElseThrow(RoomNotParticipatingException::new);
+	}
 
     private Relation throwExceptionIfManitteeNotFound(UUID memberId, Long roomId) {
         return relationRepository.findByRoomIdAndManittoId(roomId, memberId)

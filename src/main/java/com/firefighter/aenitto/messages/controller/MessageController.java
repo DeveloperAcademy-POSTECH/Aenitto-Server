@@ -39,18 +39,18 @@ public class MessageController {
 		return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId + "/messages/" + messageId)).build();
 	}
 
-    @PostMapping("/messages-separate")
-    public ResponseEntity createMessageSeparate(
-            @CurrentMember final Member currentMember,
-            @PathVariable final Long roomId,
-            @RequestPart @Nullable final MultipartFile image,
-            @Valid @RequestPart final String manitteeId,
-            @Nullable @RequestPart final String messageContent
-    ) {
-        final Long messageId = messageService.sendMessageSeparate(currentMember, roomId,
-                manitteeId, messageContent, image);
-        return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId + "/messages/" + messageId)).build();
-    }
+	@PostMapping("/messages-separate")
+	public ResponseEntity createMessageSeparate(
+		@CurrentMember final Member currentMember,
+		@PathVariable final Long roomId,
+		@RequestPart @Nullable final MultipartFile image,
+		@Valid @RequestPart final String manitteeId,
+		@Nullable @RequestPart final String messageContent
+	) {
+		final Long messageId = messageService.sendMessageSeparate(currentMember,
+			new SendMessageApiDto(roomId, manitteeId, messageContent, image));
+		return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId + "/messages/" + messageId)).build();
+	}
 
 
 

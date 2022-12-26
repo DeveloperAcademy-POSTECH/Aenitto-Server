@@ -46,15 +46,27 @@ public class Message extends CreationLog {
         this.room = room;
     }
 
-    @Builder
-    public Message(String content, String imgUrl) {
-        this.content = content;
-        this.imgUrl = imgUrl;
-    }
+	public void setMessageRelationship(Relation relation) {
+		this.sender = relation.getManitto();
+		this.receiver = relation.getManittee();
+		this.room = relation.getRoom();
+	}
 
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
+	@Builder
+	public Message(String content, String imgUrl) {
+		this.content = content;
+		this.imgUrl = imgUrl;
+	}
+
+	public static Message initializeMessageRelationship(String content, Relation relation) {
+		Message message = Message.builder().content(content).build();
+		message.setMessageRelationship(relation);
+		return message;
+	}
+
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
 
     public boolean didRead() {
         return this.read;
