@@ -42,6 +42,40 @@ public class MessageIntegrationTest extends IntegrationTest {
                 .andExpect(header().exists("Location"));
     }
 
+    @DisplayName("메시지 보내기 (seperate) -> 성공")
+    @Sql("classpath:relation.sql")
+    @Test
+    void send_separate_message_success() throws Exception {
+        // given
+        MockMultipartFile image = IMAGE;
+        final String messageContent = "message";
+        final String manitteeId = "b383cdb3-a871-4410-b147-fb1f7b447b9e";
+
+        // when, then
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/rooms/{roomId}/messages-separate", 100L)
+                .file(image)
+                .file("manitteeId", manitteeId.getBytes(StandardCharsets.UTF_8))
+                .file("messageContent", messageContent.getBytes(StandardCharsets.UTF_8))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andExpect(status().isCreated())
+            .andExpect(header().exists(HttpHeaders.LOCATION));
+
+        flushAndClear();
+
+        Message findMessage = em.createQuery(
+                "SELECT m"
+                    + " FROM Message m"
+                , Message.class)
+            .getResultList().get(0);
+
+        assertThat(findMessage.getSender().getId()).isEqualTo(MOCK_USER_ID);
+        assertThat(findMessage.getReceiver().getId()).isEqualTo(UUID.fromString(manitteeId));
+        assertThat(findMessage.didRead()).isFalse();
+        assertThat(findMessage.getContent()).isEqualTo(messageContent);
+        assertThat(findMessage.getImgUrl()).isEqualTo(STORAGE_SAVED_IMG_URL);
+    }
+
     @DisplayName("보낸 메시지 가져오기 - 실패 / 참여하고 있는 방이 아님")
     @Sql("classpath:relation.sql")
     @Test

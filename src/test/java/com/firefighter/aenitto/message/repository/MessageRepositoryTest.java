@@ -114,13 +114,24 @@ public class MessageRepositoryTest {
         assertThat(result.getImgUrl()).isNotNull();
     }
 
-    @DisplayName("보낸 메시지 가져오기 - 성공")
-    @Test
-    void getSentMessages_success() {
-        // given
-        for (Message message : messages) {
-            message.sendMessage(member1, member2, room1);
-        }
+	@DisplayName("saveMessage 메서드 read 초기화 - 성공")
+	@Test
+	void saveMessage_read_initialize_success() {
+		messageRepository.saveMessage(message1);
+		em.flush();
+
+		Message result = em.find(Message.class, message1.getId());
+
+		assertThat(result.didRead()).isFalse();
+	}
+
+	@DisplayName("보낸 메시지 가져오기 - 성공")
+	@Test
+	void getSentMessages_success() {
+		// given
+		for (Message message : messages) {
+			message.sendMessage(member1, member2, room1);
+		}
 
         em.persist(member1);
         em.persist(member2);
