@@ -77,10 +77,10 @@ public class MessageServiceImpl implements MessageService {
         return messageRepository.saveMessage(message).getId();
     }
 
-    @Override
-    @Transactional
-    public long sendMessage(Member currentMember, Long roomId,
-                            SendMessageRequest request, MultipartFile image) {
+	@Deprecated
+	@Override
+	@Transactional
+	public long sendMessage(Member currentMember, Long roomId, SendMessageRequest request, MultipartFile image) {
 
         Relation relation = relationRepository.findByRoomIdAndManittoId(roomId, currentMember.getId())
                 .orElseThrow(RoomNotParticipatingException::new);
