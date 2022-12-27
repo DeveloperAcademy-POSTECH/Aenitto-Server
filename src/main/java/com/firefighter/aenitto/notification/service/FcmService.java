@@ -58,8 +58,9 @@ public class FcmService implements NotificationService {
 		return objectMapper.writeValueAsString(fcmMessage);
 	}
 
+	// Todo: service_key 다른 방법으로 암호화 및 저장하기 (2022.12.27 - Daon)
 	private String getAccessToken() throws IOException {
-		String firebaseConfigPath = "firebase/firebase_service_key.json";
+		String firebaseConfigPath = "firebase_service_key.json";
 
 		GoogleCredentials googleCredentials = GoogleCredentials
 			.fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
