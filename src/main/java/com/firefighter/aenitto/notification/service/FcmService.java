@@ -7,6 +7,7 @@ import com.firefighter.aenitto.notification.dto.FcmMessage;
 import com.google.auth.oauth2.GoogleCredentials;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,14 +26,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Qualifier("fcmNotificationService")
+@Slf4j
 public class FcmService implements NotificationService {
 	@Value("${fcm.key.path}")
 	private String API_URL;
 	private final ObjectMapper objectMapper;
 
-	public void sendMessage(String targetToken, String title, String body) {
+	public void sendMessage(String targetToken, String title, String body, Long roomId) {
 		try {
-			String message = makeMessage(targetToken, title, body);
+			String message = makeMessage(targetToken, title, body, roomId);
 
 			OkHttpClient okHttpClient = new OkHttpClient();
 			RequestBody requestBody = RequestBody.create(message,
@@ -44,6 +46,7 @@ public class FcmService implements NotificationService {
 					"Bearer " + getAccessToken())
 				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
 				.build();
+			log.info(request.body().toString());
 			Response response = okHttpClient.newCall(request).execute();
 		} catch (IOException e) {
 			throw new FailedSendingNotificationException();
@@ -51,10 +54,10 @@ public class FcmService implements NotificationService {
 
 	}
 
-	private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
+	private String makeMessage(String targetToken, String title, String body, Long roomId) throws JsonProcessingException {
 
 		FcmMessage fcmMessage = FcmMessage.builder()
-			.title(title).body(body).targetToken(targetToken).build();
+			.title(title).body(body).targetToken(targetToken).roomId(roomId).build();
 		return objectMapper.writeValueAsString(fcmMessage);
 	}
 
