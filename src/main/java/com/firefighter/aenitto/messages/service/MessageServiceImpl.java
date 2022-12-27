@@ -80,7 +80,7 @@ public class MessageServiceImpl implements MessageService {
 
         if(relation.getManittee().getFcmToken() != null){
             notificationService.sendMessage(relation.getManittee().getFcmToken(),
-                "마니띠로부터 메시지가 도착하였습니다.", message.getContent());
+                "마니띠로부터 메시지가 도착하였습니다.", message.getContent(), relation.getRoom().getId());
         }
 
         return messageRepository.saveMessage(message).getId();
