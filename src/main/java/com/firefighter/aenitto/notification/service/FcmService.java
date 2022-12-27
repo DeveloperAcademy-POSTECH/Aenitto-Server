@@ -32,22 +32,22 @@ public class FcmService implements NotificationService {
 
 	public void sendMessage(String targetToken, String title, String body) {
 		try {
-            String message = makeMessage(targetToken, title, body);
+			String message = makeMessage(targetToken, title, body);
 
-            OkHttpClient okHttpClient = new OkHttpClient();
-            RequestBody requestBody = RequestBody.create(message,
-                MediaType.get("application/json; charset=utf-8"));
-            Request request = new Request.Builder()
-                .url(API_URL)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION,
-                    "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
-                .build();
+			OkHttpClient okHttpClient = new OkHttpClient();
+			RequestBody requestBody = RequestBody.create(message,
+				MediaType.get("application/json; charset=utf-8"));
+			Request request = new Request.Builder()
+				.url(API_URL)
+				.post(requestBody)
+				.addHeader(HttpHeaders.AUTHORIZATION,
+					"Bearer " + getAccessToken())
+				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
+				.build();
 			Response response = okHttpClient.newCall(request).execute();
 		} catch (IOException e) {
-            throw new FailedSendingNotificationException();
-        }
+			throw new FailedSendingNotificationException();
+		}
 
 	}
 
