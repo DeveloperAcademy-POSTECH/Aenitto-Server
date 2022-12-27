@@ -18,7 +18,7 @@ public class FcmMessage {
                 .token(targetToken)
                 .notification(Notification.builder()
                         .title(title).body(body).build())
-                .data(Data.builder().title(title).body(body).roomId(roomId).link(link).build())
+                .data(Data.builder().title(title).body(body).link(link).build())
                 .build();
     }
 
@@ -43,6 +43,6 @@ public class FcmMessage {
         private final String title;
         private final String body;
         private final String link;
-        private final Long roomId;
+        // private final Long roomId;
     }
 }
