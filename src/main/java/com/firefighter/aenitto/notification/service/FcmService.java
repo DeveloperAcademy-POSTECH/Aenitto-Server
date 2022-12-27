@@ -48,7 +48,7 @@ public class FcmService implements NotificationService {
 				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
 				.build();
 			Response response = okHttpClient.newCall(request).execute();
-			log.info("response" + response.code());
+			log.info("response" + response.code() + response.body() + response.message());
 		} catch (IOException e) {
 			throw new FailedSendingNotificationException();
 		}
