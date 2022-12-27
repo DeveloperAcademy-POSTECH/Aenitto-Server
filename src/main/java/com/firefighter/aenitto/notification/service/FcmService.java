@@ -35,6 +35,7 @@ public class FcmService implements NotificationService {
 	public void sendMessage(String targetToken, String title, String body, Long roomId) {
 		try {
 			String message = makeMessage(targetToken, title, body, roomId);
+			log.info("makeMessage" + message);
 
 			OkHttpClient okHttpClient = new OkHttpClient();
 			RequestBody requestBody = RequestBody.create(message,
@@ -46,8 +47,8 @@ public class FcmService implements NotificationService {
 					"Bearer " + getAccessToken())
 				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
 				.build();
-			log.info(requestBody.toString());
 			Response response = okHttpClient.newCall(request).execute();
+			log.info("response" + response.message());
 		} catch (IOException e) {
 			throw new FailedSendingNotificationException();
 		}
