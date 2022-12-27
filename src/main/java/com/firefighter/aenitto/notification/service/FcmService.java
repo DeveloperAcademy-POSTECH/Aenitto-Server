@@ -46,7 +46,7 @@ public class FcmService implements NotificationService {
 					"Bearer " + getAccessToken())
 				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
 				.build();
-			log.info(request.body().toString());
+			log.info(requestBody.toString());
 			Response response = okHttpClient.newCall(request).execute();
 		} catch (IOException e) {
 			throw new FailedSendingNotificationException();
