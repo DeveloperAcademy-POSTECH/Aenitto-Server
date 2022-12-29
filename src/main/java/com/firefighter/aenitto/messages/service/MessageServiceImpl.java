@@ -117,9 +117,6 @@ public class MessageServiceImpl implements MessageService {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation relation = throwExceptionIfManitteeNotFound(currentMember.getId(), roomId);
         List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
-        for (Message message : messages) {
-            message.readMessage();
-        }
         return SentMessagesResponse.of(messages, relation.getManittee());
     }
 
@@ -163,6 +160,9 @@ public class MessageServiceImpl implements MessageService {
         throwExceptionIfNotParticipating(currentMember.getId(), roomId);
         Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
         List<Message> messages = messageRepository.getReceivedMessages(currentMember.getId(), roomId);
+        for (Message message : messages) {
+            message.readMessage();
+        }
         return ReceivedMessagesResponse.of(messages);
     }
 
