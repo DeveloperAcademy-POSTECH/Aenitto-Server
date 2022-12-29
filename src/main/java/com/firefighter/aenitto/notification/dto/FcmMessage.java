@@ -13,7 +13,7 @@ public class FcmMessage {
     private Message message;
 
     @Builder
-    public FcmMessage(String targetToken, String title, String body, String link, Long roomId) {
+    public FcmMessage(String targetToken, String title, String body, String link, String roomId) {
         this.message = Message.builder()
                 .token(targetToken)
                 .notification(Notification.builder()
@@ -43,6 +43,6 @@ public class FcmMessage {
         private final String title;
         private final String body;
         private final String link;
-        private final Long roomId;
+        private final String roomId;
     }
 }

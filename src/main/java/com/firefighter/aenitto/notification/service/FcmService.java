@@ -32,7 +32,7 @@ public class FcmService implements NotificationService {
 	private String API_URL;
 	private final ObjectMapper objectMapper;
 
-	public void sendMessage(String targetToken, String title, String body, Long roomId) {
+	public void sendMessage(String targetToken, String title, String body, String roomId) {
 		try {
 			String message = makeMessage(targetToken, title, body, roomId);
 			log.info("makeMessage" + message);
@@ -55,7 +55,7 @@ public class FcmService implements NotificationService {
 
 	}
 
-	private String makeMessage(String targetToken, String title, String body, Long roomId) throws JsonProcessingException {
+	private String makeMessage(String targetToken, String title, String body, String roomId) throws JsonProcessingException {
 
 		FcmMessage fcmMessage = FcmMessage.builder()
 			.title(title).body(body).targetToken(targetToken).roomId(roomId).build();
