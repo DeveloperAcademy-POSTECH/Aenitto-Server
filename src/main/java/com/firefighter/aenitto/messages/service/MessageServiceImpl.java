@@ -1,14 +1,29 @@
 package com.firefighter.aenitto.messages.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.amazonaws.services.s3.model.ObjectMetadata;
+
+import lombok.RequiredArgsConstructor;
+
 import com.firefighter.aenitto.common.exception.message.FileUploadException;
 import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
 import com.firefighter.aenitto.common.exception.message.NotManitteeException;
 import com.firefighter.aenitto.common.exception.room.RelationNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
-import com.firefighter.aenitto.members.repository.MemberRepository;
 import com.firefighter.aenitto.messages.domain.Message;
+import com.firefighter.aenitto.messages.dto.api.SendMessageApiDto;
 import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
@@ -19,24 +34,11 @@ import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.repository.RelationRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class MessageServiceImpl implements MessageService {
-
     @Qualifier("memberRepositoryImpl")
     private final MemberRepository memberRepository;
 
