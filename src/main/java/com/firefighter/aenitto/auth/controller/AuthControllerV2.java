@@ -9,13 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.firefighter.aenitto.auth.dto.request.LoginRequest;
+import lombok.RequiredArgsConstructor;
+
 import com.firefighter.aenitto.auth.dto.request.LoginRequestV2;
 import com.firefighter.aenitto.auth.dto.response.LoginResponse;
-import com.firefighter.aenitto.auth.service.AuthService;
 import com.firefighter.aenitto.auth.service.AuthServiceV2;
-
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v2")

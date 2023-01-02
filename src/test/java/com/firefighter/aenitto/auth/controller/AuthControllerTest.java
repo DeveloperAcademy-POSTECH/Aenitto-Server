@@ -1,35 +1,33 @@
 package com.firefighter.aenitto.auth.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.is;
 
-import com.firefighter.aenitto.auth.dto.request.LoginRequestV2;
-import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
-import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
-import com.firefighter.aenitto.auth.service.AuthService;
-import com.firefighter.aenitto.auth.service.AuthServiceV2;
-import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
-import com.firefighter.aenitto.common.exception.auth.AuthErrorCode;
-import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
-
-import com.firefighter.aenitto.auth.dto.request.LoginRequest;
-import com.firefighter.aenitto.auth.dto.response.LoginResponse;
-
-import com.firefighter.aenitto.common.exception.auth.FailedToFetchPublicKeyException;
-import com.firefighter.aenitto.common.exception.auth.InvalidIdentityTokenException;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -39,25 +37,19 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-
-import static org.mockito.Mockito.*;
-
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
+import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
+import com.firefighter.aenitto.auth.service.AuthService;
+import com.firefighter.aenitto.auth.service.AuthServiceV2;
+import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.auth.AuthErrorCode;
+import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
+import com.firefighter.aenitto.auth.dto.request.LoginRequest;
+import com.firefighter.aenitto.auth.dto.response.LoginResponse;
+import com.firefighter.aenitto.common.exception.auth.FailedToFetchPublicKeyException;
+import com.firefighter.aenitto.common.exception.auth.InvalidIdentityTokenException;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs

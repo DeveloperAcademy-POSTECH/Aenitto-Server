@@ -1,16 +1,7 @@
 package com.firefighter.aenitto.notification.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.common.exception.notification.FailedSendingNotificationException;
-import com.firefighter.aenitto.notification.dto.FcmMessage;
-import com.google.auth.oauth2.GoogleCredentials;
-
-import lombok.RequiredArgsConstructor;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +9,20 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.google.auth.oauth2.GoogleCredentials;
+
+import lombok.RequiredArgsConstructor;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
+import com.firefighter.aenitto.common.exception.notification.FailedSendingNotificationException;
+import com.firefighter.aenitto.notification.dto.FcmMessage;
 
 @Service
 @RequiredArgsConstructor
@@ -31,21 +34,21 @@ public class FcmService implements NotificationService {
 
 	public void sendMessage(String targetToken, String title, String body) {
 		try {
-            String message = makeMessage(targetToken, title, body);
+			String message = makeMessage(targetToken, title, body);
 
-            OkHttpClient okHttpClient = new OkHttpClient();
-            RequestBody requestBody = RequestBody.create(message,
-                MediaType.get("application/json; charset=utf-8"));
-            Request request = new Request.Builder()
-                .url(API_URL)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION,
-                    "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
-                .build();
+			OkHttpClient okHttpClient = new OkHttpClient();
+			RequestBody requestBody = RequestBody.create(message,
+				MediaType.get("application/json; charset=utf-8"));
+			Request request = new Request.Builder()
+				.url(API_URL)
+				.post(requestBody)
+				.addHeader(HttpHeaders.AUTHORIZATION,
+					"Bearer " + getAccessToken())
+				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
+				.build();
 		} catch (IOException e) {
-            throw new FailedSendingNotificationException();
-        }
+			throw new FailedSendingNotificationException();
+		}
 
 	}
 

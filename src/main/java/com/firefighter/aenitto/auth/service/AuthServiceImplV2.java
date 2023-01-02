@@ -7,22 +7,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+
 import com.firefighter.aenitto.auth.client.ClientProxy;
 import com.firefighter.aenitto.auth.domain.RefreshToken;
-import com.firefighter.aenitto.auth.dto.request.LoginRequest;
 import com.firefighter.aenitto.auth.dto.request.LoginRequestV2;
-import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
 import com.firefighter.aenitto.auth.dto.response.LoginResponse;
-import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
 import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
 import com.firefighter.aenitto.auth.token.Token;
-import com.firefighter.aenitto.common.exception.auth.InvalidTokenException;
-import com.firefighter.aenitto.common.exception.auth.InvalidUserTokenException;
-import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @Qualifier(value = "authServiceImplV2 ")
@@ -87,7 +81,6 @@ public class AuthServiceImplV2 implements AuthServiceV2 {
 				.memberId(member.getId()).refreshToken(token.getRefreshToken()).build());
 		return token;
 	}
-
 
 	public Member saveMember(String socialId) {
 		final Member result = memberRepository

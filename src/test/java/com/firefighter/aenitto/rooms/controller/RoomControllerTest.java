@@ -1,28 +1,22 @@
 package com.firefighter.aenitto.rooms.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
-import com.firefighter.aenitto.common.exception.room.AdminCannotExitRoomException;
-import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
-import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
-import com.firefighter.aenitto.members.domain.Member;
-import com.firefighter.aenitto.missions.MissionFixture;
-import com.firefighter.aenitto.missions.domain.Mission;
-import com.firefighter.aenitto.rooms.domain.MemberRoom;
-import com.firefighter.aenitto.rooms.domain.Relation;
-import com.firefighter.aenitto.rooms.domain.Room;
-import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
-import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
-import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
-import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
-import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
-import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
-import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
-import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
-import com.firefighter.aenitto.rooms.service.RoomService;
-import com.firefighter.aenitto.support.security.WithMockCustomMember;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+
+import static com.firefighter.aenitto.members.MemberFixture.*;
+import static com.firefighter.aenitto.rooms.RoomFixture.*;
+import static com.firefighter.aenitto.rooms.domain.RelationFixture.relationFixture;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,23 +39,30 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static com.firefighter.aenitto.members.MemberFixture.*;
-import static com.firefighter.aenitto.rooms.RoomFixture.*;
-import static com.firefighter.aenitto.rooms.domain.RelationFixture.relationFixture;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.*;
-
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.room.AdminCannotExitRoomException;
+import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
+import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
+import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
+import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.missions.MissionFixture;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Relation;
+import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.dto.RoomRequestDtoBuilder;
+import com.firefighter.aenitto.rooms.dto.RoomResponseDtoBuilder;
+import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
+import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
+import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
+import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
+import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
+import com.firefighter.aenitto.rooms.service.RoomService;
+import com.firefighter.aenitto.support.security.WithMockCustomMember;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs

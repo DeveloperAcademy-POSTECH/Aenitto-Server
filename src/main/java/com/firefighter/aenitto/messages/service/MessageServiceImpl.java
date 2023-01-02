@@ -29,7 +29,6 @@ import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
-import com.firefighter.aenitto.notification.service.NotificationService;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.repository.RelationRepository;

@@ -1,24 +1,29 @@
 package com.firefighter.aenitto.message.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
-import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
-import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
-import com.firefighter.aenitto.common.exception.message.MessageErrorCode;
-import com.firefighter.aenitto.common.exception.message.NotManitteeException;
-import com.firefighter.aenitto.common.exception.room.RelationNotFoundException;
-import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
-import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
-import com.firefighter.aenitto.members.domain.Member;
-import com.firefighter.aenitto.messages.controller.MessageController;
-import com.firefighter.aenitto.messages.domain.Message;
-import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
-import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
-import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
-import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
-import com.firefighter.aenitto.messages.service.MessageService;
-import com.firefighter.aenitto.rooms.domain.MemberRoom;
-import com.firefighter.aenitto.rooms.domain.Room;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
+import static com.firefighter.aenitto.members.MemberFixture.memberFixture3;
+import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
+import static com.firefighter.aenitto.message.MessageFixture.*;
+import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
+import static com.firefighter.aenitto.rooms.RoomFixture.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,29 +47,25 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture2;
-import static com.firefighter.aenitto.members.MemberFixture.memberFixture3;
-import static com.firefighter.aenitto.message.ImageFixture.IMAGE;
-import static com.firefighter.aenitto.message.MessageFixture.*;
-import static com.firefighter.aenitto.message.dto.SendMessageRequestMultipartFile.requestMultipartFile;
-import static com.firefighter.aenitto.rooms.RoomFixture.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
+import com.firefighter.aenitto.common.exception.message.MessageErrorCode;
+import com.firefighter.aenitto.common.exception.message.NotManitteeException;
+import com.firefighter.aenitto.common.exception.room.RelationNotFoundException;
+import com.firefighter.aenitto.common.exception.room.RoomErrorCode;
+import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
+import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.messages.controller.MessageController;
+import com.firefighter.aenitto.messages.domain.Message;
+import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
+import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
+import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
+import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
+import com.firefighter.aenitto.messages.service.MessageService;
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Room;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs
