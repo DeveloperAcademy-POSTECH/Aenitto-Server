@@ -21,10 +21,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/static/**");
-    }
+    // @Bean
+    // public WebSecurityCustomizer webSecurityCustomizer() {
+    //     return (web) -> web.ignoring().antMatchers("/static/**");
+    // }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, TokenService tokenService) throws
@@ -39,6 +39,7 @@ public class SecurityConfig {
                         ,"/api/v1/temp-login"
                         ,"/api/v1/login"
                         ,"/api/v2/login"
+                        ,"/static/**"
                         ).permitAll()
                 .anyRequest().authenticated()
                 .and()

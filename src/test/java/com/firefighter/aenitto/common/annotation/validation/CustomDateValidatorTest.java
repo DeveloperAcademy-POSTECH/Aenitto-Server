@@ -72,7 +72,7 @@ public class CustomDateValidatorTest {
     @Test
     void valid_fail_year() {
         // given
-        final String value = "2024.1.1";
+        final String value = "2025.1.1";
 
         // when
         boolean valid = validator.isValid(value, context);
