@@ -51,6 +51,9 @@ public class MessageServiceImpl implements MessageService {
     @Qualifier("StorageS3ServiceImpl")
     private final StorageService storageService;
 
+    @Qualifier("fcmNotificationService")
+    private final NotificationService notificationService;
+
     @Override
     @Transactional
     public long sendMessageSeparate(Member currentMember, SendMessageApiDto dto) {
@@ -60,6 +63,11 @@ public class MessageServiceImpl implements MessageService {
         throwIfIdNotIdentical(relation.getManittee().getId(), dto.getManitteeId());
 
         Message message = initializeMessage(relation, dto);
+
+        if(relation.getManittee().getFcmToken() != null){
+            notificationService.sendMessage(relation.getManittee().getFcmToken(),
+                "마니띠로부터 메시지가 도착하였습니다.", message.getContent(), relation.getRoom().getId().toString());
+        }
         return messageRepository.saveMessage(message).getId();
     }
 
