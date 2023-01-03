@@ -51,30 +51,23 @@ public class MessageServiceImpl implements MessageService {
     @Qualifier("StorageS3ServiceImpl")
     private final StorageService storageService;
 
+    @Qualifier("fcmNotificationService")
+    private final NotificationService notificationService;
+
     @Override
     @Transactional
     public long sendMessageSeparate(Member currentMember, SendMessageApiDto dto) {
         Relation relation = relationRepository.findByRoomIdAndManittoId(dto.getRoomId(), currentMember.getId())
             .orElseThrow(RoomNotParticipatingException::new);
 
-        // TODO: 메시지 생성 메서드
-        Message message = Message.builder().content(messageContent).build();
-        message.sendMessage(relation.getManitto(), relation.getManittee(), relation.getRoom());
+        throwIfIdNotIdentical(relation.getManittee().getId(), dto.getManitteeId());
 
-        if (image != null) {
-            String renameImageName = getRenameImage(image);
-            uploadToFileStorage(image, renameImageName);
-            String imageUrl = storageService.getUrl(renameImageName);
-            message.setImgUrl(imageUrl);
-        }
+        Message message = initializeMessage(relation, dto);
 
         if(relation.getManittee().getFcmToken() != null){
             notificationService.sendMessage(relation.getManittee().getFcmToken(),
                 "마니띠로부터 메시지가 도착하였습니다.", message.getContent(), relation.getRoom().getId().toString());
         }
-        throwIfIdNotIdentical(relation.getManittee().getId(), dto.getManitteeId());
-
-        Message message = initializeMessage(relation, dto);
         return messageRepository.saveMessage(message).getId();
     }
 
