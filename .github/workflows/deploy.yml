@@ -29,8 +29,8 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-     
-      - name: env파일 생성     
+
+      - name: env파일 생성
         run: |
           cd ./src/main/resources/
           touch ./env.properties
@@ -41,6 +41,13 @@ jobs:
         env:
           IMAGE_ACCESS_KEY: ${{ secrets.AWS_IMAGE_ACCESS_KEY }}
           IMAGE_SECRET_KEY: ${{ secrets.AWS_IMAGE_SECRET_KEY }}
+
+      - name: firebase.json 생성
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "firebase_service_key.json"
+          json: ${{ secrets.FIREBASE_SERVICE_KEY }}
+          dir: 'src/main/resources/'
 
       # Build
       - name: Build with Gradle
@@ -57,7 +64,7 @@ jobs:
       # appspec.yml Copy
       - name: Copy appspec
         run: cp appspec.yml ./dev
-        
+
       # script file Copy
       - name: Copy shell
         run: cp ./scripts/* ./dev
@@ -76,7 +83,7 @@ jobs:
           --region ap-northeast-2 \
           --acl private \
           ./aenitto-dev-build.zip s3://aenitto-deploy/
-          
+
       # Deploy
       - name: Deploy
         env:

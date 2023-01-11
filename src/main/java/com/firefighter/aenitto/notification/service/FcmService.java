@@ -11,15 +11,16 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.google.auth.oauth2.GoogleCredentials;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import com.firefighter.aenitto.common.exception.notification.FailedSendingNotificationException;
 import com.firefighter.aenitto.notification.dto.FcmMessage;
@@ -27,14 +28,16 @@ import com.firefighter.aenitto.notification.dto.FcmMessage;
 @Service
 @RequiredArgsConstructor
 @Qualifier("fcmNotificationService")
+@Slf4j
 public class FcmService implements NotificationService {
 	@Value("${fcm.key.path}")
 	private String API_URL;
 	private final ObjectMapper objectMapper;
 
-	public void sendMessage(String targetToken, String title, String body) {
+	public void sendMessage(String targetToken, String title, String body, String roomId) {
 		try {
-			String message = makeMessage(targetToken, title, body);
+			String message = makeMessage(targetToken, title, body, roomId);
+			log.info("makeMessage" + message);
 
 			OkHttpClient okHttpClient = new OkHttpClient();
 			RequestBody requestBody = RequestBody.create(message,
@@ -46,21 +49,25 @@ public class FcmService implements NotificationService {
 					"Bearer " + getAccessToken())
 				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
 				.build();
+			Response response = okHttpClient.newCall(request).execute();
+			log.info("response" + response.code());
 		} catch (IOException e) {
 			throw new FailedSendingNotificationException();
 		}
 
 	}
 
-	private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
+	private String makeMessage(String targetToken, String title, String body, String roomId) throws
+		JsonProcessingException {
 
 		FcmMessage fcmMessage = FcmMessage.builder()
-			.title(title).body(body).targetToken(targetToken).build();
+			.title(title).body(body).targetToken(targetToken).roomId(roomId).build();
 		return objectMapper.writeValueAsString(fcmMessage);
 	}
 
+	// Todo: service_key 다른 방법으로 암호화 및 저장하기 (2022.12.27 - Daon)
 	private String getAccessToken() throws IOException {
-		String firebaseConfigPath = "firebase/firebase_service_key.json";
+		String firebaseConfigPath = "firebase_service_key.json";
 
 		GoogleCredentials googleCredentials = GoogleCredentials
 			.fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
