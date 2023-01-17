@@ -87,14 +87,14 @@ task copyDocument(type: Copy) {
 	into file("src/main/resources/static/docs")
 }
 
-//bootJar {
-//	archiveFileName = 'aenitto-dev.jar'
+bootJar {
+	archiveFileName = 'aenitto-dev.jar'
 //	dependsOn asciidoctor
 //	copy {
 //		from "${asciidoctor.outputDir}"
 //		into 'BOOT-INF/classes/static/docs'
 //	}
-//}
+}
 
 build {
 	dependsOn copyDocument
