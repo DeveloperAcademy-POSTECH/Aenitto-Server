@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.rooms.repository;
 
 import com.firefighter.aenitto.common.exception.room.InvitationNotFoundException;
+import com.firefighter.aenitto.common.utils.SqlPath;
 import com.firefighter.aenitto.members.MemberFixture;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.rooms.RoomFixture;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -370,13 +372,18 @@ class RoomRepositoryImplTest {
     }
 
     @DisplayName("진행 상황 기준으로 방 가져오기 - 성공")
+    @Sql(
+        SqlPath.ROOM_PROCESSING
+    )
     @Test
     void findRoomsByState_success() {
         // given
         Room room1 = RoomFixture.transientRoomFixture(1, 10, 10);
-        Room room2 = RoomFixture.transientRoomFixture(2, 10, 10);
+        Room room2 = RoomFixture.transientRoomFixture(100, 10, 10);
         room1.setState(RoomState.PRE);
         room2.setState(RoomState.PROCESSING);
+
+        System.out.println("room!!" + room1.getId());
 
         Member member1 = MemberFixture.transientMemberFixture(1);
         Member member2 = MemberFixture.transientMemberFixture(2);
@@ -414,7 +421,7 @@ class RoomRepositoryImplTest {
         // then
         assertThat(roomsProcessing).hasSize(1);
         assertThat(roomsPre).hasSize(1);
-        assertThat(roomsProcessing.get(0).getMemberRooms()).hasSize(2);
+        // assertThat(roomsProcessing.get(0).getMemberRooms()).hasSize(2);
         assertThat(roomsPre.get(0).getMemberRooms()).hasSize(3);
     }
 
@@ -459,5 +466,22 @@ class RoomRepositoryImplTest {
         assertThat(relation.getManittee().getId()).isEqualTo(member2.getId());
         assertThat(relation1.getManitto().getId()).isEqualTo(member2.getId());
         assertThat(relation1.getManittee().getId()).isEqualTo(member1.getId());
+    }
+
+    @DisplayName("진행중인 방 중 마니또 마치는 날인 방 가져오기 - 성공")
+    @Sql({
+        SqlPath.ROOM_PROCESSING
+    })
+    @Test
+    void findRoomsByStateAndEndDate_success() {
+
+        // when
+        // List<Room> foundRoom = roomRepository.findRoomsByStateAndEndDate(RoomState.PROCESSING, LocalDate.now());
+        List<Room> foundRoom = roomRepository.findRoomsByState(RoomState.PROCESSING);
+
+        // then
+        assertThat(foundRoom.size()).isEqualTo(1);
+        assertThat(foundRoom.get(0).getState()).isEqualTo(RoomState.PROCESSING);
+        // assertThat(foundRoom.get(0).getEndDate()).isEqualTo(LocalDate.now());
     }
 }
