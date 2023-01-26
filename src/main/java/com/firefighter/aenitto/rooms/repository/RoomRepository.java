@@ -6,6 +6,7 @@ import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,4 +25,5 @@ public interface RoomRepository {
     public List<Room> findRoomsByState(RoomState state);
 
     public Optional<Relation> findRelationByManittoId(UUID memberId, Long roomId);
+    public List<Room> findRoomsByStateAndEndDate(RoomState state, LocalDate endDate);
 }
