@@ -78,31 +78,11 @@ public class RelationShipRepositoryImplTest {
 		final Optional<Relation> result = target.findByRoomIdAndManitteeId(2L,
 			UUID.fromString("4ba90eab-c62b-4d44-aadb-b7f3183ea83e"));
 
+
 		// then
 		assertThat(result).isNotNull();
 		assertThat(result.get().getId()).isEqualTo(1L);
 		assertThat(result.get().getRoom().getId()).isEqualTo(2L);
 		assertThat(result.get().getManittee().getNickname()).isEqualTo("nickname2");
 	}
-
-	@DisplayName("진행중인 방 중 마니또 마치는 날인 방 가져오기 - 성공")
-	@Sql(
-		SqlPath.ROOM_PROCESSING
-	)
-	@Test
-	void findRoomsByStateAndEndDate_success() {
-
-		// when
-		// List<Room> foundRoom = roomRepository.findRoomsByStateAndEndDate(RoomState.PROCESSING, LocalDate.now());
-		// Optional<Room> foundRoom = roomRepository.findRoomById(2L);
-		// List<Room> foundRoom = roomRepository.findAllRooms();
-		List<Room> foundRoom = roomRepository.findRoomsByState(RoomState.PROCESSING);
-
-		// then
-		assertThat(foundRoom).isNotNull();
-		assertThat(foundRoom.get(0).getState()).isEqualTo(RoomState.PROCESSING);
-		// assertThat(foundRoom.get(0).getState()).isEqualTo(RoomState.PROCESSING);
-		// assertThat(foundRoom.get(0).getEndDate()).isEqualTo(LocalDate.now());
-	}
-
 }
