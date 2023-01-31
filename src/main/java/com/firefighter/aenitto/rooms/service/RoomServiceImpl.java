@@ -284,7 +284,7 @@ public class RoomServiceImpl implements RoomService {
 			for (MemberRoom memberRoom : room.getMemberRooms()) {
 				if (memberRoom.getMember().getFcmToken() != null) {
 					notificationService.sendMessage(memberRoom.getMember().getFcmToken(),
-						"10분 후에 마니또가 공개됩니다.", "마니또를 확인하러 가봐요.");
+						"10분 후에 마니또가 공개됩니다.", "마니또를 확인하러 가봐요.", room.getId().toString());
 				}
 			}
 		}
