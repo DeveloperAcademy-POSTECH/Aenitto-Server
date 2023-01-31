@@ -16,5 +16,6 @@ public class SqlPath {
     public static final String ROOM_POST = "classpath:sql/room/room-post.sql";
     public static final String MEMORIES = "classpath:sql/message/memories.sql";
     public static final String ROOM_PARTICIPATE = "classpath:sql/api/room-participate.sql";
+    public static final String ROOM_PROCESSING_ENDDATE = "classpath:sql/room/room-processing-endDate.sql";
     public static final String EXIT_ROOM = "classpath:sql/api/exit-room.sql";
 }
