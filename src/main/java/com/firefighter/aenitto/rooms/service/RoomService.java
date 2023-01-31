@@ -35,4 +35,6 @@ public interface RoomService {
     public void exitRoom(Member member, Long roomId);
 
     public void endAenitto();
+
+    public void sendManittoRevealNotification();
 }
