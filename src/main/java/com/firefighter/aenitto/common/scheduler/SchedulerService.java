@@ -28,13 +28,13 @@ public class SchedulerService {
 
     // TODO: Logger 설정 -> scheduler 로 서버 내부에서 돌릴 경우 exception throw 하지 않고 logging 남기는 방식으로 (22.09.04 - Leo)
     @Async
-    @Scheduled(cron = "0 55 23 * * ?", zone = LOCAL_TIMEZONE)
+    @Scheduled(cron = "0 15 0 * * ?", zone = LOCAL_TIMEZONE)
     // 0초 55분 23시
     void setDailyMissions() {
         log.info("SchedulerService::setDailyMissions - START");
         try {
-            missionService.setDailyCommonMission(LocalDate.now().plusDays(1));
-            missionService.setDailyIndividualMission(LocalDate.now().plusDays(1));
+            missionService.setDailyCommonMission(LocalDate.now());
+            missionService.setDailyIndividualMission(LocalDate.now());
         } catch (CustomException e) {
             log.warn("daily mission 을 설정하는데 문제가 생겼네요. \nmessage: {}", e.getMessage());
         }
@@ -47,5 +47,13 @@ public class SchedulerService {
         log.info("SchedulerService::endAenitto - START");
         roomService.endAenitto();
         log.info("SchedulerService::endAenitto - END");
+    }
+
+    @Async
+    @Scheduled(cron = "0 10 9 * * ?", zone = LOCAL_TIMEZONE)
+    void scheduleSendManittoNotification() {
+        log.info("SchedulerService::sendrevealManittoNotification - START");
+        roomService.sendManittoRevealNotification();
+        log.info("SchedulerService::sendrevealManittoNotification - END");
     }
 }
