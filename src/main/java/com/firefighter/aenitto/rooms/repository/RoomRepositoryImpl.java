@@ -117,10 +117,10 @@ public class RoomRepositoryImpl implements RoomRepository {
 					" FROM Room r" +
 					" JOIN FETCH r.memberRooms" +
 					" WHERE r.state = :roomState" +
-					" AND r.deleted = FALSE"
+					" AND r.deleted = FALSE" +
+						" AND r.endDate = :endDate"
 				, Room.class)
-			.setParameter("roomState", state)
-			// .setParameter("endDate", endDate)
+			.setParameter("roomState", state).setParameter("endDate", endDate)
 			.getResultList();
 	}
 

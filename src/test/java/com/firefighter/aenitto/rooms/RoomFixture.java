@@ -78,6 +78,15 @@ public class RoomFixture {
                 .build();
     }
 
+    public static Room transientLastDateRoomFixture(int number, int capacity, int date) {
+        return Room.builder()
+                .title("방제목" + number)
+                .capacity(capacity)
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now())
+                .build();
+    }
+
     public static MemberRoom transientMemberRoomFixture(int number) {
         return MemberRoom.builder()
                 .colorIdx(number)
