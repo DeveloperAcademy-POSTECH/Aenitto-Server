@@ -1,14 +1,10 @@
 package com.firefighter.aenitto.auth.service;
 
-import static com.firefighter.aenitto.members.MemberFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static com.firefighter.aenitto.members.MemberFixture.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,14 +16,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.firefighter.aenitto.auth.client.ClientProxy;
 import com.firefighter.aenitto.auth.domain.RefreshToken;
-import com.firefighter.aenitto.auth.dto.request.LoginRequest;
 import com.firefighter.aenitto.auth.dto.request.LoginRequestV2;
 import com.firefighter.aenitto.auth.dto.response.LoginResponse;
 import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;

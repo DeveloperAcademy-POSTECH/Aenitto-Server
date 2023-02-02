@@ -2,10 +2,10 @@ package com.firefighter.aenitto.common.exception.notification;
 
 import org.springframework.http.HttpStatus;
 
-import com.firefighter.aenitto.common.exception.ErrorCode;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import com.firefighter.aenitto.common.exception.ErrorCode;
 
 @Getter
 @AllArgsConstructor

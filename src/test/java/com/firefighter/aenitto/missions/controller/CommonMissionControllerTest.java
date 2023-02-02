@@ -1,13 +1,19 @@
 package com.firefighter.aenitto.missions.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
-import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
-import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
-import com.firefighter.aenitto.missions.domain.CommonMission;
-import com.firefighter.aenitto.missions.domain.Mission;
-import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
-import com.firefighter.aenitto.missions.service.MissionService;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import static com.firefighter.aenitto.missions.CommonMissionFixture.commonMissionFixture1;
+import static com.firefighter.aenitto.missions.MissionFixture.missionFixture1_Common;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,20 +35,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static com.firefighter.aenitto.missions.CommonMissionFixture.commonMissionFixture1;
-import static com.firefighter.aenitto.missions.MissionFixture.missionFixture1_Common;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.mission.MissionErrorCode;
+import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
+import com.firefighter.aenitto.missions.domain.CommonMission;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
+import com.firefighter.aenitto.missions.service.MissionService;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs

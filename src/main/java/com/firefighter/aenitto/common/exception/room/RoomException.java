@@ -4,7 +4,7 @@ import com.firefighter.aenitto.common.exception.CustomException;
 import com.firefighter.aenitto.common.exception.ErrorCode;
 
 public class RoomException extends CustomException {
-    public RoomException(ErrorCode errorCode) {
-        super(errorCode);
-    }
+	public RoomException(ErrorCode errorCode) {
+		super(errorCode);
+	}
 }

@@ -1,18 +1,7 @@
 package com.firefighter.aenitto.notification.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.common.exception.notification.FailedSendingNotificationException;
-import com.firefighter.aenitto.notification.dto.FcmMessage;
-import com.google.auth.oauth2.GoogleCredentials;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +9,21 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.auth.oauth2.GoogleCredentials;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+import com.firefighter.aenitto.common.exception.notification.FailedSendingNotificationException;
+import com.firefighter.aenitto.notification.dto.FcmMessage;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +57,8 @@ public class FcmService implements NotificationService {
 
 	}
 
-	private String makeMessage(String targetToken, String title, String body, String roomId) throws JsonProcessingException {
+	private String makeMessage(String targetToken, String title, String body, String roomId) throws
+		JsonProcessingException {
 
 		FcmMessage fcmMessage = FcmMessage.builder()
 			.title(title).body(body).targetToken(targetToken).roomId(roomId).build();

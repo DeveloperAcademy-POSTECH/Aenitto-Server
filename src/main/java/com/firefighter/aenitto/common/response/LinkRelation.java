@@ -4,12 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum LinkRelation {
-    FIRST("first"), NEXT("next")
-    ;
+	FIRST("first"), NEXT("next");
 
-    private String value;
+	private String value;
 
-    LinkRelation(String value) {
-        this.value = value;
-    }
+	LinkRelation(String value) {
+		this.value = value;
+	}
 }

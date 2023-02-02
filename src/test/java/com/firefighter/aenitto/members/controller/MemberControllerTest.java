@@ -1,11 +1,16 @@
 package com.firefighter.aenitto.members.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
-import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
-import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
-import com.firefighter.aenitto.members.dto.request.ChangeNicknameRequest;
-import com.firefighter.aenitto.members.service.MemberService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,19 +33,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
+import com.firefighter.aenitto.common.exception.member.MemberErrorCode;
+import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
+import com.firefighter.aenitto.members.dto.request.ChangeNicknameRequest;
+import com.firefighter.aenitto.members.service.MemberService;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs

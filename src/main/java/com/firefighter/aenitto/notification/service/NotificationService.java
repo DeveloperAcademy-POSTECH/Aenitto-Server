@@ -1,7 +1,5 @@
 package com.firefighter.aenitto.notification.service;
 
-import java.io.IOException;
-
 public interface NotificationService {
-	void sendMessage(String targetToken, String title, String body, String rooomId);
+	void sendMessage(String targetToken, String title, String body, String roomId);
 }

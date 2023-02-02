@@ -1,19 +1,21 @@
 package com.firefighter.aenitto.common.baseEntities;
 
-import lombok.Getter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
-import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import lombok.Getter;
 
 @MappedSuperclass
 @Getter
 @EntityListeners({AuditingEntityListener.class})
 public abstract class CreationLog {
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+	@CreatedDate
+	@Column(updatable = false)
+	private LocalDateTime createdAt;
 }

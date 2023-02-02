@@ -33,7 +33,6 @@ import com.firefighter.aenitto.auth.service.AuthService;
 import com.firefighter.aenitto.auth.service.AuthServiceV2;
 import com.firefighter.aenitto.common.exception.GlobalExceptionHandler;
 
-
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc

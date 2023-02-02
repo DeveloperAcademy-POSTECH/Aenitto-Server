@@ -1,28 +1,29 @@
 package com.firefighter.aenitto.missions.domain;
 
+import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mission {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "mission_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "mission_id")
+	private Long id;
 
-    private String content;
+	private String content;
 
-    @Enumerated(value = EnumType.STRING)
-    private MissionType type;
+	@Enumerated(value = EnumType.STRING)
+	private MissionType type;
 
-    @Builder
-    public Mission(String content, MissionType type) {
-        this.content = content;
-        this.type = type;
-    }
+	@Builder
+	public Mission(String content, MissionType type) {
+		this.content = content;
+		this.type = type;
+	}
 }
