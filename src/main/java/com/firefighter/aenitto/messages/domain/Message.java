@@ -46,6 +46,9 @@ public class Message extends CreationLog {
 	@Column
 	private String imgUrl;
 
+	@Column
+	private Long missionId;
+
 	public void sendMessage(Member sender, Member receiver, Room room) {
 		this.sender = sender;
 		this.receiver = receiver;
@@ -59,12 +62,13 @@ public class Message extends CreationLog {
 	}
 
 	@Builder
-	public Message(String content, String imgUrl) {
+	public Message(String content, String imgUrl, Long missionId) {
 		this.content = content;
 		this.imgUrl = imgUrl;
+		this.missionId = missionId;
 	}
 
-	public static Message initializeMessageRelationship(String content, Relation relation) {
+	public static Message initializeMessageRelationship(String content, Relation relation, Long missionId) {
 		Message message = Message.builder().content(content).build();
 		message.setMessageRelationship(relation);
 		return message;
