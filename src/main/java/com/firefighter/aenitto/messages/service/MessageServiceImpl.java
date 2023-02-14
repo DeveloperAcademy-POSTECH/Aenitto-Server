@@ -151,7 +151,7 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	private Message initializeMessage(Relation relation, SendMessageApiDto dto) {
-		Message message = Message.initializeMessageRelationship(dto.getMessageContent(), relation);
+		Message message = Message.initializeMessageRelationship(dto.getMessageContent(), relation, dto.getMissionId());
 		if (dto.isImageNotNull()) {
 			String imgUrl = uploadAndGetSavedImgUrl(dto.getImage());
 			message.setImgUrl(imgUrl);
