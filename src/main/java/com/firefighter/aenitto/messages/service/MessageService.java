@@ -8,6 +8,7 @@ import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
+import com.firefighter.aenitto.messages.dto.response.version2.ReceivedMessagesResponseV2;
 import com.firefighter.aenitto.messages.dto.response.version2.SentMessagesResponseV2;
 
 public interface MessageService {
@@ -21,6 +22,7 @@ public interface MessageService {
 	void setReadMessagesStatus(Member currentMember, Long roomId);
 
 	ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId);
+	ReceivedMessagesResponseV2 getReceivedMessagesV2(Member currentMember, Long roomId);
 
 	MemoriesResponse getMemories(Member currentMember, Long roomId);
 }

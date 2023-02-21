@@ -31,6 +31,7 @@ import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.version2.MessageResponseV2;
+import com.firefighter.aenitto.messages.dto.response.version2.ReceivedMessagesResponseV2;
 import com.firefighter.aenitto.messages.dto.response.version2.SentMessagesResponseV2;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.missions.domain.Mission;
@@ -160,26 +161,34 @@ public class MessageServiceImpl implements MessageService {
 			message.readMessage();
 		}
 		SentMessagesResponseV2 sentMessagesResponse = SentMessagesResponseV2.of(messages, relation.getManittee());
-		setMission(sentMessagesResponse);
+		setMission(sentMessagesResponse.getMessages());
 
 		return sentMessagesResponse;
 	}
 
-	public SentMessagesResponseV2 setMission(SentMessagesResponseV2 sentMessagesResponse) {
-		sentMessagesResponse.getMessages().stream().filter(message->message.hasMission())
+	public List<MessageResponseV2> setMission(List<MessageResponseV2> messagesResponse) {
+		messagesResponse.stream().filter(message->message.hasMission())
 			.forEach(messageWithMission ->
-				MessageResponseV2.MissionInfo
-					.setMissionContent(throwExceptionMissionNotExist(
-						messageWithMission.getMissionInfo().getId())));
-		return sentMessagesResponse;
-	}
+				messageWithMission.getMissionInfo()
+					.setContent(throwExceptionMissionNotExist(messageWithMission.getMissionInfo()
+						.getId()).getContent()));
 
+		return messagesResponse;
+	}
 
 	public ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
 		throwExceptionIfNotParticipating(currentMember.getId(), roomId);
 		Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
 		List<Message> messages = messageRepository.getReceivedMessages(currentMember.getId(), roomId);
 		return ReceivedMessagesResponse.of(messages);
+	}
+	public ReceivedMessagesResponseV2 getReceivedMessagesV2(Member currentMember, Long roomId) {
+		throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+		Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
+		List<Message> messages = messageRepository.getReceivedMessages(currentMember.getId(), roomId);
+		ReceivedMessagesResponseV2 receivedMessagesResponseV2 = ReceivedMessagesResponseV2.of(messages);
+		setMission(receivedMessagesResponseV2.getMessages());
+		return receivedMessagesResponseV2;
 	}
 
 	private Message initializeMessage(Relation relation, SendMessageApiDto dto) {
