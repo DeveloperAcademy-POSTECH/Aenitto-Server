@@ -39,6 +39,15 @@ public class MessageFixture {
 		return baseMessageFixture(8, true);
 	}
 
+	public static Message messageWithMisssionFixture1() {
+		return addMissionToMessageFixture(baseMessageFixture(1, false));
+	}
+
+	private static Message addMissionToMessageFixture(Message message) {
+		ReflectionTestUtils.setField(message, "missionId", message.getId());
+		return message;
+	}
+
 	private static Message baseMessageFixture(int number, boolean read) {
 		Message message = transientMessageFixture(number);
 		ReflectionTestUtils.setField(message, "id", number * 1L);
