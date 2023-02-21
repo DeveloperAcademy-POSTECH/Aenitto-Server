@@ -44,7 +44,9 @@ import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.messages.controller.MessageController;
 import com.firefighter.aenitto.messages.controller.MessageControllerV2;
 import com.firefighter.aenitto.messages.domain.Message;
+import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
+import com.firefighter.aenitto.messages.dto.response.version2.ReceivedMessagesResponseV2;
 import com.firefighter.aenitto.messages.dto.response.version2.SentMessagesResponseV2;
 import com.firefighter.aenitto.messages.service.MessageService;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
@@ -125,7 +127,7 @@ public class MessageControllerV2Test {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.count").exists())
 			.andExpect(jsonPath("$.messages[0].id").exists())
-			.andDo(document("보낸 메시지 가져오기",
+			.andDo(document("보낸 메시지 가져오기V2",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -149,6 +151,47 @@ public class MessageControllerV2Test {
 					fieldWithPath("manittee.nickname").description("내 마니띠 닉네임")
 				)
 			));
+	}
+
+	@DisplayName("받은 메시지 가져오기V2 - 성공")
+	@Test
+	void get_received_message_success() throws Exception {
+		//given
+		final String uri = "/api/v2/rooms/{roomId}/messages-received";
+		Long roomId = 1L;
+		when(messageService.getReceivedMessagesV2(any(Member.class), anyLong()))
+			.thenReturn(ReceivedMessagesResponseV2.of(messages));
+
+		//when, then, docs
+		mockMvc.perform(RestDocumentationRequestBuilders.get(uri, roomId)
+				.header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.count").exists())
+			.andExpect(jsonPath("$.messages[0].id").exists())
+			.andDo(document("받은 메시지 가져오기V2",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("roomId").description("방 id")
+				),
+				requestHeaders(
+					headerWithName(HttpHeaders.AUTHORIZATION).description("유저 인증 토큰")
+				),
+				responseFields(
+					fieldWithPath("count").description("총 메시지 수"),
+					fieldWithPath("messages").description("보낸 메시지들"),
+					fieldWithPath("messages[0].id").description("메세지 id"),
+					fieldWithPath("messages[0].content").description("메세지 내용"),
+					fieldWithPath("messages[0].imageUrl").description("메세지에 들어간 사진"),
+					fieldWithPath("messages[0].createdDate").description("메세지 생성 날짜"),
+					fieldWithPath("messages[0].missionInfo").description("메세지의 미션 정보"),
+					fieldWithPath("messages[0].missionInfo.id").description("메세지의 미션 id"),
+					fieldWithPath("messages[0].missionInfo.content").description("메세지의 미션 내용")
+				)
+			));
+		;
 	}
 
 }
