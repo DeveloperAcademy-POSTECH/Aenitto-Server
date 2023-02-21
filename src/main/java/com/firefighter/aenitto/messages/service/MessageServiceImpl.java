@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import com.firefighter.aenitto.common.exception.message.FileUploadException;
 import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
 import com.firefighter.aenitto.common.exception.message.NotManitteeException;
+import com.firefighter.aenitto.common.exception.mission.MissionNotExistException;
+import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RelationNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
@@ -28,7 +30,11 @@ import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
+import com.firefighter.aenitto.messages.dto.response.version2.MessageResponseV2;
+import com.firefighter.aenitto.messages.dto.response.version2.SentMessagesResponseV2;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.notification.service.NotificationService;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
@@ -53,6 +59,8 @@ public class MessageServiceImpl implements MessageService {
 
 	@Qualifier("fcmNotificationService")
 	private final NotificationService notificationService;
+	@Qualifier("missionRepositoryImpl")
+	private final MissionRepository missionRepository;
 
 	@Override
 	@Transactional
@@ -142,6 +150,30 @@ public class MessageServiceImpl implements MessageService {
 
 		return MemoriesResponse.of(myManitto, myManittee, receivedMessage, sentMessage);
 	}
+	@Override
+	public SentMessagesResponseV2 getSentMessagesV2(Member currentMember, Long roomId) {
+		throwExceptionIfNotParticipating(currentMember.getId(), roomId);
+		Relation relation = throwExceptionIfManitteeNotFound(currentMember.getId(), roomId);
+		List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
+
+		for (Message message : messages) {
+			message.readMessage();
+		}
+		SentMessagesResponseV2 sentMessagesResponse = SentMessagesResponseV2.of(messages, relation.getManittee());
+		setMission(sentMessagesResponse);
+
+		return sentMessagesResponse;
+	}
+
+	public SentMessagesResponseV2 setMission(SentMessagesResponseV2 sentMessagesResponse) {
+		sentMessagesResponse.getMessages().stream().filter(message->message.hasMission())
+			.forEach(messageWithMission ->
+				MessageResponseV2.MissionInfo
+					.setMissionContent(throwExceptionMissionNotExist(
+						messageWithMission.getMissionInfo().getId())));
+		return sentMessagesResponse;
+	}
+
 
 	public ReceivedMessagesResponse getReceivedMessages(Member currentMember, Long roomId) {
 		throwExceptionIfNotParticipating(currentMember.getId(), roomId);
@@ -209,5 +241,9 @@ public class MessageServiceImpl implements MessageService {
 	private Relation throwExceptionIfManittoNotFound(UUID memberId, Long roomId) {
 		return relationRepository.findByRoomIdAndManitteeId(roomId, memberId)
 			.orElseThrow(RelationNotFoundException::new);
+	}
+	private Mission throwExceptionMissionNotExist(Long missionId) {
+		return missionRepository.findById(missionId)
+			.orElseThrow(MissionNotExistException::new);
 	}
 }
