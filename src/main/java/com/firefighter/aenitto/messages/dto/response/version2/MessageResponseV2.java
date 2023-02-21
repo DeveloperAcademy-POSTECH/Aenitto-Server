@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @NoArgsConstructor(force = true)
@@ -25,22 +26,17 @@ public class MessageResponseV2 {
 	private final MissionInfo missionInfo;
 
 	@Getter
+	@Setter
 	@Builder
 	@AllArgsConstructor
 	@NoArgsConstructor(force = true)
 	public static class MissionInfo {
 		private final Long id;
-		private final String content;
+		private String content;
 
 		public static MissionInfo setMissionId(Long missionId) {
 			return MissionInfo.builder()
 				.id(missionId)
-				.build();
-		}
-
-		public static MissionInfo setMissionContent(Mission mission) {
-			return MissionInfo.builder()
-				.content(mission.getContent())
 				.build();
 		}
 	}
@@ -60,7 +56,6 @@ public class MessageResponseV2 {
 
 	public boolean hasMission() {
 		if (missionInfo.id != null) {
-			System.out.println(missionInfo.id);
 			return true;
 		} else {
 			return false;

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.firefighter.aenitto.common.annotation.CurrentMember;
 import com.firefighter.aenitto.members.domain.Member;
+import com.firefighter.aenitto.messages.dto.response.version2.ReceivedMessagesResponseV2;
 import com.firefighter.aenitto.messages.dto.response.version2.SentMessagesResponseV2;
 import com.firefighter.aenitto.messages.service.MessageService;
 
@@ -22,10 +23,18 @@ public class MessageControllerV2 {
 	private final MessageService messageService;
 
 	@GetMapping("/messages-sent")
-	public ResponseEntity<SentMessagesResponseV2> getSentMessages(
+	public ResponseEntity<SentMessagesResponseV2> getSentMessagesV2(
 		@CurrentMember Member currentMember,
 		@PathVariable final Long roomId
 	) {
 		return ResponseEntity.ok(messageService.getSentMessagesV2(currentMember, roomId));
+	}
+
+	@GetMapping("/messages-received")
+	public ResponseEntity<ReceivedMessagesResponseV2> getReceivedMessagesV2(
+		@CurrentMember Member currentMember,
+		@PathVariable final Long roomId
+	) {
+		return ResponseEntity.ok(messageService.getReceivedMessagesV2(currentMember, roomId));
 	}
 }
