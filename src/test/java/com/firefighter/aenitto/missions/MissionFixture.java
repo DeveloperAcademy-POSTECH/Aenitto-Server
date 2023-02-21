@@ -17,6 +17,7 @@ public class MissionFixture {
 	private static Mission baseMissionFixture(int number, MissionType type) {
 		Mission mission = transientMissionFixture(number, type);
 		ReflectionTestUtils.setField(mission, "id", number * 1L);
+		ReflectionTestUtils.setField(mission, "content", "string");
 		return mission;
 	}
 
