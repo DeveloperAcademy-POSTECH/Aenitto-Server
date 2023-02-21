@@ -42,6 +42,8 @@ import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
+import com.firefighter.aenitto.messages.dto.response.version2.MessageResponseV2;
+import com.firefighter.aenitto.messages.dto.response.version2.ReceivedMessagesResponseV2;
 import com.firefighter.aenitto.messages.dto.response.version2.SentMessagesResponseV2;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.messages.service.MessageServiceImpl;
@@ -111,7 +113,7 @@ public class MessageServiceImplTest {
 	private MultipartFile image;
 
 	List<Message> messages = new ArrayList<>();
-	List<Message> messageWithMissions = new ArrayList<>();
+	List<Message> messagesWithMission = new ArrayList<>();
 	List<Message> messages2 = new ArrayList<>();
 
 	@BeforeEach
@@ -134,17 +136,15 @@ public class MessageServiceImplTest {
 
 		messageWithMission1 = messageWithMisssionFixture1();
 
-
-
 		messages.add(message1);
 		messages.add(message2);
 		messages.add(message3);
 		messages.add(message4);
 		messages.add(message5);
 
-		messageWithMissions.add(message1);
-		messageWithMissions.add(message2);
-		messageWithMissions.add(messageWithMission1);
+		messagesWithMission.add(message1);
+		messagesWithMission.add(message2);
+		messagesWithMission.add(messageWithMission1);
 	}
 
 	@DisplayName("메세지 생성 - 실패 / 사진파일의 확장자명을 찾을 수 없음")
@@ -324,7 +324,7 @@ public class MessageServiceImplTest {
 			.findMemberRoomById(manitto.getId(), room.getId());
 		doReturn(Optional.ofNullable(relation)).when(relationRepository)
 			.findByRoomIdAndManittoId(room.getId(), manitto.getId());
-		doReturn(messageWithMissions).when(messageRepository)
+		doReturn(messagesWithMission).when(messageRepository)
 			.getSentMessages(manitto.getId(), room.getId());
 		doReturn(Optional.of(mission)).when(missionRepository)
 			.findById(1L);
@@ -356,7 +356,7 @@ public class MessageServiceImplTest {
 			.findMemberRoomById(manitto.getId(), room.getId());
 		doReturn(Optional.ofNullable(relation)).when(relationRepository)
 			.findByRoomIdAndManittoId(room.getId(), manitto.getId());
-		doReturn(messageWithMissions).when(messageRepository)
+		doReturn(messagesWithMission).when(messageRepository)
 			.getSentMessages(manitto.getId(), room.getId());
 		doReturn(Optional.empty()).when(missionRepository)
 			.findById(1L);
@@ -471,6 +471,55 @@ public class MessageServiceImplTest {
 			.findByRoomIdAndManitteeId(room.getId(), manittee.getId());
 		verify(messageRepository, times(1))
 			.getReceivedMessages(manittee.getId(), room.getId());
+	}
+
+	@DisplayName("받은 메시지 가져오기V2 - 성공")
+	@Test
+	void getReceivedMessagesV2_success() {
+		//given
+		memberRoom = memberRoomFixture1(manittee, room);
+		doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+			.findMemberRoomById(manittee.getId(), room.getId());
+		doReturn(Optional.ofNullable(relation)).when(relationRepository)
+			.findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+		doReturn(messagesWithMission).when(messageRepository)
+			.getReceivedMessages(manittee.getId(), room.getId());
+		doReturn(Optional.of(mission)).when(missionRepository)
+			.findById(1L);
+
+		//when
+		ReceivedMessagesResponseV2 response = target.getReceivedMessagesV2(manittee, room.getId());
+
+		//then
+		assertThat(response.getCount()).isEqualTo(3);
+		assertThat(response.getMessages().size()).isEqualTo(3);
+		assertThat(response.getMessages().get(0).getId()).isEqualTo(1L);
+		assertThat(response.getMessages().get(2).getMissionInfo().getId()).isNotNull();
+
+		verify(roomRepository, times(1))
+			.findMemberRoomById(manittee.getId(), room.getId());
+		verify(relationRepository, times(1))
+			.findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+		verify(messageRepository, times(1))
+			.getReceivedMessages(manittee.getId(), room.getId());
+	}
+
+	@DisplayName("미션 정보 설정 - 성공")
+	@Test
+	void setMissionInfo_success() {
+		//given
+		doReturn(Optional.of(mission)).when(missionRepository)
+			.findById(1L);
+		List<MessageResponseV2> messageResponseV2List = new ArrayList<>();
+		MessageResponseV2 messageResponseV2 = MessageResponseV2.builder().id(1L).missionInfo(
+			MessageResponseV2.MissionInfo.setMissionId(1L)).build();
+		messageResponseV2List.add(messageResponseV2);
+
+		//when
+		List<MessageResponseV2> responseV2 = target.setMission(messageResponseV2List);
+
+		//then
+		assertThat(responseV2.get(0).getMissionInfo().getContent()).isNotNull();
 	}
 
 	@DisplayName("추억 가져오기 - 실패 / 참여하고 있지 않은 방")
