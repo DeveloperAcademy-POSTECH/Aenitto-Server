@@ -44,4 +44,9 @@ public class MissionRepositoryImpl implements MissionRepository {
 			.getResultStream()
 			.findFirst();
 	}
+
+	@Override
+	public Optional<Mission> findById(Long id) {
+		return Optional.ofNullable(em.find(Mission.class, id));
+	}
 }
