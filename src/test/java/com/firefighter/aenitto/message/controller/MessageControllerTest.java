@@ -252,14 +252,7 @@ public class MessageControllerTest {
 				.contentType(MediaType.MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isCreated())
-			.andExpect(header().exists("Location"))
-			.andDo(document("메세지 생성 - 성공",
-				// preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())
-				// requestPartFields(
-				//     ""
-				// )
-			));
+			.andExpect(header().exists("Location"));
 	}
 
 	//    TODO: 이미지 용량 체크 테스트 만들기 - 다온

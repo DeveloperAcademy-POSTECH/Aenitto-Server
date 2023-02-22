@@ -79,6 +79,7 @@ public class MessageIntegrationTest extends IntegrationTest {
 		assertThat(findMessage.getReceiver().getId()).isEqualTo(UUID.fromString(manitteeId));
 		assertThat(findMessage.didRead()).isFalse();
 		assertThat(findMessage.getContent()).isEqualTo(messageContent);
+		assertThat(findMessage.getMissionId()).isEqualTo(1L);
 		assertThat(findMessage.getImgUrl()).isEqualTo(STORAGE_SAVED_IMG_URL);
 	}
 

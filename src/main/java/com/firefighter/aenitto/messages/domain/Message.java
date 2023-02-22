@@ -68,7 +68,7 @@ public class Message extends CreationLog {
 		this.missionId = missionId;
 	}
 
-	public static Message initializeMessageRelationship(String content, Relation relation, Long missionId) {
+	public static Message initializeMessageRelationship(String content, Relation relation) {
 		Message message = Message.builder().content(content).build();
 		message.setMessageRelationship(relation);
 		return message;
@@ -76,6 +76,10 @@ public class Message extends CreationLog {
 
 	public void setImgUrl(String imgUrl) {
 		this.imgUrl = imgUrl;
+	}
+
+	public void setMissionId(Long missionId) {
+		this.missionId = missionId;
 	}
 
 	public boolean didRead() {

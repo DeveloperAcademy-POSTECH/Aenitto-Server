@@ -167,7 +167,7 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	public List<MessageResponseV2> setMission(List<MessageResponseV2> messagesResponse) {
-		messagesResponse.stream().filter(message->message.hasMission())
+		messagesResponse.stream().filter(message -> message.hasMission())
 			.forEach(messageWithMission ->
 				messageWithMission.getMissionInfo()
 					.setContent(throwExceptionMissionNotExist(messageWithMission.getMissionInfo()
@@ -182,6 +182,7 @@ public class MessageServiceImpl implements MessageService {
 		List<Message> messages = messageRepository.getReceivedMessages(currentMember.getId(), roomId);
 		return ReceivedMessagesResponse.of(messages);
 	}
+
 	public ReceivedMessagesResponseV2 getReceivedMessagesV2(Member currentMember, Long roomId) {
 		throwExceptionIfNotParticipating(currentMember.getId(), roomId);
 		Relation relation = throwExceptionIfManittoNotFound(currentMember.getId(), roomId);
@@ -192,10 +193,13 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	private Message initializeMessage(Relation relation, SendMessageApiDto dto) {
-		Message message = Message.initializeMessageRelationship(dto.getMessageContent(), relation, dto.getMissionId());
+		Message message = Message.initializeMessageRelationship(dto.getMessageContent(), relation);
 		if (dto.isImageNotNull()) {
 			String imgUrl = uploadAndGetSavedImgUrl(dto.getImage());
 			message.setImgUrl(imgUrl);
+		}
+		if (dto.isMissionIdNotNull()) {
+			message.setMissionId(Long.parseLong(dto.getMissionId()));
 		}
 		return message;
 	}
