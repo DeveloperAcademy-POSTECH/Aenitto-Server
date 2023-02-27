@@ -12,4 +12,5 @@ public interface MissionRepository {
 	Optional<Mission> findRandomMission(MissionType missionType);
 
 	Optional<IndividualMission> findIndividualMissionByDate(LocalDate date, Long memberRoomId);
+	Optional<Mission> findById(Long id);
 }

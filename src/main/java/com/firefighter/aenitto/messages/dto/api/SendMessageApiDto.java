@@ -14,12 +14,13 @@ public class SendMessageApiDto {
 	private final String manitteeId;
 	private final String messageContent;
 	private final MultipartFile image;
+	private final String missionId;
 
 	public UUID getManitteeId() {
 		return UUID.fromString(this.manitteeId);
 	}
-
 	public boolean isImageNotNull() {
 		return image != null;
 	}
+	public boolean isMissionIdNotNull(){return missionId != null;}
 }

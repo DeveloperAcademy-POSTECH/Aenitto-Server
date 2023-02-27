@@ -1,5 +1,7 @@
 package com.firefighter.aenitto.message.service;
 
+import static com.firefighter.aenitto.missions.IndividualMissionFixture.*;
+import static com.firefighter.aenitto.missions.MissionFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.firefighter.aenitto.common.exception.message.FileUploadException;
 import com.firefighter.aenitto.common.exception.message.ImageExtensionNotFoundException;
 import com.firefighter.aenitto.common.exception.message.NotManitteeException;
+import com.firefighter.aenitto.common.exception.mission.MissionNotExistException;
 import com.firefighter.aenitto.common.exception.room.RelationNotFoundException;
 import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
 import com.firefighter.aenitto.members.domain.Member;
@@ -39,9 +42,14 @@ import com.firefighter.aenitto.messages.dto.request.SendMessageRequest;
 import com.firefighter.aenitto.messages.dto.response.MemoriesResponse;
 import com.firefighter.aenitto.messages.dto.response.ReceivedMessagesResponse;
 import com.firefighter.aenitto.messages.dto.response.SentMessagesResponse;
+import com.firefighter.aenitto.messages.dto.response.version2.MessageResponseV2;
+import com.firefighter.aenitto.messages.dto.response.version2.ReceivedMessagesResponseV2;
+import com.firefighter.aenitto.messages.dto.response.version2.SentMessagesResponseV2;
 import com.firefighter.aenitto.messages.repository.MessageRepository;
 import com.firefighter.aenitto.messages.service.MessageServiceImpl;
 import com.firefighter.aenitto.messages.service.StorageS3ServiceImpl;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -70,6 +78,10 @@ public class MessageServiceImplTest {
 	private RoomRepository roomRepository;
 
 	@Mock
+	@Qualifier("missionRepositoryImpl")
+	private MissionRepository missionRepository;
+
+	@Mock
 	private StorageS3ServiceImpl storageS3Service;
 
 	private Message message;
@@ -78,6 +90,8 @@ public class MessageServiceImplTest {
 	private Message message3;
 	private Message message4;
 	private Message message5;
+
+	private Message messageWithMission1;
 
 	private Member manitto;
 	private Member manittee;
@@ -94,10 +108,12 @@ public class MessageServiceImplTest {
 	private Relation relation;
 
 	private Room room;
+	private Mission mission;
 
 	private MultipartFile image;
 
 	List<Message> messages = new ArrayList<>();
+	List<Message> messagesWithMission = new ArrayList<>();
 	List<Message> messages2 = new ArrayList<>();
 
 	@BeforeEach
@@ -109,6 +125,7 @@ public class MessageServiceImplTest {
 		room = roomFixture1();
 		relation = relationFixture(manitto, manittee, room);
 		image = IMAGE;
+		mission = missionFixture2_Individual();
 
 		message = messageFixture1();
 		message1 = messageFixture1();
@@ -117,11 +134,17 @@ public class MessageServiceImplTest {
 		message4 = messageFixture4();
 		message5 = messageFixture5();
 
+		messageWithMission1 = messageWithMisssionFixture1();
+
 		messages.add(message1);
 		messages.add(message2);
 		messages.add(message3);
 		messages.add(message4);
 		messages.add(message5);
+
+		messagesWithMission.add(message1);
+		messagesWithMission.add(message2);
+		messagesWithMission.add(messageWithMission1);
 	}
 
 	@DisplayName("메세지 생성 - 실패 / 사진파일의 확장자명을 찾을 수 없음")
@@ -292,6 +315,59 @@ public class MessageServiceImplTest {
 			.getSentMessages(manitto.getId(), room.getId());
 	}
 
+	@DisplayName("보낸 메시지 가져오기V2 - 성공")
+	@Test
+	void getSentMessagesV2_success() {
+		//given
+		memberRoom = memberRoomFixture1(manitto, room);
+		doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+			.findMemberRoomById(manitto.getId(), room.getId());
+		doReturn(Optional.ofNullable(relation)).when(relationRepository)
+			.findByRoomIdAndManittoId(room.getId(), manitto.getId());
+		doReturn(messagesWithMission).when(messageRepository)
+			.getSentMessages(manitto.getId(), room.getId());
+		doReturn(Optional.of(mission)).when(missionRepository)
+			.findById(1L);
+
+		//when
+		SentMessagesResponseV2 response = target.getSentMessagesV2(manitto, room.getId());
+
+		//then
+		assertThat(response.getCount()).isEqualTo(3);
+		assertThat(response.getMessages().size()).isEqualTo(3);
+		assertThat(response.getMessages().get(0).getId()).isEqualTo(1L);
+		assertThat(response.getMessages().get(0).getMissionInfo().getId()).isNull();
+		assertThat(response.getMessages().get(2).getMissionInfo().getId()).isNotNull();
+
+		verify(roomRepository, times(1))
+			.findMemberRoomById(manitto.getId(), room.getId());
+		verify(relationRepository, times(1))
+			.findByRoomIdAndManittoId(room.getId(), manitto.getId());
+		verify(messageRepository, times(1))
+			.getSentMessages(manitto.getId(), room.getId());
+	}
+
+	@DisplayName("보낸 메시지 가져오기V2 - 실패(유효하지 않은 미션)")
+	@Test
+	void getSentMessagesV2_failure_mission_notValid() {
+		//given
+		memberRoom = memberRoomFixture1(manitto, room);
+		doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+			.findMemberRoomById(manitto.getId(), room.getId());
+		doReturn(Optional.ofNullable(relation)).when(relationRepository)
+			.findByRoomIdAndManittoId(room.getId(), manitto.getId());
+		doReturn(messagesWithMission).when(messageRepository)
+			.getSentMessages(manitto.getId(), room.getId());
+		doReturn(Optional.empty()).when(missionRepository)
+			.findById(1L);
+
+		//when, then
+		assertThatExceptionOfType(MissionNotExistException.class)
+			.isThrownBy(() -> {
+				target.getSentMessagesV2(manitto, room.getId());
+			});
+	}
+
 	@DisplayName("읽은 메세지 상태 변경 - 실패 / 참여하고 있지 않은 방")
 	@Test
 	void setReadMessagesStatus_failure_not_participating_room() {
@@ -395,6 +471,55 @@ public class MessageServiceImplTest {
 			.findByRoomIdAndManitteeId(room.getId(), manittee.getId());
 		verify(messageRepository, times(1))
 			.getReceivedMessages(manittee.getId(), room.getId());
+	}
+
+	@DisplayName("받은 메시지 가져오기V2 - 성공")
+	@Test
+	void getReceivedMessagesV2_success() {
+		//given
+		memberRoom = memberRoomFixture1(manittee, room);
+		doReturn(Optional.ofNullable(memberRoom)).when(roomRepository)
+			.findMemberRoomById(manittee.getId(), room.getId());
+		doReturn(Optional.ofNullable(relation)).when(relationRepository)
+			.findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+		doReturn(messagesWithMission).when(messageRepository)
+			.getReceivedMessages(manittee.getId(), room.getId());
+		doReturn(Optional.of(mission)).when(missionRepository)
+			.findById(1L);
+
+		//when
+		ReceivedMessagesResponseV2 response = target.getReceivedMessagesV2(manittee, room.getId());
+
+		//then
+		assertThat(response.getCount()).isEqualTo(3);
+		assertThat(response.getMessages().size()).isEqualTo(3);
+		assertThat(response.getMessages().get(0).getId()).isEqualTo(1L);
+		assertThat(response.getMessages().get(2).getMissionInfo().getId()).isNotNull();
+
+		verify(roomRepository, times(1))
+			.findMemberRoomById(manittee.getId(), room.getId());
+		verify(relationRepository, times(1))
+			.findByRoomIdAndManitteeId(room.getId(), manittee.getId());
+		verify(messageRepository, times(1))
+			.getReceivedMessages(manittee.getId(), room.getId());
+	}
+
+	@DisplayName("미션 정보 설정 - 성공")
+	@Test
+	void setMissionInfo_success() {
+		//given
+		doReturn(Optional.of(mission)).when(missionRepository)
+			.findById(1L);
+		List<MessageResponseV2> messageResponseV2List = new ArrayList<>();
+		MessageResponseV2 messageResponseV2 = MessageResponseV2.builder().id(1L).missionInfo(
+			MessageResponseV2.MissionInfo.setMissionId(1L)).build();
+		messageResponseV2List.add(messageResponseV2);
+
+		//when
+		List<MessageResponseV2> responseV2 = target.setMission(messageResponseV2List);
+
+		//then
+		assertThat(responseV2.get(0).getMissionInfo().getContent()).isNotNull();
 	}
 
 	@DisplayName("추억 가져오기 - 실패 / 참여하고 있지 않은 방")

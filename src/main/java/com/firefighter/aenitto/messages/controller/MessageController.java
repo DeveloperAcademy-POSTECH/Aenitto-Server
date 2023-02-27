@@ -48,10 +48,11 @@ public class MessageController {
 		@PathVariable final Long roomId,
 		@RequestPart @Nullable final MultipartFile image,
 		@Valid @RequestPart final String manitteeId,
-		@Nullable @RequestPart final String messageContent
+		@Nullable @RequestPart() final String messageContent,
+		@Nullable @RequestPart(required = false) final String missionId
 	) {
 		final Long messageId = messageService.sendMessageSeparate(currentMember,
-			new SendMessageApiDto(roomId, manitteeId, messageContent, image));
+			new SendMessageApiDto(roomId, manitteeId, messageContent, image, missionId));
 		return ResponseEntity.created(URI.create("/api/v1/rooms/" + roomId + "/messages/" + messageId)).build();
 	}
 

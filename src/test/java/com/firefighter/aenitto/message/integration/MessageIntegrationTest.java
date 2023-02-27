@@ -54,11 +54,13 @@ public class MessageIntegrationTest extends IntegrationTest {
 		MockMultipartFile image = IMAGE;
 		final String messageContent = "message";
 		final String manitteeId = "b383cdb3-a871-4410-b147-fb1f7b447b9e";
+		final String missionId = "1";
 
 		// when, then
 		mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/rooms/{roomId}/messages-separate", 100L)
 				.file(image)
 				.file("manitteeId", manitteeId.getBytes(StandardCharsets.UTF_8))
+				.file("missionId", missionId.getBytes(StandardCharsets.UTF_8))
 				.file("messageContent", messageContent.getBytes(StandardCharsets.UTF_8))
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 			)
@@ -77,6 +79,7 @@ public class MessageIntegrationTest extends IntegrationTest {
 		assertThat(findMessage.getReceiver().getId()).isEqualTo(UUID.fromString(manitteeId));
 		assertThat(findMessage.didRead()).isFalse();
 		assertThat(findMessage.getContent()).isEqualTo(messageContent);
+		assertThat(findMessage.getMissionId()).isEqualTo(1L);
 		assertThat(findMessage.getImgUrl()).isEqualTo(STORAGE_SAVED_IMG_URL);
 	}
 
