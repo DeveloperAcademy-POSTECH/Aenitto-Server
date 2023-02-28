@@ -609,7 +609,7 @@ Content-Type: application/json
 Content-Length: 157
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 35, 969912000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 21, 628867000 ],
   "status" : 400,
   "message" : "유효하지 않은 identity 토큰입니다.",
   "errors" : [ ]
@@ -890,7 +890,7 @@ Content-Type: application/json
 Content-Length: 281
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 675087000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 25, 431762000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -914,7 +914,7 @@ Content-Type: application/json
 Content-Length: 152
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 685434000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 25, 517643000 ],
   "status" : 404,
   "message" : "존재하지 않는 사용자 입니다.",
   "errors" : [ ]
@@ -1022,10 +1022,10 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 33
+Content-Length: 26
 
 {
-  "mission" : "COMMON미션1"
+  "mission" : "string"
 }</code></pre>
 </div>
 </div>
@@ -1063,10 +1063,10 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
 Content-Type: application/json
-Content-Length: 160
+Content-Length: 159
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 35, 806835000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 21, 29838000 ],
   "status" : 404,
   "message" : "오늘의 미션이 설정되지 않았습니다",
   "errors" : [ ]
@@ -1311,7 +1311,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 621
+Content-Length: 610
 
 {
   "room" : {
@@ -1325,7 +1325,7 @@ Content-Length: 621
   "participants" : {
     "count" : 1,
     "members" : [ {
-      "id" : "51b5ffb7-64e7-4660-8977-0b9b77cee224",
+      "id" : "126f6e37-ad99-4cae-8daf-06f581076b7e",
       "nickname" : "멤버1"
     } ]
   },
@@ -1340,7 +1340,7 @@ Content-Length: 621
   },
   "mission" : {
     "id" : 2,
-    "content" : "INDIVIDUAL미션2"
+    "content" : "string"
   },
   "didViewRoulette" : false,
   "admin" : false,
@@ -1753,17 +1753,17 @@ Content-Type: application/json
 Content-Length: 482
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 37, 81466000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 27, 16713000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
-    "field" : "room.endDate",
-    "value" : "2022.2.31",
-    "reason" : "존재하지 않는 연/월/일 값입니다. \n현재 입력 값: 2022.2.31"
-  }, {
     "field" : "room.startDate",
     "value" : "1999.10.01",
     "reason" : "년도는 2000 ~ 2024 사이의 값을 입력해주세요. \n현재 입력 값: 1999.10.01"
+  }, {
+    "field" : "room.endDate",
+    "value" : "2022.2.31",
+    "reason" : "존재하지 않는 연/월/일 값입니다. \n현재 입력 값: 2022.2.31"
   } ]
 }</code></pre>
 </div>
@@ -1781,7 +1781,7 @@ Content-Type: application/json
 Content-Length: 264
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 37, 180520000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 27, 398907000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2165,7 +2165,7 @@ Content-Type: application/json
 Content-Length: 260
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 37, 223892000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 27, 556573000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2190,11 +2190,8 @@ Content-Length: 260
 <h4 id="_성공_response_6"><a class="link" href="#_성공_response_6">성공 response</a></h4>
 <div class="sect4">
 <h5 id="_성공_response_6_http_response"><a class="link" href="#_성공_response_6_http_response">HTTP response</a></h5>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Location: /api/v1/rooms/1/messages/0</code></pre>
-</div>
+<div class="paragraph">
+<p>Snippet http-response not found for operation::메세지 생성 - 성공</p>
 </div>
 </div>
 </div>
@@ -2209,7 +2206,7 @@ Content-Type: application/json
 Content-Length: 189
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 386491000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 23, 404485000 ],
   "status" : 400,
   "message" : "내 마니띠가 아닌 사용자에게 메시지를 보낼 수 없습니다.",
   "errors" : [ ]
@@ -2229,7 +2226,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 541371000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 24, 357645000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2249,7 +2246,7 @@ Content-Type: application/json
 Content-Length: 163
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 514980000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 24, 208445000 ],
   "status" : 415,
   "message" : "이미지 확장자 명을 찾을 수 없습니다.",
   "errors" : [ ]
@@ -2269,7 +2266,7 @@ Content-Type: application/json
 Content-Length: 263
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 418052000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 23, 614785000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2355,30 +2352,30 @@ Content-Length: 711
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   } ],
   "manittee" : {
-    "id" : "6f018fdd-e098-45f3-bfd0-fe731e3e45d5",
+    "id" : "7704e741-d471-4bc1-916c-d707a14fd076",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -2397,7 +2394,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 438900000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 23, 771065000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2417,7 +2414,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 429084000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 23, 701934000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2564,27 +2561,27 @@ Content-Length: 611
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.22"
   } ]
 }</code></pre>
 </div>
@@ -2601,7 +2598,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 459718000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 23, 939460000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2621,7 +2618,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 493710000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 24, 114060000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2708,22 +2705,22 @@ Content-Length: 1259
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     } ]
   },
   "memoriesWithManittee" : {
@@ -2735,22 +2732,22 @@ Content-Length: 1259
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.22"
     } ]
   }
 }</code></pre>
@@ -2769,7 +2766,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 524230000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 24, 252661000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2789,7 +2786,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 503983000 ],
+  "timestamp" : [ 2023, 2, 22, 15, 15, 24, 159282000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2805,7 +2802,7 @@ Content-Length: 179
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-12-22 10:44:47 +0900
+Last updated 2022-12-29 10:29:18 +0900
 </div>
 </div>
 </body>
