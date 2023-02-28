@@ -80,21 +80,21 @@ asciidoctor {
 }
 
 
-task copyDocument(type: Copy) {
-	dependsOn asciidoctor
-
-	from file("build/docs/asciidoc")
-	into file("src/main/resources/static/docs")
-}
-
-//bootJar {
-//	archiveFileName = 'aenitto-dev.jar'
+//task copyDocument(type: Copy) {
 //	dependsOn asciidoctor
-//	copy {
-//		from "${asciidoctor.outputDir}"
-//		into 'BOOT-INF/classes/static/docs'
-//	}
+//
+//	from file("build/docs/asciidoc")
+//	into file("src/main/resources/static/docs")
 //}
+
+bootJar {
+	archiveFileName = 'aenitto-dev.jar'
+	dependsOn asciidoctor
+	copy {
+		from "${asciidoctor.outputDir}"
+		into 'BOOT-INF/classes/static/docs'
+	}
+}
 
 build {
 	dependsOn copyDocument
