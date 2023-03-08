@@ -1,0 +1,25 @@
+<configuration>
+    <!-- log file path -->
+    <property name="LOG_PATH" value="./logs/"/>
+
+    <appender name="Error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/errorLogFile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_PATH}/errorLogFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="INFO">
+        <!--                <appender-ref ref="CONSOLE"/>-->
+        <!--                <appender-ref ref="FILE"/>-->
+        <appender-ref ref="Error"/>
+    </root>
+
+</configuration>
