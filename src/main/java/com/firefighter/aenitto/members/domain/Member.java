@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import javax.persistence.*;
 
-기import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.ColumnDefault;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
