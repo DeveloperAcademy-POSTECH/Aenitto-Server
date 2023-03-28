@@ -479,9 +479,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#Message-API">메시지 API</a>
 <ul class="sectlevel2">
 <li><a href="#_메세지_보내기">메세지 보내기</a></li>
-<li><a href="#_보낸_메시지_가져오기">보낸 메시지 가져오기</a></li>
+<li><a href="#_보낸_메시지_가져오기v1">보낸 메시지 가져오기V1</a></li>
 <li><a href="#_메세지_읽음으로_상태변경_deprecated">메세지 읽음으로 상태변경 &#8594; deprecated</a></li>
-<li><a href="#_받은_메시지_가져오기">받은 메시지 가져오기</a></li>
+<li><a href="#_받은_메시지_가져오기v1">받은 메시지 가져오기V1</a></li>
+<li><a href="#_보낸_메시지_가져오기v2">보낸 메시지 가져오기V2</a></li>
+<li><a href="#_받은_메시지_가져오기v2">받은 메시지 가져오기V2</a></li>
 <li><a href="#_추억_가져오기">추억 가져오기</a></li>
 </ul>
 </li>
@@ -606,10 +608,10 @@ Content-Length: 143
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json
-Content-Length: 157
+Content-Length: 156
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 35, 969912000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 9, 131658000 ],
   "status" : 400,
   "message" : "유효하지 않은 identity 토큰입니다.",
   "errors" : [ ]
@@ -890,7 +892,7 @@ Content-Type: application/json
 Content-Length: 281
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 675087000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 13, 206912000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -914,7 +916,7 @@ Content-Type: application/json
 Content-Length: 152
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 685434000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 13, 263111000 ],
   "status" : 404,
   "message" : "존재하지 않는 사용자 입니다.",
   "errors" : [ ]
@@ -1022,10 +1024,10 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 33
+Content-Length: 26
 
 {
-  "mission" : "COMMON미션1"
+  "mission" : "string"
 }</code></pre>
 </div>
 </div>
@@ -1063,10 +1065,10 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
 Content-Type: application/json
-Content-Length: 160
+Content-Length: 159
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 35, 806835000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 8, 461445000 ],
   "status" : 404,
   "message" : "오늘의 미션이 설정되지 않았습니다",
   "errors" : [ ]
@@ -1311,7 +1313,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 621
+Content-Length: 610
 
 {
   "room" : {
@@ -1325,7 +1327,7 @@ Content-Length: 621
   "participants" : {
     "count" : 1,
     "members" : [ {
-      "id" : "51b5ffb7-64e7-4660-8977-0b9b77cee224",
+      "id" : "9c7b5f1b-a8a6-4844-92de-6c8fe999cea6",
       "nickname" : "멤버1"
     } ]
   },
@@ -1340,7 +1342,7 @@ Content-Length: 621
   },
   "mission" : {
     "id" : 2,
-    "content" : "INDIVIDUAL미션2"
+    "content" : "string"
   },
   "didViewRoulette" : false,
   "admin" : false,
@@ -1750,20 +1752,20 @@ Location: /api/v1/rooms/1</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json
-Content-Length: 482
+Content-Length: 483
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 37, 81466000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 14, 998039000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
-    "field" : "room.endDate",
-    "value" : "2022.2.31",
-    "reason" : "존재하지 않는 연/월/일 값입니다. \n현재 입력 값: 2022.2.31"
-  }, {
     "field" : "room.startDate",
     "value" : "1999.10.01",
     "reason" : "년도는 2000 ~ 2024 사이의 값을 입력해주세요. \n현재 입력 값: 1999.10.01"
+  }, {
+    "field" : "room.endDate",
+    "value" : "2022.2.31",
+    "reason" : "존재하지 않는 연/월/일 값입니다. \n현재 입력 값: 2022.2.31"
   } ]
 }</code></pre>
 </div>
@@ -1781,7 +1783,7 @@ Content-Type: application/json
 Content-Length: 264
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 37, 180520000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 15, 369308000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2165,7 +2167,7 @@ Content-Type: application/json
 Content-Length: 260
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 37, 223892000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 15, 536937000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2190,11 +2192,8 @@ Content-Length: 260
 <h4 id="_성공_response_6"><a class="link" href="#_성공_response_6">성공 response</a></h4>
 <div class="sect4">
 <h5 id="_성공_response_6_http_response"><a class="link" href="#_성공_response_6_http_response">HTTP response</a></h5>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Location: /api/v1/rooms/1/messages/0</code></pre>
-</div>
+<div class="paragraph">
+<p>Snippet http-response not found for operation::메세지 생성 - 성공</p>
 </div>
 </div>
 </div>
@@ -2209,7 +2208,7 @@ Content-Type: application/json
 Content-Length: 189
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 386491000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 11, 690473000 ],
   "status" : 400,
   "message" : "내 마니띠가 아닌 사용자에게 메시지를 보낼 수 없습니다.",
   "errors" : [ ]
@@ -2229,7 +2228,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 541371000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 12, 359398000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2249,7 +2248,7 @@ Content-Type: application/json
 Content-Length: 163
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 514980000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 12, 246593000 ],
   "status" : 415,
   "message" : "이미지 확장자 명을 찾을 수 없습니다.",
   "errors" : [ ]
@@ -2269,7 +2268,7 @@ Content-Type: application/json
 Content-Length: 263
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 418052000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 11, 890092000 ],
   "status" : 400,
   "message" : "입력 조건에 대한 예외입니다",
   "errors" : [ {
@@ -2284,9 +2283,9 @@ Content-Length: 263
 </div>
 </div>
 <div class="sect2">
-<h3 id="_보낸_메시지_가져오기"><a class="link" href="#_보낸_메시지_가져오기">보낸 메시지 가져오기</a></h3>
+<h3 id="_보낸_메시지_가져오기v1"><a class="link" href="#_보낸_메시지_가져오기v1">보낸 메시지 가져오기V1</a></h3>
 <div class="sect3">
-<h4 id="_보낸_메시지_가져오기_path_parameters"><a class="link" href="#_보낸_메시지_가져오기_path_parameters">Path parameters</a></h4>
+<h4 id="_보낸_메시지_가져오기v1_path_parameters"><a class="link" href="#_보낸_메시지_가져오기v1_path_parameters">Path parameters</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. /api/v1/rooms/{roomId}/messages-sent</caption>
 <colgroup>
@@ -2308,7 +2307,7 @@ Content-Length: 263
 </table>
 </div>
 <div class="sect3">
-<h4 id="_보낸_메시지_가져오기_request_headers"><a class="link" href="#_보낸_메시지_가져오기_request_headers">Request headers</a></h4>
+<h4 id="_보낸_메시지_가져오기v1_request_headers"><a class="link" href="#_보낸_메시지_가져오기v1_request_headers">Request headers</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -2329,7 +2328,7 @@ Content-Length: 263
 </table>
 </div>
 <div class="sect3">
-<h4 id="_보낸_메시지_가져오기_http_request"><a class="link" href="#_보낸_메시지_가져오기_http_request">HTTP request</a></h4>
+<h4 id="_보낸_메시지_가져오기v1_http_request"><a class="link" href="#_보낸_메시지_가져오기v1_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms/1/messages-sent HTTP/1.1
@@ -2355,30 +2354,30 @@ Content-Length: 711
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   } ],
   "manittee" : {
-    "id" : "6f018fdd-e098-45f3-bfd0-fe731e3e45d5",
+    "id" : "ced7d5e1-5079-41a1-b374-48ada731f34a",
     "nickname" : "멤버2"
   }
 }</code></pre>
@@ -2397,7 +2396,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 438900000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 11, 966661000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2417,7 +2416,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 429084000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 11, 927296000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2493,9 +2492,9 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_받은_메시지_가져오기"><a class="link" href="#_받은_메시지_가져오기">받은 메시지 가져오기</a></h3>
+<h3 id="_받은_메시지_가져오기v1"><a class="link" href="#_받은_메시지_가져오기v1">받은 메시지 가져오기V1</a></h3>
 <div class="sect3">
-<h4 id="_받은_메시지_가져오기_path_parameters"><a class="link" href="#_받은_메시지_가져오기_path_parameters">Path parameters</a></h4>
+<h4 id="_받은_메시지_가져오기v1_path_parameters"><a class="link" href="#_받은_메시지_가져오기v1_path_parameters">Path parameters</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. /api/v1/rooms/{roomId}/messages-received</caption>
 <colgroup>
@@ -2517,7 +2516,7 @@ Host: localhost:8080</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_받은_메시지_가져오기_request_headers"><a class="link" href="#_받은_메시지_가져오기_request_headers">Request headers</a></h4>
+<h4 id="_받은_메시지_가져오기v1_request_headers"><a class="link" href="#_받은_메시지_가져오기v1_request_headers">Request headers</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -2538,7 +2537,7 @@ Host: localhost:8080</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_받은_메시지_가져오기_http_request"><a class="link" href="#_받은_메시지_가져오기_http_request">HTTP request</a></h4>
+<h4 id="_받은_메시지_가져오기v1_http_request"><a class="link" href="#_받은_메시지_가져오기v1_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v1/rooms/1/messages-received HTTP/1.1
@@ -2564,27 +2563,27 @@ Content-Length: 611
     "id" : 1,
     "content" : "메시지내용1",
     "imageUrl" : "url1",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 2,
     "content" : "메시지내용2",
     "imageUrl" : "url2",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 3,
     "content" : "메시지내용3",
     "imageUrl" : "url3",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 4,
     "content" : "메시지내용4",
     "imageUrl" : "url4",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   }, {
     "id" : 5,
     "content" : "메시지내용5",
     "imageUrl" : "url5",
-    "createdDate" : "2023.01.11"
+    "createdDate" : "2023.02.28"
   } ]
 }</code></pre>
 </div>
@@ -2598,10 +2597,10 @@ Content-Length: 611
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
 Content-Type: application/json
-Content-Length: 171
+Content-Length: 170
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 459718000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 12, 38486000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2621,12 +2620,184 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 493710000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 12, 164480000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
 }</code></pre>
 </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_보낸_메시지_가져오기v2"><a class="link" href="#_보낸_메시지_가져오기v2">보낸 메시지 가져오기V2</a></h3>
+<div class="sect3">
+<h4 id="_보낸_메시지_가져오기v2_path_parameters"><a class="link" href="#_보낸_메시지_가져오기v2_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /api/v2/rooms/{roomId}/messages-sent</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방 id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_보낸_메시지_가져오기v2_request_headers"><a class="link" href="#_보낸_메시지_가져오기v2_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 인증 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_보낸_메시지_가져오기v2_http_request"><a class="link" href="#_보낸_메시지_가져오기v2_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v2/rooms/1/messages-sent HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer testAccessToken
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_성공_response_9"><a class="link" href="#_성공_response_9">성공 response</a></h4>
+<div class="sect4">
+<h5 id="_성공_response_9_http_response"><a class="link" href="#_성공_response_9_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 319
+
+{
+  "count" : 1,
+  "messages" : [ {
+    "id" : 1,
+    "content" : "메시지내용1",
+    "imageUrl" : "url1",
+    "createdDate" : "2023.02.28",
+    "missionInfo" : {
+      "id" : 1,
+      "content" : null
+    }
+  } ],
+  "manittee" : {
+    "id" : "b60dcfdd-7394-4e65-9eb6-7311b812baa7",
+    "nickname" : "멤버2"
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_받은_메시지_가져오기v2"><a class="link" href="#_받은_메시지_가져오기v2">받은 메시지 가져오기V2</a></h3>
+<div class="sect3">
+<h4 id="_받은_메시지_가져오기v2_path_parameters"><a class="link" href="#_받은_메시지_가져오기v2_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /api/v2/rooms/{roomId}/messages-received</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방 id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_받은_메시지_가져오기v2_request_headers"><a class="link" href="#_받은_메시지_가져오기v2_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 인증 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_받은_메시지_가져오기v2_http_request"><a class="link" href="#_받은_메시지_가져오기v2_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /api/v2/rooms/1/messages-received HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer testAccessToken
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_성공_response_10"><a class="link" href="#_성공_response_10">성공 response</a></h4>
+<div class="sect4">
+<h5 id="_성공_response_10_http_response"><a class="link" href="#_성공_response_10_http_response">HTTP response</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 219
+
+{
+  "count" : 1,
+  "messages" : [ {
+    "id" : 1,
+    "content" : "메시지내용1",
+    "imageUrl" : "url1",
+    "createdDate" : "2023.02.28",
+    "missionInfo" : {
+      "id" : 1,
+      "content" : null
+    }
+  } ]
+}</code></pre>
 </div>
 </div>
 </div>
@@ -2689,9 +2860,9 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_성공_response_9"><a class="link" href="#_성공_response_9">성공 response</a></h4>
+<h4 id="_성공_response_11"><a class="link" href="#_성공_response_11">성공 response</a></h4>
 <div class="sect4">
-<h5 id="_성공_response_9_http_response"><a class="link" href="#_성공_response_9_http_response">HTTP response</a></h5>
+<h5 id="_성공_response_11_http_response"><a class="link" href="#_성공_response_11_http_response">HTTP response</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
@@ -2708,22 +2879,22 @@ Content-Length: 1259
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     } ]
   },
   "memoriesWithManittee" : {
@@ -2735,22 +2906,22 @@ Content-Length: 1259
       "id" : 1,
       "content" : "메시지내용1",
       "imageUrl" : "url1",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     }, {
       "id" : 2,
       "content" : "메시지내용2",
       "imageUrl" : "url2",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     }, {
       "id" : 3,
       "content" : "메시지내용3",
       "imageUrl" : "url3",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     }, {
       "id" : 4,
       "content" : "메시지내용4",
       "imageUrl" : "url4",
-      "createdDate" : "2023.01.11"
+      "createdDate" : "2023.02.28"
     } ]
   }
 }</code></pre>
@@ -2769,7 +2940,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 524230000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 12, 285820000 ],
   "status" : 404,
   "message" : "마니또-마니띠 관계가 설정되지 않았습니다.",
   "errors" : [ ]
@@ -2789,7 +2960,7 @@ Content-Type: application/json
 Content-Length: 179
 
 {
-  "timestamp" : [ 2023, 1, 11, 17, 26, 36, 503983000 ],
+  "timestamp" : [ 2023, 2, 28, 15, 28, 12, 203986000 ],
   "status" : 403,
   "message" : "방이 존재하지 않거나 참여 권한이 없는 방입니다.",
   "errors" : [ ]
@@ -2805,7 +2976,7 @@ Content-Length: 179
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-12-22 10:44:47 +0900
+Last updated 2023-02-28 15:23:38 +0900
 </div>
 </div>
 </body>
