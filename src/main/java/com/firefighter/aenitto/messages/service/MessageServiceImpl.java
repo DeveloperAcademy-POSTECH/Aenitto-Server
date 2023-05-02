@@ -157,9 +157,6 @@ public class MessageServiceImpl implements MessageService {
 		Relation relation = throwExceptionIfManitteeNotFound(currentMember.getId(), roomId);
 		List<Message> messages = messageRepository.getSentMessages(currentMember.getId(), roomId);
 
-		for (Message message : messages) {
-			message.readMessage();
-		}
 		SentMessagesResponseV2 sentMessagesResponse = SentMessagesResponseV2.of(messages, relation.getManittee());
 		setMission(sentMessagesResponse.getMessages());
 
