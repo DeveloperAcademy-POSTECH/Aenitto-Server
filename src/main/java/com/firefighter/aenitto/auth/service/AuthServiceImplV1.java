@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import com.firefighter.aenitto.auth.client.ClientProxy;
 import com.firefighter.aenitto.auth.domain.RefreshToken;
 import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
+import com.firefighter.aenitto.auth.dto.request.WithdrawlRequest;
 import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
 import com.firefighter.aenitto.auth.dto.request.LoginRequest;
 import com.firefighter.aenitto.auth.dto.response.LoginResponse;
@@ -113,6 +114,12 @@ public class AuthServiceImplV1 implements AuthService {
 			.nickname(member.getNickname())
 			.refreshToken(token.getRefreshToken()).isNewMember(false)
 			.userSettingDone(member.getNickname() != null).build();
+	}
+
+	@Transactional
+	public void withdrawlUser(Member member, WithdrawlRequest withdrawlRequest) {
+		refreshTokenRepository.deleteByMemberId(member.getId());
+		member.setWithdrawl(withdrawlRequest.isWithdrawl());
 	}
 
 	public Token saveRefreshToken(Member member) {

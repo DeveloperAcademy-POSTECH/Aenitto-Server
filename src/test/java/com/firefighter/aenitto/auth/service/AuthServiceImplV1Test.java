@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.firefighter.aenitto.auth.client.ClientProxy;
 import com.firefighter.aenitto.auth.domain.RefreshToken;
 import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
+import com.firefighter.aenitto.auth.dto.request.WithdrawlRequest;
 import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
 import com.firefighter.aenitto.auth.repository.RefreshTokenRepository;
 import com.firefighter.aenitto.auth.token.Token;
@@ -291,5 +292,19 @@ public class AuthServiceImplV1Test {
 			.isThrownBy(() -> {
 				target.loginOrSignIn(loginRequest);
 			});
+	}
+
+	@Test
+	@DisplayName("withDrawl user - 성공")
+	public void withDrawlUser_success() {
+		// given
+		WithdrawlRequest withdrawlRequest = WithdrawlRequest.builder().withDrawl(true).build();
+
+		// when
+		target.withdrawlUser(member, withdrawlRequest);
+
+		//then
+		assertThat(member.isWithdrawl()).isTrue();
+
 	}
 }

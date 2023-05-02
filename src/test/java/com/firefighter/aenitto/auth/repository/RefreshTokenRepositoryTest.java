@@ -54,6 +54,23 @@ public class RefreshTokenRepositoryTest {
 	}
 
 	@Test
+	@DisplayName("RefreshToken 삭제 테스트")
+	public void refreshToken삭제() {
+
+		//given
+		refreshTokenRepository.saveRefreshToken(refreshToken);
+
+		//when
+		refreshTokenRepository.deleteByMemberId(refreshToken.getMemberId());
+		em.flush();
+		em.clear();
+
+		// then
+		RefreshToken emptyRefreshToken = refreshTokenRepository.findRefreshTokenById(refreshToken.getId());
+		assertThat(emptyRefreshToken).isNull();
+	}
+
+	@Test
 	@DisplayName("refreshToken 존재 여부 테스트")
 	public void 사용자가이미존재하는지테스트() {
 

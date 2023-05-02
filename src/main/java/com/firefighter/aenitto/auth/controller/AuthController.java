@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
 import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
+import com.firefighter.aenitto.auth.dto.request.WithdrawlRequest;
 import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
 import com.firefighter.aenitto.auth.dto.request.LoginRequest;
 import com.firefighter.aenitto.auth.dto.response.LoginResponse;
 import com.firefighter.aenitto.auth.service.AuthService;
+import com.firefighter.aenitto.common.annotation.CurrentMember;
+import com.firefighter.aenitto.members.domain.Member;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -31,5 +34,12 @@ public class AuthController {
 	public ResponseEntity<ReissueTokenResponse> reissueAccessToken(
 		@Valid @RequestBody final ReissueTokenRequest reissueTokenRequest) {
 		return ResponseEntity.ok(authService.reissueAccessToken(reissueTokenRequest));
+	}
+	@PostMapping("/withdrawl")
+	public ResponseEntity reissueAccessToken(
+		@CurrentMember Member member,
+		@RequestBody final WithdrawlRequest withdrawlRequest) {
+		authService.withdrawlUser(member, withdrawlRequest);
+		return ResponseEntity.ok().build();
 	}
 }

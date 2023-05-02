@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 
@@ -29,6 +31,9 @@ public class Member extends CreationModificationLog {
 
 	private String fcmToken;
 
+	@ColumnDefault("false")
+	private boolean withdrawl;
+
 	@OneToMany(mappedBy = "member")
 	private List<MemberRoom> memberRooms = new ArrayList<>();
 
@@ -45,5 +50,9 @@ public class Member extends CreationModificationLog {
 
 	public void setFcmToken(String fcmToken) {
 		this.fcmToken = fcmToken;
+	}
+
+	public void setWithdrawl(boolean isWithdrawl) {
+		this.withdrawl = isWithdrawl;
 	}
 }

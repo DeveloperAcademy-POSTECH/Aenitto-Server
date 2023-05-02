@@ -36,4 +36,12 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 	public RefreshToken findRefreshTokenById(Long id) {
 		return em.find(RefreshToken.class, id);
 	}
+
+	@Override
+	public void deleteByMemberId(final UUID memberId){
+		em.createQuery("DELETE FROM RefreshToken r WHERE r.memberId = :memberId")
+			.setParameter("memberId", memberId)
+			.executeUpdate();
+		;
+	}
 }

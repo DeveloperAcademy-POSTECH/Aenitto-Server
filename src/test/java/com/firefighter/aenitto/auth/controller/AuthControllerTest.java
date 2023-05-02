@@ -40,6 +40,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.firefighter.aenitto.auth.dto.request.ReissueTokenRequest;
+import com.firefighter.aenitto.auth.dto.request.WithdrawlRequest;
 import com.firefighter.aenitto.auth.dto.response.ReissueTokenResponse;
 import com.firefighter.aenitto.auth.service.AuthService;
 import com.firefighter.aenitto.auth.service.AuthServiceV2;
@@ -232,6 +233,30 @@ public class AuthControllerTest {
 					fieldWithPath("refreshToken").description("재발급 토큰"),
 					fieldWithPath("isNewMember").description("새로운 멤버인지 기존 멤버인지"),
 					fieldWithPath("userSettingDone").description("닉네임 정보 입력했는지 여부")
+				)
+			));
+	}
+
+	@DisplayName("회원 탈퇴 / 성공")
+	@Test
+	void withdrawlUser_success() throws Exception {
+		//given
+		final String uri = "/api/v1/withdrawl";
+
+		WithdrawlRequest request = WithdrawlRequest.builder().withDrawl(true).build();
+
+		//when, then, docs
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.post(uri)
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andDo(document("회원 탈퇴",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("withdrawl").description("회원 탈퇴")
 				)
 			));
 	}
