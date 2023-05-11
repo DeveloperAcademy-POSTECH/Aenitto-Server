@@ -1,0 +1,19 @@
+<configuration>
+    <!-- log file path -->
+    <property name="ACCESS_LOG_PATH" value="./logs/access"/>
+
+    <appender name="Access" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${ACCESS_LOG_PATH}/accessLogFile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${ACCESS_LOG_PATH}/accessLogFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%fullRequest%n%n%fullResponse</pattern>
+        </encoder>
+    </appender>
+
+    <appender-ref ref="Access" />
+</configuration>

@@ -151,6 +151,7 @@ public class MessageServiceImpl implements MessageService {
 
 		return MemoriesResponse.of(myManitto, myManittee, receivedMessage, sentMessage);
 	}
+
 	@Override
 	public SentMessagesResponseV2 getSentMessagesV2(Member currentMember, Long roomId) {
 		throwExceptionIfNotParticipating(currentMember.getId(), roomId);
@@ -186,7 +187,14 @@ public class MessageServiceImpl implements MessageService {
 		List<Message> messages = messageRepository.getReceivedMessages(currentMember.getId(), roomId);
 		ReceivedMessagesResponseV2 receivedMessagesResponseV2 = ReceivedMessagesResponseV2.of(messages);
 		setMission(receivedMessagesResponseV2.getMessages());
+		readMessage(messages);
 		return receivedMessagesResponseV2;
+	}
+
+	private void readMessage(List<Message> messages) {
+		for (Message message : messages) {
+			message.readMessage();
+		}
 	}
 
 	private Message initializeMessage(Relation relation, SendMessageApiDto dto) {
@@ -252,6 +260,7 @@ public class MessageServiceImpl implements MessageService {
 		return relationRepository.findByRoomIdAndManitteeId(roomId, memberId)
 			.orElseThrow(RelationNotFoundException::new);
 	}
+
 	private Mission throwExceptionMissionNotExist(Long missionId) {
 		return missionRepository.findById(missionId)
 			.orElseThrow(MissionNotExistException::new);
