@@ -23,11 +23,6 @@ firebase/
 *.tar.gz
 *.rar
 
-*.idea
-*build
-*.gradle
-*out
-
 application-developdb.yml
 application-leodb.yml
 application-daondb.yml
