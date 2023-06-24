@@ -1,5 +1,7 @@
 package com.firefighter.aenitto.missions.service;
 
+import com.firefighter.aenitto.missions.dto.response.UpdateRequest;
+import com.firefighter.aenitto.missions.dto.response.UpdateResponse;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -58,6 +60,15 @@ public class MissionServiceImpl implements MissionService {
 		CommonMission commonMission = commonMissionRepository.findCommonMissionByDate(LocalDate.now())
 			.orElseThrow(MissionNotFoundException::new);
 		return DailyCommonMissionResponse.of(commonMission);
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponse update(Long id, UpdateRequest dto) {
+		Mission mission = missionRepository.findById(id)
+				.orElseThrow(MissionNotFoundException::new);
+		mission.update(dto.getMission());
+		return UpdateResponse.fromEntity(mission);
 	}
 
 	@Override
