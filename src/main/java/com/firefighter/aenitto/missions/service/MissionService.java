@@ -1,5 +1,7 @@
 package com.firefighter.aenitto.missions.service;
 
+import com.firefighter.aenitto.missions.dto.response.UpdateRequest;
+import com.firefighter.aenitto.missions.dto.response.UpdateResponse;
 import java.time.LocalDate;
 
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
@@ -14,4 +16,6 @@ public interface MissionService {
 	void setInitialIndividualMission(MemberRoom memberRoom);
 
 	DailyCommonMissionResponse getDailyCommonMission() throws MissionNotFoundException;
+
+  UpdateResponse update(Long id, UpdateRequest dto);
 }
