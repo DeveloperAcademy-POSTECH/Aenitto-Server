@@ -90,5 +90,10 @@ public class MemberRoom extends CreationModificationLog {
 		room.getMemberRooms().add(this);
 		member.getMemberRooms().add(this);
 	}
+
+	public IndividualMission getLastIndividualMission() {
+		int lastIndex = individualMissions.size() - 1;
+		return individualMissions.get(lastIndex);
+	}
 }
 
