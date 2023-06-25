@@ -66,7 +66,6 @@ public class RoomServiceTest {
 	private MissionServiceImpl missionService;
 
 	@Mock
-	@Qualifier("memberRoomRepositoryImpl")
 	private MemberRoomRepository memberRoomRepository;
 
 	// Fixtures

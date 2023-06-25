@@ -53,7 +53,6 @@ public class RoomServiceImpl implements RoomService {
 	private final MessageRepository messageRepository;
 	@Qualifier("missionServiceImpl")
 	private final MissionService missionService;
-	@Qualifier("memberRoomRepositoryImpl")
 	private final MemberRoomRepository memberRoomRepository;
 
 	@Override
