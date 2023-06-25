@@ -1,5 +1,7 @@
 package com.firefighter.aenitto.missions.controller;
 
+import com.firefighter.aenitto.common.annotation.CurrentMember;
+import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.dto.response.UpdateRequest;
 import com.firefighter.aenitto.missions.dto.response.UpdateResponse;
 import com.firefighter.aenitto.missions.service.MissionService;
@@ -18,10 +20,10 @@ public class IndividualMissionController {
 
   private final MissionService missionService;
 
-  @PatchMapping("/{memberRoomId}/individual-mission")
-  public ResponseEntity<UpdateResponse> update(@PathVariable Long memberRoomId,
+  @PatchMapping("/{roomId}/individual-mission")
+  public ResponseEntity<UpdateResponse> update(@CurrentMember final Member member, @PathVariable Long roomId,
       @RequestBody UpdateRequest dto) {
-    UpdateResponse response = missionService.updateIndividualMission(memberRoomId, dto);
+    UpdateResponse response = missionService.updateIndividualMission(member, roomId, dto);
     return ResponseEntity.ok(response);
   }
 }

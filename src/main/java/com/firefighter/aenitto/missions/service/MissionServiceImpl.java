@@ -1,31 +1,28 @@
 package com.firefighter.aenitto.missions.service;
 
-import com.firefighter.aenitto.missions.domain.IndividualMission;
-import com.firefighter.aenitto.missions.dto.response.UpdateRequest;
-import com.firefighter.aenitto.missions.dto.response.UpdateResponse;
-import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-
 import com.firefighter.aenitto.common.exception.mission.MissionAlreadySetException;
 import com.firefighter.aenitto.common.exception.mission.MissionEmptyException;
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
+import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.CommonMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
 import com.firefighter.aenitto.missions.dto.response.DailyCommonMissionResponse;
+import com.firefighter.aenitto.missions.dto.response.UpdateRequest;
+import com.firefighter.aenitto.missions.dto.response.UpdateResponse;
 import com.firefighter.aenitto.missions.repository.CommonMissionRepository;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
+import java.time.LocalDate;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Qualifier("missionServiceImpl")
@@ -71,11 +68,14 @@ public class MissionServiceImpl implements MissionService {
 
   @Override
   @Transactional
-  public UpdateResponse updateIndividualMission(Long memberRoomId, UpdateRequest dto) {
+  public UpdateResponse updateIndividualMission(Member member, Long roomId, UpdateRequest dto) {
     Mission mission = new Mission(dto.getMission(), MissionType.INDIVIDUAL);
     missionRepository.save(mission);
-    missionRepository.findIndividualMissionByDate(LocalDate.now(), memberRoomId)
-        .ifPresent((individualMission -> individualMission.changeMission(mission)));
+    roomRepository.findMemberRoomById(member.getId(), roomId)
+        .ifPresent((memberRoom -> missionRepository.findIndividualMissionByDate(LocalDate.now(),
+                memberRoom.getId())
+            .ifPresent((individualMission -> individualMission.changeMission(mission))))
+        );
     return UpdateResponse.fromEntity(mission);
   }
 
