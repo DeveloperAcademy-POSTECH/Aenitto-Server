@@ -212,7 +212,7 @@ public class RoomServiceImpl implements RoomService {
 		Relation.createRelations(room.getMemberRooms(), room);
 
 		// 참여인원에 대하여 individual Mission 생성
-		room.getMemberRooms().stream()
+		room.getMemberRooms()
 			.forEach(missionService::setInitialIndividualMission);
 
 		// RoomState 수정

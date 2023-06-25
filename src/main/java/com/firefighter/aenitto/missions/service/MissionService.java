@@ -19,4 +19,6 @@ public interface MissionService {
 	DailyCommonMissionResponse getDailyCommonMission() throws MissionNotFoundException;
 
   UpdateResponse updateIndividualMission(Member member, Long roomId, UpdateRequest dto);
+
+	UpdateResponse restoreIndividualMission(Member member, Long roomId);
 }
