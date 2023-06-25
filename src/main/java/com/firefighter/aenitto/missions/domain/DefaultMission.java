@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.missions.domain;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+@Entity
 public class DefaultMission {
 
   @Id
@@ -20,9 +22,11 @@ public class DefaultMission {
   private Mission mission;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "individual_mission_id")
-  @Column(updatable = false)
+  @JoinColumn(name = "individual_mission_id", updatable = false)
   private IndividualMission individualMission;
+
+  protected DefaultMission() {
+  }
 
   public DefaultMission(Mission mission, IndividualMission individualMission) {
     this.mission = mission;
