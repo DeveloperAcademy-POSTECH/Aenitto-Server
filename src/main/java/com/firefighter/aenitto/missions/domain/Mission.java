@@ -32,10 +32,4 @@ public class Mission {
     this.content = content;
     this.type = type;
   }
-
-  public void update(String content) {
-    if (content != null) {
-      this.content = content;
-    }
-  }
 }

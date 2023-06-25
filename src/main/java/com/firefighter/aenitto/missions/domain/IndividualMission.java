@@ -1,64 +1,74 @@
 package com.firefighter.aenitto.missions.domain;
 
+import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import javax.persistence.*;
-
-import org.hibernate.annotations.ColumnDefault;
-
-import com.firefighter.aenitto.rooms.domain.MemberRoom;
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IndividualMission {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "individual_mission_id")
-	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mission_id")
-	private Mission mission;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "individual_mission_id")
+  private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_room_id")
-	private MemberRoom memberRoom;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_id")
+  private Mission mission;
 
-	private LocalDate date;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "member_room_id")
+  private MemberRoom memberRoom;
 
-	@ColumnDefault(value = "false")
-	private boolean fulfilled;
+  private LocalDate date;
 
-	@Column
-	private LocalDateTime fulfilledAt;
+  @ColumnDefault(value = "false")
+  private boolean fulfilled;
 
-	@Builder
-	public IndividualMission(LocalDate date) {
-		this.date = date;
-	}
+  @Column
+  private LocalDateTime fulfilledAt;
 
-	private IndividualMission(LocalDate date, Mission mission) {
-		this.date = date;
-		this.mission = mission;
-	}
+  @Builder
+  public IndividualMission(LocalDate date) {
+    this.date = date;
+  }
 
-	public boolean didSet(LocalDate date) {
-		return (this.date.isEqual(date));
-	}
+  private IndividualMission(LocalDate date, Mission mission) {
+    this.date = date;
+    this.mission = mission;
+  }
 
-	public void setMemberRoom(MemberRoom memberRoom) {
-		this.memberRoom = memberRoom;
-	}
+  public boolean didSet(LocalDate date) {
+    return (this.date.isEqual(date));
+  }
 
-	public static IndividualMission of(Mission mission, LocalDate date) {
-		return new IndividualMission(date, mission);
-	}
+  public void setMemberRoom(MemberRoom memberRoom) {
+    this.memberRoom = memberRoom;
+  }
+
+  public static IndividualMission of(Mission mission, LocalDate date) {
+    return new IndividualMission(date, mission);
+  }
+
+  public void changeMission(Mission mission) {
+    if (mission != null) {
+      this.mission = mission;
+    }
+  }
 }
 

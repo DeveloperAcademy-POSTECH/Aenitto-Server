@@ -13,4 +13,6 @@ public interface MissionRepository {
 
 	Optional<IndividualMission> findIndividualMissionByDate(LocalDate date, Long memberRoomId);
 	Optional<Mission> findById(Long id);
+
+	void save(Mission mission);
 }

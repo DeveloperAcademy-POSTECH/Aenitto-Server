@@ -49,4 +49,9 @@ public class MissionRepositoryImpl implements MissionRepository {
 	public Optional<Mission> findById(Long id) {
 		return Optional.ofNullable(em.find(Mission.class, id));
 	}
+
+	@Override
+	public void save(Mission mission) {
+		em.persist(mission);
+	}
 }
