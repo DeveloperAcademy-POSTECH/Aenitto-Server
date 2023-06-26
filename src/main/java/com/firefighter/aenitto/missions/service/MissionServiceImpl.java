@@ -96,6 +96,7 @@ public class MissionServiceImpl implements MissionService {
 
     Mission mission = defaultMission.getMission();
     individualMission.changeMission(mission);
+    missionRepository.save(individualMission);
     return UpdateResponse.fromEntity(mission);
   }
 

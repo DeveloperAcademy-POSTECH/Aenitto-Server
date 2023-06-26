@@ -15,4 +15,6 @@ public interface MissionRepository {
 	Optional<Mission> findById(Long id);
 
 	void save(Mission mission);
+
+	void save(IndividualMission individualMission);
 }

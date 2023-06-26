@@ -54,4 +54,9 @@ public class MissionRepositoryImpl implements MissionRepository {
 	public void save(Mission mission) {
 		em.persist(mission);
 	}
+
+	@Override
+	public void save(IndividualMission individualMission) {
+		em.persist(individualMission);
+	}
 }
