@@ -14,6 +14,7 @@ import com.firefighter.aenitto.missions.dto.response.UpdateRequest;
 import com.firefighter.aenitto.missions.dto.response.UpdateResponse;
 import com.firefighter.aenitto.missions.repository.CommonMissionRepository;
 import com.firefighter.aenitto.missions.repository.DefaultMissionRepository;
+import com.firefighter.aenitto.missions.repository.IndividualMissionRepository;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
@@ -36,11 +37,12 @@ public class MissionServiceImpl implements MissionService {
   @Qualifier("roomRepositoryImpl")
   private final RoomRepository roomRepository;
 
-  @Qualifier("missionRepositoryImpl")
   private final MissionRepository missionRepository;
 
   @Qualifier("commonMissionRepositoryImpl")
   private final CommonMissionRepository commonMissionRepository;
+
+  private final IndividualMissionRepository individualMissionRepository;
 
   private final MemberRoomRepository memberRoomRepository;
 
@@ -77,9 +79,11 @@ public class MissionServiceImpl implements MissionService {
     Mission mission = new Mission(dto.getMission(), MissionType.CUSTOM_INDIVIDUAL);
     missionRepository.save(mission);
     roomRepository.findMemberRoomById(member.getId(), roomId)
-        .ifPresent((memberRoom -> missionRepository.findIndividualMissionByDate(LocalDate.now(),
-                memberRoom.getId())
-            .ifPresent((individualMission -> individualMission.changeMission(mission))))
+        .ifPresent(
+            (memberRoom -> individualMissionRepository.findIndividualMissionByDateAndMemberRoomId(
+                    LocalDate.now(),
+                    memberRoom.getId())
+                .ifPresent((individualMission -> individualMission.changeMission(mission))))
         );
     return UpdateResponse.fromEntity(mission);
   }
@@ -87,17 +91,16 @@ public class MissionServiceImpl implements MissionService {
   @Override
   @Transactional(readOnly = true)
   public UpdateResponse restoreIndividualMission(Member member, Long roomId) {
-    MemberRoom memberRoom = roomRepository.findMemberRoomById(member.getId(), roomId)
+    return roomRepository.findMemberRoomById(member.getId(), roomId)
+        .flatMap(memberRoom -> individualMissionRepository.findIndividualMissionByDateAndMemberRoomId(LocalDate.now(), memberRoom.getId()))
+        .map(individualMission -> {
+          Mission mission = defaultMissionRepository.findByIndividualMissionId(individualMission.getId())
+              .map(DefaultMission::getMission)
+              .orElseThrow();
+          individualMission.changeMission(mission);
+          return UpdateResponse.fromEntity(mission);
+        })
         .orElseThrow();
-    IndividualMission individualMission = missionRepository.findIndividualMissionByDate(LocalDate.now(), memberRoom.getId())
-        .orElseThrow();
-    DefaultMission defaultMission = defaultMissionRepository.findByIndividualMissionId(individualMission.getId())
-        .orElseThrow();
-
-    Mission mission = defaultMission.getMission();
-    individualMission.changeMission(mission);
-    missionRepository.save(individualMission);
-    return UpdateResponse.fromEntity(mission);
   }
 
   @Override
