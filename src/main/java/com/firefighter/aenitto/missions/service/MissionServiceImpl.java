@@ -59,7 +59,7 @@ public class MissionServiceImpl implements MissionService {
         });
 
     // 랜덤한 Mission 을 하나 가져오고, 아예 없을 경우 -> throw
-    Mission mission = missionRepository.findFirstRandomMission(MissionType.COMMON)
+    Mission mission = missionRepository.findRandomMission(MissionType.COMMON)
         .orElseThrow(MissionEmptyException::new);
 
     return commonMissionRepository.saveCommonMission(
@@ -109,7 +109,7 @@ public class MissionServiceImpl implements MissionService {
       throws MissionAlreadySetException, MissionEmptyException {
     List<Room> roomsProcessing = roomRepository.findRoomsByState(RoomState.PROCESSING);
     for (Room room : roomsProcessing) {
-      Mission mission = missionRepository.findFirstRandomMission(MissionType.INDIVIDUAL)
+      Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
           .orElseThrow(MissionEmptyException::new);
       for (MemberRoom memberRoom : room.getMemberRooms()) {
         if (memberRoom.didSetDailyIndividualMission(date)) {
@@ -124,7 +124,7 @@ public class MissionServiceImpl implements MissionService {
   @Override
   @Transactional
   public void setInitialIndividualMission(MemberRoom memberRoom) {
-    Mission mission = missionRepository.findFirstRandomMission(MissionType.INDIVIDUAL)
+    Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
         .orElseThrow(MissionEmptyException::new);
     memberRoom.addIndividualMission(mission, LocalDate.now());
     storeDefaultMission(memberRoom, mission);

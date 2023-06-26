@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MissionRepository extends JpaRepository<Mission, Long> {
 
-  @Query("SELECT m FROM Mission m WHERE m.type = :missionType ORDER BY RANDOM()")
-  Optional<Mission> findFirstRandomMission(MissionType missionType);
+  @Query(value = "SELECT m FROM Mission m WHERE m.type = :missionType ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
+  Optional<Mission> findRandomMission(MissionType missionType);
 }
