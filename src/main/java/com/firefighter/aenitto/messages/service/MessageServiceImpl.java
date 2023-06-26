@@ -60,7 +60,7 @@ public class MessageServiceImpl implements MessageService {
 
 	@Qualifier("fcmNotificationService")
 	private final NotificationService notificationService;
-	@Qualifier("missionRepositoryImpl")
+
 	private final MissionRepository missionRepository;
 
 	@Override

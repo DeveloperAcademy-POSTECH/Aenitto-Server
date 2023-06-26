@@ -1,20 +1,15 @@
 package com.firefighter.aenitto.missions.repository;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.missions.domain.MissionType;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-public interface MissionRepository {
+@Repository
+public interface MissionRepository extends JpaRepository<Mission, Long> {
 
-	Optional<Mission> findRandomMission(MissionType missionType);
-
-	Optional<IndividualMission> findIndividualMissionByDate(LocalDate date, Long memberRoomId);
-	Optional<Mission> findById(Long id);
-
-	void save(Mission mission);
-
-	void save(IndividualMission individualMission);
+  @Query("SELECT m FROM Mission AS m ORDER BY RANDOM()")
+  Optional<Mission> findRandomMission(MissionType missionType);
 }
