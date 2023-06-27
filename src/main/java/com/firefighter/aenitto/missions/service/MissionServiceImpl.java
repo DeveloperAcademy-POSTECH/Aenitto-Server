@@ -89,7 +89,7 @@ public class MissionServiceImpl implements MissionService {
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional
   public UpdateResponse restoreIndividualMission(Member member, Long roomId) {
     return roomRepository.findMemberRoomById(member.getId(), roomId)
         .flatMap(memberRoom -> individualMissionRepository.findIndividualMissionByDateAndMemberRoomId(LocalDate.now(), memberRoom.getId()))
@@ -98,6 +98,7 @@ public class MissionServiceImpl implements MissionService {
               .map(DefaultMission::getMission)
               .orElseThrow();
           individualMission.changeMission(mission);
+          individualMissionRepository.save(individualMission);
           return UpdateResponse.fromEntity(mission);
         })
         .orElseThrow();
