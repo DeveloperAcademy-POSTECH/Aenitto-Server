@@ -1,6 +1,7 @@
 package com.firefighter.aenitto.missions.domain;
 
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
+import com.firefighter.aenitto.rooms.domain.Room;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -32,8 +33,8 @@ public class IndividualMission {
   private Mission mission;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_room_id")
-  private MemberRoom memberRoom;
+  @JoinColumn(name = "room_id")
+  private Room room;
 
   private LocalDate date;
 
@@ -57,8 +58,8 @@ public class IndividualMission {
     return (this.date.isEqual(date));
   }
 
-  public void setMemberRoom(MemberRoom memberRoom) {
-    this.memberRoom = memberRoom;
+  public void setRoom(Room room) {
+    this.room = room;
   }
 
   public static IndividualMission of(Mission mission, LocalDate date) {

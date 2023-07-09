@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum MissionType {
+	DEFAULT("DEFAULT"),
 	COMMON("COMMON"),
 	INDIVIDUAL("INDIVIDUAL"),
 	CUSTOM_INDIVIDUAL("CUSTOM_INDIVIDUAL");

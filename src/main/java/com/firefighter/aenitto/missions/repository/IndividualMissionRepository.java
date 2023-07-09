@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IndividualMissionRepository extends JpaRepository<IndividualMission, Long> {
 
-  Optional<IndividualMission> findIndividualMissionByDateAndMemberRoomId(LocalDate date,
-      Long memberRoomId);
+  Optional<IndividualMission> findIndividualMissionByDateAndRoomId(LocalDate date,
+      Long roomId);
 }
