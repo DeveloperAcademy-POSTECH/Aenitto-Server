@@ -16,7 +16,6 @@ import com.firefighter.aenitto.missions.repository.CommonMissionRepository;
 import com.firefighter.aenitto.missions.repository.DefaultMissionRepository;
 import com.firefighter.aenitto.missions.repository.IndividualMissionRepository;
 import com.firefighter.aenitto.missions.repository.MissionRepository;
-import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import com.firefighter.aenitto.rooms.domain.RoomState;
 import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
@@ -78,30 +77,24 @@ public class MissionServiceImpl implements MissionService {
   public UpdateResponse updateIndividualMission(Member member, Long roomId, UpdateRequest dto) {
     Mission mission = new Mission(dto.getMission(), MissionType.CUSTOM_INDIVIDUAL);
     missionRepository.save(mission);
-    roomRepository.findMemberRoomById(member.getId(), roomId)
-        .ifPresent(
-            (memberRoom -> individualMissionRepository.findIndividualMissionByDateAndMemberRoomId(
-                    LocalDate.now(),
-                    memberRoom.getId())
-                .ifPresent((individualMission -> individualMission.changeMission(mission))))
-        );
+    individualMissionRepository.findIndividualMissionByDateAndRoomId(LocalDate.now(), roomId)
+        .ifPresent(individualMission -> individualMission.changeMission(mission));
     return UpdateResponse.fromEntity(mission);
   }
 
   @Override
   @Transactional
   public UpdateResponse restoreIndividualMission(Member member, Long roomId) {
-    return roomRepository.findMemberRoomById(member.getId(), roomId)
-        .flatMap(memberRoom -> individualMissionRepository.findIndividualMissionByDateAndMemberRoomId(LocalDate.now(), memberRoom.getId()))
+    return individualMissionRepository.findIndividualMissionByDateAndRoomId(LocalDate.now(), roomId)
         .map(individualMission -> {
-          Mission mission = defaultMissionRepository.findByIndividualMissionId(individualMission.getId())
+          Mission mission = defaultMissionRepository.findByIndividualMissionId(
+                  individualMission.getId())
               .map(DefaultMission::getMission)
               .orElseThrow();
           individualMission.changeMission(mission);
           individualMissionRepository.save(individualMission);
           return UpdateResponse.fromEntity(mission);
-        })
-        .orElseThrow();
+        }).orElseThrow();
   }
 
   @Override
@@ -110,29 +103,28 @@ public class MissionServiceImpl implements MissionService {
       throws MissionAlreadySetException, MissionEmptyException {
     List<Room> roomsProcessing = roomRepository.findRoomsByState(RoomState.PROCESSING);
     for (Room room : roomsProcessing) {
+      if (room.didSetDailyIndividualMission(date)) {
+        throw new MissionAlreadySetException();
+      }
+
       Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
           .orElseThrow(MissionEmptyException::new);
-      for (MemberRoom memberRoom : room.getMemberRooms()) {
-        if (memberRoom.didSetDailyIndividualMission(date)) {
-          throw new MissionAlreadySetException();
-        }
-        memberRoom.addIndividualMission(mission, date);
-        storeDefaultMission(memberRoom, mission);
-      }
+      room.addIndividualMission(mission, date);
+      storeDefaultMission(room, mission);
     }
   }
 
   @Override
   @Transactional
-  public void setInitialIndividualMission(MemberRoom memberRoom) {
+  public void setInitialIndividualMission(Room room) {
     Mission mission = missionRepository.findRandomMission(MissionType.INDIVIDUAL)
         .orElseThrow(MissionEmptyException::new);
-    memberRoom.addIndividualMission(mission, LocalDate.now());
-    storeDefaultMission(memberRoom, mission);
+    room.addIndividualMission(mission, LocalDate.now());
+    storeDefaultMission(room, mission);
   }
 
-  private void storeDefaultMission(MemberRoom memberRoom, Mission mission) {
-    IndividualMission individualMission = memberRoom.getLastIndividualMission();
+  private void storeDefaultMission(Room room, Mission mission) {
+    IndividualMission individualMission = room.getLastIndividualMission();
     defaultMissionRepository.findByIndividualMissionId(individualMission.getId())
         .ifPresentOrElse(
             defaultMission -> defaultMission.changeDefaultMission(mission),

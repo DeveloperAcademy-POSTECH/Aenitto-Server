@@ -36,9 +36,6 @@ public class MemberRoom extends CreationModificationLog {
 	@JoinColumn(name = "room_id")
 	private Room room;
 
-	@OneToMany(mappedBy = "memberRoom", cascade = CascadeType.ALL)
-	private List<IndividualMission> individualMissions = new ArrayList<>();
-
 	private boolean admin;
 
 	@ColumnDefault(value = "false")
@@ -68,19 +65,6 @@ public class MemberRoom extends CreationModificationLog {
 		viewManitto = true;
 	}
 
-	public Boolean didSetDailyIndividualMission(LocalDate date) {
-		if (this.getIndividualMissions().size() == 0) {
-			return false;
-		}
-		return this.getIndividualMissions().get(this.getIndividualMissions().size() - 1).didSet(date);
-	}
-
-	public void addIndividualMission(Mission mission, LocalDate date) {
-		IndividualMission individualMission = IndividualMission.of(mission, date);
-		individualMissions.add(individualMission);
-		individualMission.setMemberRoom(this);
-	}
-
 	public void setMemberRoom(Member member, Room room) {
 		if (this.member != null || this.room != null) {
 			throw new RoomAlreadyParticipatingException();
@@ -89,11 +73,6 @@ public class MemberRoom extends CreationModificationLog {
 		this.room = room;
 		room.getMemberRooms().add(this);
 		member.getMemberRooms().add(this);
-	}
-
-	public IndividualMission getLastIndividualMission() {
-		int lastIndex = individualMissions.size() - 1;
-		return individualMissions.get(lastIndex);
 	}
 }
 

@@ -1,123 +1,156 @@
 package com.firefighter.aenitto.rooms.domain;
 
+import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
+import com.firefighter.aenitto.common.utils.DateConverter;
+import com.firefighter.aenitto.missions.domain.IndividualMission;
+import com.firefighter.aenitto.missions.domain.Mission;
+import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import javax.persistence.*;
-
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-
-import lombok.*;
-
-import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
-import com.firefighter.aenitto.common.utils.DateConverter;
-import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 
 @Entity
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends CreationModificationLog {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "room_id")
-	private Long id;
 
-	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-	private List<MemberRoom> memberRooms = new ArrayList<>();
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "room_id")
+  private Long id;
 
-	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-	private List<Relation> relations = new ArrayList<>();
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+  private List<MemberRoom> memberRooms = new ArrayList<>();
 
-	private String title;
-	private int capacity;
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+  private List<Relation> relations = new ArrayList<>();
 
-	private String invitation;
+  @OneToMany(mappedBy = "room")
+  private List<IndividualMission> individualMissions = new ArrayList<>();
 
-	@Enumerated(value = EnumType.STRING)
-	private RoomState state = RoomState.PRE;
+  private String title;
+  private int capacity;
 
-	@ColumnDefault(value = "false")
-	private boolean deleted;
+  private String invitation;
 
-	private LocalDate startDate;
+  @Enumerated(value = EnumType.STRING)
+  private RoomState state = RoomState.PRE;
 
-	private LocalDate endDate;
+  @ColumnDefault(value = "false")
+  private boolean deleted;
 
-	@Builder
-	public Room(String title, int capacity, String invitation, LocalDate startDate, LocalDate endDate) {
-		this.title = title;
-		this.capacity = capacity;
-		this.invitation = invitation;
-		this.startDate = startDate;
-		this.endDate = endDate;
-	}
+  private LocalDate startDate;
 
-	public void createInvitation() {
-		this.invitation = randomSixNumUpperString();
-	}
+  private LocalDate endDate;
 
-	public void setState(RoomState state) {
-		this.state = state;
-	}
+  @Builder
+  public Room(String title, int capacity, String invitation, LocalDate startDate,
+      LocalDate endDate) {
+    this.title = title;
+    this.capacity = capacity;
+    this.invitation = invitation;
+    this.startDate = startDate;
+    this.endDate = endDate;
+  }
 
-	public void delete() {
-		this.deleted = true;
-	}
 
-	public String getStartDateValue() {
-		return DateConverter.localDateToString(this.startDate);
-	}
+  public Boolean didSetDailyIndividualMission(LocalDate date) {
+    if (this.getIndividualMissions().size() == 0) {
+      return false;
+    }
+    return this.getIndividualMissions().get(this.getIndividualMissions().size() - 1).didSet(date);
+  }
 
-	public String getEndDateValue() {
-		return DateConverter.localDateToString(this.endDate);
-	}
+  public void addIndividualMission(Mission mission, LocalDate date) {
+    IndividualMission individualMission = IndividualMission.of(mission, date);
+    individualMissions.add(individualMission);
+    individualMission.setRoom(this);
+  }
 
-	public int participantsCount() {
-		return memberRooms.size();
-	}
 
-	public boolean cannotStart() {
-		return (4 > participantsCount());
-	}
+  public IndividualMission getLastIndividualMission() {
+    int lastIndex = individualMissions.size() - 1;
+    return individualMissions.get(lastIndex);
+  }
 
-	public boolean unAcceptable() {
-		return (capacity <= memberRooms.size());
-	}
+  public void createInvitation() {
+    this.invitation = randomSixNumUpperString();
+  }
 
-	public boolean isProcessingAndExpired() {
-		return (this.state == RoomState.PROCESSING) & (this.endDate.isBefore(LocalDate.now()));
-	}
+  public void setState(RoomState state) {
+    this.state = state;
+  }
 
-	public boolean isNotPre() {
-		return (this.state != RoomState.PRE);
-	}
+  public void delete() {
+    this.deleted = true;
+  }
 
-	public Room updateRoom(UpdateRoomRequest request) {
-		if (request.getTitle() != null) {
-			this.title = request.getTitle();
-		}
-		if (request.getCapacity() != null) {
-			this.capacity = request.getCapacity();
-		}
-		if (request.getStartDate() != null) {
-			this.startDate = DateConverter.stringToLocalDate(request.getStartDate());
-		}
-		if (request.getEndDate() != null) {
-			this.endDate = DateConverter.stringToLocalDate(request.getEndDate());
-		}
-		return this;
-	}
+  public String getStartDateValue() {
+    return DateConverter.localDateToString(this.startDate);
+  }
 
-	private String randomSixNumUpperString() {
-		Random random = new Random();
-		return random.ints(48, 91)
-			.filter((rand) -> (rand < 58) || (rand >= 65))
-			.limit(6)
-			.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-			.toString();
-	}
+  public String getEndDateValue() {
+    return DateConverter.localDateToString(this.endDate);
+  }
+
+  public int participantsCount() {
+    return memberRooms.size();
+  }
+
+  public boolean cannotStart() {
+    return (4 > participantsCount());
+  }
+
+  public boolean unAcceptable() {
+    return (capacity <= memberRooms.size());
+  }
+
+  public boolean isProcessingAndExpired() {
+    return (this.state == RoomState.PROCESSING) & (this.endDate.isBefore(LocalDate.now()));
+  }
+
+  public boolean isNotPre() {
+    return (this.state != RoomState.PRE);
+  }
+
+  public void updateRoom(UpdateRoomRequest request) {
+    if (request.getTitle() != null) {
+      this.title = request.getTitle();
+    }
+    if (request.getCapacity() != null) {
+      this.capacity = request.getCapacity();
+    }
+    if (request.getStartDate() != null) {
+      this.startDate = DateConverter.stringToLocalDate(request.getStartDate());
+    }
+    if (request.getEndDate() != null) {
+      this.endDate = DateConverter.stringToLocalDate(request.getEndDate());
+    }
+  }
+
+  private String randomSixNumUpperString() {
+    Random random = new Random();
+    return random.ints(48, 91)
+        .filter((rand) -> (rand < 58) || (rand >= 65))
+        .limit(6)
+        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+        .toString();
+  }
 }

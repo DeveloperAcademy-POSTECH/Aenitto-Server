@@ -56,7 +56,6 @@ public class RoomServiceImpl implements RoomService {
   @Qualifier("relationRepositoryImpl")
   private final RelationRepository relationRepository;
 
-  @Qualifier("memberRepositoryImpl")
   private final MemberRepository memberRepository;
 
   private final MissionRepository missionRepository;
@@ -73,7 +72,7 @@ public class RoomServiceImpl implements RoomService {
   public Long createRoom(Member currentMember, CreateRoomRequest createRoomRequest) {
     // Dto -> Entity
     final Room room = createRoomRequest.toEntity();
-    final Member member = memberRepository.findByMemberId(currentMember.getId())
+    final Member member = memberRepository.findById(currentMember.getId())
         .orElseThrow(MemberNotFoundException::new);
 
     // Room invitation 생성 -> 존재하지 않는 random 코드 나올 때 까지.
@@ -109,7 +108,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   @Transactional
   public Long participateRoom(Member currentMember, Long roomId, ParticipateRoomRequest request) {
-    Member member = memberRepository.findByMemberId(currentMember.getId())
+    Member member = memberRepository.findById(currentMember.getId())
         .orElseThrow(MemberNotFoundException::new);
 
     // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
@@ -136,7 +135,7 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public GetRoomStateResponse getRoomState(Member currentMember, Long roomId) {
-    Member member = memberRepository.findByMemberId(currentMember.getId())
+    Member member = memberRepository.findById(currentMember.getId())
         .orElseThrow(MemberNotFoundException::new);
 
     // 참여 중인 방이 아닐 경우 -> throw
@@ -160,8 +159,8 @@ public class RoomServiceImpl implements RoomService {
         Relation relationManittee = relationRepository.findByRoomIdAndManitteeId(roomId,
                 member.getId())
             .orElseThrow(RelationNotFoundException::new);
-        IndividualMission individualMission = individualMissionRepository.findIndividualMissionByDateAndMemberRoomId(
-                LocalDate.now(), memberRoom.getId())
+        IndividualMission individualMission = individualMissionRepository.findIndividualMissionByDateAndRoomId(
+                LocalDate.now(), roomId)
             .orElseThrow(MissionNotFoundException::new);
         int unreadMessageCount = messageRepository.findUnreadMessageCount(member.getId(), roomId);
         boolean didView = memberRoom.didViewManitto();
@@ -230,8 +229,7 @@ public class RoomServiceImpl implements RoomService {
     Relation.createRelations(room.getMemberRooms(), room);
 
     // 참여인원에 대하여 individual Mission 생성
-    room.getMemberRooms()
-        .forEach(missionService::setInitialIndividualMission);
+    missionService.setInitialIndividualMission(room);
 
     // RoomState 수정
     room.setState(RoomState.PROCESSING);
