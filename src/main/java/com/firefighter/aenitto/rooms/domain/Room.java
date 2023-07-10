@@ -46,6 +46,7 @@ public class Room extends CreationModificationLog {
   private List<IndividualMission> individualMissions = new ArrayList<>();
 
   private String title;
+
   private int capacity;
 
   private String invitation;
@@ -152,5 +153,13 @@ public class Room extends CreationModificationLog {
         .limit(6)
         .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
         .toString();
+  }
+
+  public void clearRelations() {
+    relations.clear();
+  }
+
+  public void removeMember(MemberRoom memberRoom) {
+    memberRooms.remove(memberRoom);
   }
 }

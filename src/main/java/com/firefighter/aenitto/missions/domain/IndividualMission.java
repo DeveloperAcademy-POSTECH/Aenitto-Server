@@ -1,6 +1,5 @@
 package com.firefighter.aenitto.missions.domain;
 
-import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Room;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

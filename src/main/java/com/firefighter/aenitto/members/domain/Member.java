@@ -55,7 +55,7 @@ public class Member extends CreationModificationLog {
     this.fcmToken = fcmToken;
   }
 
-  public void setWithdrawl(boolean isWithdrawl) {
+  public void withdrawl(boolean isWithdrawl) {
     this.withdrawl = isWithdrawl;
   }
 }
