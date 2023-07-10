@@ -46,7 +46,8 @@ public class Relation {
 		this.room = room;
 	}
 
-	public static void createRelations(List<MemberRoom> memberRooms, Room room) {
+	public static void createRelations(Room room) {
+		List<MemberRoom> memberRooms = room.getMemberRooms();
 		final int size = memberRooms.size();
 		final List<Integer> nums = new ArrayList<>(size);
 

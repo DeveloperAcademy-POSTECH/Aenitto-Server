@@ -226,7 +226,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     // 참여인원에 대하여 Relation 생성
-    Relation.createRelations(room.getMemberRooms(), room);
+    Relation.createRelations(room);
 
     // 참여인원에 대하여 individual Mission 생성
     missionService.setInitialIndividualMission(room);

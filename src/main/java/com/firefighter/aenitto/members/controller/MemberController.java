@@ -29,4 +29,10 @@ public class MemberController {
 		memberService.setNickname(member, changeNicknameRequest.getNickname());
 		return ResponseEntity.noContent().build();
 	}
+
+	@DeleteMapping("/members")
+	public ResponseEntity<Void> withdrawal(@CurrentMember Member member) {
+		memberService.withdrawal(member);
+		return ResponseEntity.noContent().build();
+	}
 }

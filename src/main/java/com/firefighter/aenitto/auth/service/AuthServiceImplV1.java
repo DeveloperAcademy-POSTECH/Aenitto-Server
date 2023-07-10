@@ -118,7 +118,7 @@ public class AuthServiceImplV1 implements AuthService {
   @Transactional
   public void withdrawlUser(Member member, WithdrawlRequest withdrawlRequest) {
     refreshTokenRepository.deleteByMemberId(member.getId());
-    member.setWithdrawl(withdrawlRequest.isWithdrawl());
+    member.withdrawl(withdrawlRequest.isWithdrawl());
   }
 
   public Token saveRefreshToken(Member member) {
