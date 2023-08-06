@@ -1,8 +1,9 @@
 package com.firefighter.aenitto.common.log;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.filter.AbstractRequestLoggingFilter;
+
 
 public class RequestLoggingFilter extends AbstractRequestLoggingFilter {
 

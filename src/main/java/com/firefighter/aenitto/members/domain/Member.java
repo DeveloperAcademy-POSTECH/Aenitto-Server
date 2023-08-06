@@ -5,11 +5,8 @@ import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

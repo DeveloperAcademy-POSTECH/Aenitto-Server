@@ -1,107 +1,108 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.1'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
-	id 'java'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'java'
 }
 
 group = 'com.firefighter'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+java {
+    sourceCompatibility = '17'
+}
 
 configurations {
-	asciidoctorExt
+    asciidoctorExt
 
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 
 jar {
-	enabled = false
+    enabled = false
 }
 
 dependencies {
-	// spring
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.1'
-	compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
-	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    // spring
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
 
-	// jjwt
-	compileOnly 'io.jsonwebtoken:jjwt-api:0.11.1'
-	runtimeOnly'io.jsonwebtoken:jjwt-impl:0.11.1', 'io.jsonwebtoken:jjwt-jackson:0.11.1'
+    // aws
+    implementation('com.amazonaws:aws-java-sdk-s3:1.12.523') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
 
-	// database
-	implementation 'org.postgresql:postgresql:42.1.4'
-	runtimeOnly 'com.h2database:h2'
+    // jjwt
+    compileOnly 'io.jsonwebtoken:jjwt-api:0.11.1'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.1', 'io.jsonwebtoken:jjwt-jackson:0.11.1'
 
-	// lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    // database
+    implementation 'org.postgresql:postgresql:42.6.0'
+    runtimeOnly 'com.h2database:h2'
 
-	// test
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-	testImplementation 'org.assertj:assertj-core:3.22.0'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'com.h2database:h2'
-	testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '3.2.0'
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	// lombok
-	implementation group: 'org.json', name: 'json', version: '20090211'
-	implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.assertj:assertj-core:3.22.0'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.h2database:h2'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.10.0'
 
-	// FCM
-	implementation 'com.google.firebase:firebase-admin:9.0.0'
-	implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    // json
+    implementation 'org.json:json:20230618'
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // FCM
+    implementation('com.google.firebase:firebase-admin:9.2.0') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 }
 
 
 asciidoctor.doFirst {
-	delete file('src/main/resources/static/docs')
+    delete file('src/main/resources/static/docs')
 }
 
 ext {
-	snippetsDir = file('build/generated-snippets')
+    snippetsDir = file('build/generated-snippets')
 }
 
 test {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 }
 
 asciidoctor {
-	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
-	dependsOn test
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
 }
 
 
 task copyDocument(type: Copy) {
-	dependsOn asciidoctor
+    dependsOn asciidoctor
 
-	from file("build/docs/asciidoc")
-	into file("src/main/resources/static/docs")
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
 }
 
-//bootJar {
-//	dependsOn asciidoctor
-//	copy {
-//		from("${asciidoctor.outputDir}/html5") {
-//			into 'static/docs'
-//		}
-//	}
-//}
-
 build {
-	dependsOn copyDocument
+    dependsOn copyDocument
 }
