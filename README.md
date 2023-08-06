@@ -15,7 +15,7 @@ _**다음 날이 기대되는 소소한 즐거움, AENITTO.**_
 
 
 ## 기술 스택
-- Java 11
+- Java 17
 - Spring Boot, Spring JPA, Spring Security, Spring Rest Docs
 - AWS EC2, AWS RDS, AWS S3
 - PostgreSQL
