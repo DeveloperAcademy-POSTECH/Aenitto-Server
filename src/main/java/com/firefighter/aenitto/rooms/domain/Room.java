@@ -5,25 +5,18 @@ import com.firefighter.aenitto.common.utils.DateConverter;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @Entity
 @Getter
@@ -63,7 +56,7 @@ public class Room extends CreationModificationLog {
 
   @Builder
   public Room(String title, int capacity, String invitation, LocalDate startDate,
-      LocalDate endDate) {
+              LocalDate endDate) {
     this.title = title;
     this.capacity = capacity;
     this.invitation = invitation;
