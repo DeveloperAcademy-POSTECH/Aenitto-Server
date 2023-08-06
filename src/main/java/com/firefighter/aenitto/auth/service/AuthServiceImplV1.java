@@ -14,12 +14,13 @@ import com.firefighter.aenitto.common.exception.auth.InvalidUserTokenException;
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Qualifier(value = "authServiceImplV1 ")
@@ -44,19 +45,19 @@ public class AuthServiceImplV1 implements AuthService {
     String socialId = tokenService.getSocialId(reissueTokenRequest.getAccessToken());
     System.out.println("social Id 가져오기");
     Member member = memberRepository.findBySocialId(socialId)
-        .orElseThrow(MemberNotFoundException::new);
+      .orElseThrow(MemberNotFoundException::new);
     System.out.println("memberRepo 소셜 id 찾기");
     RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId())
-        .orElseThrow(InvalidTokenException::new);
+      .orElseThrow(InvalidTokenException::new);
 
     if (!refreshToken.getRefreshToken().equals(reissueTokenRequest.getRefreshToken())) {
       throw new InvalidUserTokenException();
     }
     if (tokenService.checkTokenExpired(reissueTokenRequest.getAccessToken())) {
       return ReissueTokenResponse.builder()
-          .accessToken(reissueTokenRequest.getAccessToken())
-          .refreshToken(reissueTokenRequest.getRefreshToken())
-          .build();
+        .accessToken(reissueTokenRequest.getAccessToken())
+        .refreshToken(reissueTokenRequest.getRefreshToken())
+        .build();
     }
 
     Token token = tokenService.generateToken(socialId, "USER");
@@ -64,17 +65,18 @@ public class AuthServiceImplV1 implements AuthService {
       refreshToken.updateRefreshToken(token.getRefreshToken());
 
       return ReissueTokenResponse.builder()
-          .accessToken(token.getAccessToken())
-          .refreshToken(token.getRefreshToken())
-          .build();
+        .accessToken(token.getAccessToken())
+        .refreshToken(token.getRefreshToken())
+        .build();
     } else {
       return ReissueTokenResponse.builder()
-          .accessToken(token.getAccessToken())
-          .refreshToken(reissueTokenRequest.getRefreshToken())
-          .build();
+        .accessToken(token.getAccessToken())
+        .refreshToken(reissueTokenRequest.getRefreshToken())
+        .build();
     }
   }
 
+  @Transactional
   public LoginResponse loginOrSignIn(LoginRequest loginRequest) {
     String socialId = clientProxy.validateToken(loginRequest.getIdentityToken());
     Optional<Member> member = memberRepository.findBySocialId(socialId);
@@ -85,24 +87,25 @@ public class AuthServiceImplV1 implements AuthService {
     }
   }
 
-  @Transactional
-  LoginResponse signIn(String socialId) {
+  private LoginResponse signIn(String socialId) {
     Member member = memberRepository
-        .save(Member.builder().socialId(socialId).build());
+      .save(Member.builder().socialId(socialId).build());
     Token token = tokenService.generateToken(member.getSocialId(), "USER");
 
     RefreshToken refreshToken = refreshTokenRepository
-        .saveRefreshToken(RefreshToken.builder()
-            .refreshToken(token.getRefreshToken()).memberId(member.getId()).build());
+      .saveRefreshToken(RefreshToken.builder()
+        .refreshToken(token.getRefreshToken()).memberId(member.getId()).build());
 
     return LoginResponse.builder().accessToken(token.getAccessToken())
-        .nickname(member.getNickname())
-        .refreshToken(token.getRefreshToken()).isNewMember(true)
-        .userSettingDone(false).build();
+      .nickname(member.getNickname())
+      .refreshToken(token.getRefreshToken()).isNewMember(true)
+      .userSettingDone(false).build();
   }
 
-  @Transactional
   private LoginResponse logIn(String socialId, Member member) {
+    if (member.isWithdrawal()) {
+      member.recovery();
+    }
 
     Token token = tokenService.generateToken(member.getSocialId(), "USER");
 
@@ -110,29 +113,29 @@ public class AuthServiceImplV1 implements AuthService {
     refreshToken.updateRefreshToken(token.getRefreshToken());
 
     return LoginResponse.builder().accessToken(token.getAccessToken())
-        .nickname(member.getNickname())
-        .refreshToken(token.getRefreshToken()).isNewMember(false)
-        .userSettingDone(member.getNickname() != null).build();
+      .nickname(member.getNickname())
+      .refreshToken(token.getRefreshToken()).isNewMember(false)
+      .userSettingDone(member.getNickname() != null).build();
   }
 
   @Transactional
   public void withdrawlUser(Member member, WithdrawlRequest withdrawlRequest) {
     refreshTokenRepository.deleteByMemberId(member.getId());
-    member.withdrawl(withdrawlRequest.isWithdrawl());
+    member.withdrawal();
   }
 
   public Token saveRefreshToken(Member member) {
     Token token = tokenService.generateToken(member.getSocialId(), "USER");
 
     final RefreshToken result = refreshTokenRepository
-        .saveRefreshToken(RefreshToken.builder()
-            .memberId(member.getId()).refreshToken(token.getRefreshToken()).build());
+      .saveRefreshToken(RefreshToken.builder()
+        .memberId(member.getId()).refreshToken(token.getRefreshToken()).build());
     return token;
   }
 
   public Member saveMember(String socialId) {
     final Member result = memberRepository
-        .save(Member.builder().socialId(socialId).build());
+      .save(Member.builder().socialId(socialId).build());
     return result;
   }
 }

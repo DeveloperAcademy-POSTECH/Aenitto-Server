@@ -2,16 +2,17 @@ package com.firefighter.aenitto.members.domain;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.firefighter.aenitto.rooms.domain.Room;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -32,9 +33,9 @@ public class Member extends CreationModificationLog {
   private String fcmToken;
 
   @ColumnDefault("false")
-  private boolean withdrawl;
+  private boolean withdrawal;
 
-  @OneToMany(mappedBy = "member", orphanRemoval = true)
+  @OneToMany(mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
   private List<MemberRoom> memberRooms = new ArrayList<>();
 
   @Builder
@@ -42,6 +43,15 @@ public class Member extends CreationModificationLog {
     this.nickname = nickname;
     this.socialId = socialId;
     this.fcmToken = fcmToken;
+  }
+
+  public void withdrawal() {
+    this.withdrawal = true;
+    this.leaveRooms();
+  }
+
+  public void recovery() {
+    this.withdrawal = false;
   }
 
   public void changeNickname(String nickname) {
@@ -52,7 +62,16 @@ public class Member extends CreationModificationLog {
     this.fcmToken = fcmToken;
   }
 
-  public void withdrawl(boolean isWithdrawl) {
-    this.withdrawl = isWithdrawl;
+  public void removeMemberRoom(MemberRoom memberRoom) {
+    memberRooms.remove(memberRoom);
+  }
+
+  private void leaveRooms() {
+    this.getMemberRooms()
+      .forEach(memberRoom -> {
+        Room room = memberRoom.getRoom();
+        room.kickOut(memberRoom);
+      });
+    this.memberRooms.clear();
   }
 }
