@@ -9,7 +9,7 @@ env:
   S3_BUCKET_NAME: aenitto-deploy
 
 jobs:
-  build:
+  deploy:
     # 실행 환경 지정
     runs-on: ubuntu-latest
 
