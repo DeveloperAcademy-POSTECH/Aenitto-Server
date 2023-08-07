@@ -142,17 +142,23 @@ public class Room extends CreationModificationLog {
   private String randomSixNumUpperString() {
     Random random = new Random();
     return random.ints(48, 91)
-        .filter((rand) -> (rand < 58) || (rand >= 65))
-        .limit(6)
-        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-        .toString();
+      .filter((rand) -> (rand < 58) || (rand >= 65))
+      .limit(6)
+      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+      .toString();
   }
 
   public void clearRelations() {
     relations.clear();
   }
 
-  public void removeMember(MemberRoom memberRoom) {
+  public void kickOut(MemberRoom memberRoom) {
     memberRooms.remove(memberRoom);
+    this.reassignRoomRelations();
+  }
+
+  private void reassignRoomRelations() {
+    this.clearRelations();
+    Relation.createRelations(this);
   }
 }
