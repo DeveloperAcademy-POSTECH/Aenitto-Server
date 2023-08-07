@@ -45,12 +45,14 @@ public class AuthServiceImplV2 implements AuthServiceV2 {
   private LoginResponse signIn(String socialId, String fcmToken) {
     Member member = memberRepository
       .save(Member.builder().socialId(socialId).fcmToken(fcmToken).build());
-    Token token = tokenService.generateToken(member.getSocialId(), "USER");
 
-    RefreshToken refreshToken = refreshTokenRepository
-      .saveRefreshToken(RefreshToken.builder()
-        .refreshToken(token.getRefreshToken())
-        .memberId(member.getId()).build());
+    Token token = tokenService.generateToken(member.getSocialId(), "USER");
+    refreshTokenRepository
+      .saveRefreshToken(
+        RefreshToken.builder()
+          .refreshToken(token.getRefreshToken())
+          .memberId(member.getId()).build()
+      );
 
     return LoginResponse.builder().accessToken(token.getAccessToken())
       .nickname(member.getNickname())
@@ -65,10 +67,21 @@ public class AuthServiceImplV2 implements AuthServiceV2 {
 
     Token token = tokenService.generateToken(member.getSocialId(), "USER");
 
-    RefreshToken refreshToken = refreshTokenRepository.findByMemberId(member.getId()).orElseThrow();
-    refreshToken.updateRefreshToken(token.getRefreshToken());
 
-    return LoginResponse.builder().accessToken(token.getAccessToken())
+    refreshTokenRepository.findByMemberId(member.getId())
+      .ifPresentOrElse(
+        (refreshToken -> refreshToken.updateRefreshToken(token.getRefreshToken())),
+        () -> refreshTokenRepository
+          .saveRefreshToken(
+            RefreshToken.builder()
+              .refreshToken(token.getRefreshToken())
+              .memberId(member.getId())
+              .build()
+          )
+      );
+
+    return LoginResponse.builder()
+      .accessToken(token.getAccessToken())
       .nickname(member.getNickname())
       .refreshToken(token.getRefreshToken()).isNewMember(false)
       .userSettingDone(member.getNickname() != null).build();
