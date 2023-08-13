@@ -29,10 +29,10 @@ public class Room extends CreationModificationLog {
   @Column(name = "room_id")
   private Long id;
 
-  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<MemberRoom> memberRooms = new ArrayList<>();
 
-  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Relation> relations = new ArrayList<>();
 
   @OneToMany(mappedBy = "room")
