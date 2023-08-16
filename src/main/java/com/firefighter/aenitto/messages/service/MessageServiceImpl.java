@@ -43,7 +43,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class MessageServiceImpl implements MessageService {
-  @Qualifier("relationRepositoryImpl")
   private final RelationRepository relationRepository;
 
   @Qualifier("messageRepositoryImpl")
@@ -64,7 +63,7 @@ public class MessageServiceImpl implements MessageService {
   @Transactional
   public long sendMessageSeparate(Member currentMember, SendMessageApiDto dto) {
     Relation relation = relationRepository.findByRoomIdAndManittoId(dto.getRoomId(), currentMember.getId())
-        .orElseThrow(RoomNotParticipatingException::new);
+      .orElseThrow(RoomNotParticipatingException::new);
 
     throwIfIdNotIdentical(relation.getManittee().getId(), dto.getManitteeId());
 
@@ -72,7 +71,7 @@ public class MessageServiceImpl implements MessageService {
 
     if (relation.getManittee().getFcmToken() != null) {
       notificationService.sendMessage(relation.getManittee().getFcmToken(),
-          "마니또로부터 메시지가 도착하였습니다.", message.getContent(), relation.getRoom().getId().toString());
+        "마니또로부터 메시지가 도착하였습니다.", message.getContent(), relation.getRoom().getId().toString());
     }
     return messageRepository.saveMessage(message).getId();
   }
@@ -83,7 +82,7 @@ public class MessageServiceImpl implements MessageService {
   public long sendMessage(Member currentMember, Long roomId, SendMessageRequest request, MultipartFile image) {
 
     Relation relation = relationRepository.findByRoomIdAndManittoId(roomId, currentMember.getId())
-        .orElseThrow(RoomNotParticipatingException::new);
+      .orElseThrow(RoomNotParticipatingException::new);
 
     if (!Objects.equals(relation.getManittee().getId(), UUID.fromString(request.getManitteeId()))) {
       throw new NotManitteeException();
@@ -118,7 +117,7 @@ public class MessageServiceImpl implements MessageService {
   public void setReadMessagesStatus(Member currentMember, Long roomId) {
     throwExceptionIfNotParticipating(currentMember.getId(), roomId);
     List<Message> messages = messageRepository.findMessagesByReceiverIdAndRoomIdAndStatus(currentMember.getId(),
-        roomId, false);
+      roomId, false);
     for (Message message : messages) {
       message.readMessage();
     }
@@ -132,12 +131,12 @@ public class MessageServiceImpl implements MessageService {
     MemberRoom myManitto = throwExceptionIfNotParticipating(myManittoRelation.getManitto().getId(), roomId);
     MemberRoom myManittee = throwExceptionIfNotParticipating(myManitteeRelation.getManittee().getId(), roomId);
     List<Message> receivedMessageImage = messageRepository.getTwoRandomImageReceivedMessages(currentMember.getId(),
-        roomId);
+      roomId);
     List<Message> receivedMessageContent = messageRepository.getTwoRandomContentReceivedMessages(
-        currentMember.getId(), roomId);
+      currentMember.getId(), roomId);
     List<Message> sentMessageImage = messageRepository.getTwoRandomImageSentMessages(currentMember.getId(), roomId);
     List<Message> sentMessageContent = messageRepository.getTwoRandomContentSentMessages(currentMember.getId(),
-        roomId);
+      roomId);
 
     List<Message> receivedMessage = new ArrayList<>();
     receivedMessage.addAll(receivedMessageContent);
@@ -166,10 +165,10 @@ public class MessageServiceImpl implements MessageService {
 
   public List<MessageResponseV2> setMission(List<MessageResponseV2> messagesResponse) {
     messagesResponse.stream().filter(message -> message.hasMission())
-        .forEach(messageWithMission ->
-            messageWithMission.getMissionInfo()
-                .setContent(throwExceptionMissionNotExist(messageWithMission.getMissionInfo()
-                    .getId()).getContent()));
+      .forEach(messageWithMission ->
+        messageWithMission.getMissionInfo()
+          .setContent(throwExceptionMissionNotExist(messageWithMission.getMissionInfo()
+            .getId()).getContent()));
 
     return messagesResponse;
   }
@@ -218,9 +217,9 @@ public class MessageServiceImpl implements MessageService {
 
   private String getIdentifiableImageName(MultipartFile image) {
     return UUID.randomUUID()
-        .toString()
-        .concat(image.getOriginalFilename())
-        .concat(getImageExtension(Objects.requireNonNull(image.getOriginalFilename())));
+      .toString()
+      .concat(image.getOriginalFilename())
+      .concat(getImageExtension(Objects.requireNonNull(image.getOriginalFilename())));
   }
 
   private void uploadToFileStorage(MultipartFile image, String imageName) {
@@ -246,16 +245,16 @@ public class MessageServiceImpl implements MessageService {
 
   private Relation throwExceptionIfManitteeNotFound(UUID memberId, Long roomId) {
     return relationRepository.findByRoomIdAndManittoId(roomId, memberId)
-        .orElseThrow(RelationNotFoundException::new);
+      .orElseThrow(RelationNotFoundException::new);
   }
 
   private Relation throwExceptionIfManittoNotFound(UUID memberId, Long roomId) {
     return relationRepository.findByRoomIdAndManitteeId(roomId, memberId)
-        .orElseThrow(RelationNotFoundException::new);
+      .orElseThrow(RelationNotFoundException::new);
   }
 
   private Mission throwExceptionMissionNotExist(Long missionId) {
     return missionRepository.findById(missionId)
-        .orElseThrow(MissionNotExistException::new);
+      .orElseThrow(MissionNotExistException::new);
   }
 }

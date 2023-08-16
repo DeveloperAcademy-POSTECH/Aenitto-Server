@@ -2,16 +2,7 @@ package com.firefighter.aenitto.rooms.service;
 
 import com.firefighter.aenitto.common.exception.member.MemberNotFoundException;
 import com.firefighter.aenitto.common.exception.mission.MissionNotFoundException;
-import com.firefighter.aenitto.common.exception.room.AdminCannotExitRoomException;
-import com.firefighter.aenitto.common.exception.room.InvitationNotFoundException;
-import com.firefighter.aenitto.common.exception.room.RelationNotFoundException;
-import com.firefighter.aenitto.common.exception.room.RoomAlreadyParticipatingException;
-import com.firefighter.aenitto.common.exception.room.RoomAlreadyStartedException;
-import com.firefighter.aenitto.common.exception.room.RoomCapacityExceededException;
-import com.firefighter.aenitto.common.exception.room.RoomInsufficientParticipantsException;
-import com.firefighter.aenitto.common.exception.room.RoomNotFoundException;
-import com.firefighter.aenitto.common.exception.room.RoomNotParticipatingException;
-import com.firefighter.aenitto.common.exception.room.RoomUnAuthorizedException;
+import com.firefighter.aenitto.common.exception.room.*;
 import com.firefighter.aenitto.common.utils.RoomComparator;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
@@ -28,21 +19,18 @@ import com.firefighter.aenitto.rooms.dto.request.CreateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.ParticipateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
 import com.firefighter.aenitto.rooms.dto.request.VerifyInvitationRequest;
-import com.firefighter.aenitto.rooms.dto.response.GetRoomStateResponse;
-import com.firefighter.aenitto.rooms.dto.response.ParticipatingRoomsResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomDetailResponse;
-import com.firefighter.aenitto.rooms.dto.response.RoomParticipantsResponse;
-import com.firefighter.aenitto.rooms.dto.response.VerifyInvitationResponse;
+import com.firefighter.aenitto.rooms.dto.response.*;
 import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
 import com.firefighter.aenitto.rooms.repository.RelationRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,7 +41,6 @@ public class RoomServiceImpl implements RoomService {
   @Qualifier("roomRepositoryImpl")
   private final RoomRepository roomRepository;
 
-  @Qualifier("relationRepositoryImpl")
   private final RelationRepository relationRepository;
 
   private final MemberRepository memberRepository;
@@ -73,7 +60,7 @@ public class RoomServiceImpl implements RoomService {
     // Dto -> Entity
     final Room room = createRoomRequest.toEntity();
     final Member member = memberRepository.findById(currentMember.getId())
-        .orElseThrow(MemberNotFoundException::new);
+      .orElseThrow(MemberNotFoundException::new);
 
     // Room invitation 생성 -> 존재하지 않는 random 코드 나올 때 까지.
     do {
@@ -85,9 +72,9 @@ public class RoomServiceImpl implements RoomService {
 
     // admin MemberRoom 생성 및 persist
     MemberRoom memberRoom = MemberRoom.builder()
-        .admin(true)
-        .colorIdx(createRoomRequest.getMember().getColorIdx())
-        .build();
+      .admin(true)
+      .colorIdx(createRoomRequest.getMember().getColorIdx())
+      .build();
 
     memberRoom.setMemberRoom(member, room);
     return roomRepository.saveRoom(room).getId();
@@ -95,12 +82,12 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public VerifyInvitationResponse verifyInvitation(Member member,
-      VerifyInvitationRequest verifyInvitationRequest) {
+                                                   VerifyInvitationRequest verifyInvitationRequest) {
     final String invitation = verifyInvitationRequest.getInvitationCode();
 
     // 초대코드로 Room 조회 -> 결과가 없을 경우 throw
     Room findRoom = roomRepository.findByInvitation(invitation)
-        .orElseThrow(InvitationNotFoundException::new);
+      .orElseThrow(InvitationNotFoundException::new);
 
     return VerifyInvitationResponse.from(findRoom);
   }
@@ -109,14 +96,14 @@ public class RoomServiceImpl implements RoomService {
   @Transactional
   public Long participateRoom(Member currentMember, Long roomId, ParticipateRoomRequest request) {
     Member member = memberRepository.findById(currentMember.getId())
-        .orElseThrow(MemberNotFoundException::new);
+      .orElseThrow(MemberNotFoundException::new);
 
     // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
     throwExceptionIfParticipating(member.getId(), roomId);
 
     // roomId로 방 조회 -> 없을 경우 throw
     Room findRoom = roomRepository.findRoomById(roomId)
-        .orElseThrow(RoomNotFoundException::new);
+      .orElseThrow(RoomNotFoundException::new);
 
     // 방의 수용인원이 초과했을 경우 -> throw
     if (findRoom.unAcceptable()) {
@@ -136,7 +123,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public GetRoomStateResponse getRoomState(Member currentMember, Long roomId) {
     Member member = memberRepository.findById(currentMember.getId())
-        .orElseThrow(MemberNotFoundException::new);
+      .orElseThrow(MemberNotFoundException::new);
 
     // 참여 중인 방이 아닐 경우 -> throw
     MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
@@ -155,37 +142,37 @@ public class RoomServiceImpl implements RoomService {
       case PROCESSING: {
         // 마니띠, 룰렛 봤는지, admin 인지, 미션, 읽지 않은 메시지 수
         Relation relationManitto = roomRepository.findRelationByManittoId(member.getId(), roomId)
-            .orElseThrow(RelationNotFoundException::new);
+          .orElseThrow(RelationNotFoundException::new);
         Relation relationManittee = relationRepository.findByRoomIdAndManitteeId(roomId,
-                member.getId())
-            .orElseThrow(RelationNotFoundException::new);
+            member.getId())
+          .orElseThrow(RelationNotFoundException::new);
         IndividualMission individualMission = individualMissionRepository.findIndividualMissionByDateAndRoomId(
-                LocalDate.now(), roomId)
-            .orElseThrow(MissionNotFoundException::new);
+            LocalDate.now(), roomId)
+          .orElseThrow(MissionNotFoundException::new);
         int unreadMessageCount = messageRepository.findUnreadMessageCount(member.getId(), roomId);
         boolean didView = memberRoom.didViewManitto();
         if (!didView) {
           memberRoom.setViewManito();
         }
         return RoomDetailResponse.buildProcessingResponse(
-            room,
-            relationManitto,
-            relationManittee,
-            memberRoom,
-            didView,
-            individualMission.getMission(),
-            unreadMessageCount
+          room,
+          relationManitto,
+          relationManittee,
+          memberRoom,
+          didView,
+          individualMission.getMission(),
+          unreadMessageCount
         );
       }
       case POST: {
         Relation relation = roomRepository.findRelationByManittoId(member.getId(), roomId)
-            .orElseThrow(RelationNotFoundException::new);
+          .orElseThrow(RelationNotFoundException::new);
         int unreadMessageCount = messageRepository.findUnreadMessageCount(member.getId(), roomId);
         return RoomDetailResponse.buildPostResponse(
-            room,
-            relation,
-            memberRoom,
-            unreadMessageCount
+          room,
+          relation,
+          memberRoom,
+          unreadMessageCount
         );
       }
       default:
@@ -197,15 +184,15 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit) {
     List<Room> participatingRooms = roomRepository.findParticipatingRoomsByMemberIdWithCursor(
-        member.getId(),
-        cursor, limit);
+      member.getId(),
+      cursor, limit);
     return ParticipatingRoomsResponse.of(participatingRooms);
   }
 
   @Override
   public ParticipatingRoomsResponse getParticipatingRooms(Member member) {
     return ParticipatingRoomsResponse.of(
-        RoomComparator.sortRooms(roomRepository.findAllParticipatingRooms(member.getId())));
+      RoomComparator.sortRooms(roomRepository.findAllParticipatingRooms(member.getId())));
   }
 
   @Override
@@ -234,7 +221,7 @@ public class RoomServiceImpl implements RoomService {
     // RoomState 수정
     room.setState(RoomState.PROCESSING);
     Relation adminManitteeRelation = roomRepository.findRelationByManittoId(member.getId(), roomId)
-        .orElseThrow(RelationNotFoundException::new);
+      .orElseThrow(RelationNotFoundException::new);
     return RoomDetailResponse.RelationInfo.ofManittee(adminManitteeRelation);
   }
 
@@ -274,22 +261,22 @@ public class RoomServiceImpl implements RoomService {
   @Transactional
   public void endAenitto() {
     roomRepository.findAllRooms().stream()
-        .filter(Room::isProcessingAndExpired)
-        .forEach(room -> {
-          room.setState(RoomState.POST);
-        });
+      .filter(Room::isProcessingAndExpired)
+      .forEach(room -> {
+        room.setState(RoomState.POST);
+      });
   }
 
   private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
     roomRepository.findMemberRoomById(memberId, roomId)
-        .ifPresent(memberRoom -> {
-          throw new RoomAlreadyParticipatingException();
-        });
+      .ifPresent(memberRoom -> {
+        throw new RoomAlreadyParticipatingException();
+      });
   }
 
   private MemberRoom throwExceptionIfNotParticipating(UUID memberId, Long roomId) {
     return roomRepository.findMemberRoomById(memberId, roomId)
-        .orElseThrow(RoomNotParticipatingException::new);
+      .orElseThrow(RoomNotParticipatingException::new);
   }
 
   private void throwExceptionIfNotAdmin(MemberRoom memberRoom) {
