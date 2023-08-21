@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MissionServiceImpl implements MissionService {
 
-  @Qualifier("roomRepositoryImpl")
   private final RoomRepository roomRepository;
 
   private final MissionRepository missionRepository;

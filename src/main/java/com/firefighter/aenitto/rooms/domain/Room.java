@@ -2,6 +2,7 @@ package com.firefighter.aenitto.rooms.domain;
 
 import com.firefighter.aenitto.common.baseEntities.CreationModificationLog;
 import com.firefighter.aenitto.common.utils.DateConverter;
+import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.missions.domain.IndividualMission;
 import com.firefighter.aenitto.missions.domain.Mission;
 import com.firefighter.aenitto.rooms.dto.request.UpdateRoomRequest;
@@ -15,8 +16,10 @@ import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -35,7 +38,7 @@ public class Room extends CreationModificationLog {
   @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Relation> relations = new ArrayList<>();
 
-  @OneToMany(mappedBy = "room")
+  @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST)
   private List<IndividualMission> individualMissions = new ArrayList<>();
 
   private String title;
@@ -148,17 +151,34 @@ public class Room extends CreationModificationLog {
       .toString();
   }
 
-  public void clearRelations() {
-    relations.clear();
-  }
-
   public void kickOut(MemberRoom memberRoom) {
     memberRooms.remove(memberRoom);
-    this.reassignRoomRelations();
+    reassignRelation();
   }
 
-  private void reassignRoomRelations() {
-    this.clearRelations();
-    Relation.createRelations(this);
+  public void createRelations() {
+    List<Member> members = this.getMemberRooms()
+      .stream()
+      .map(MemberRoom::getMember)
+      .collect(Collectors.toList());
+    Collections.shuffle(members);
+
+    int size = members.size();
+    for (int i = 0; i < size - 1; i++) {
+      Member manitto = members.get(i);
+      Member manittee = members.get(i + 1);
+      createRelation(manitto, manittee);
+    }
+    createRelation(members.get(size - 1), members.get(0));
+  }
+
+  private void createRelation(Member manitto, Member manittee) {
+    Relation relation = new Relation(manitto, manittee, this);
+    relations.add(relation);
+  }
+
+  private void reassignRelation() {
+    relations.clear();
+    this.createRelations();
   }
 }

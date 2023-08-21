@@ -1,32 +1,22 @@
 package com.firefighter.aenitto.rooms.repository;
 
+import com.firefighter.aenitto.rooms.domain.Room;
+import com.firefighter.aenitto.rooms.domain.RoomState;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.firefighter.aenitto.rooms.domain.MemberRoom;
-import com.firefighter.aenitto.rooms.domain.Relation;
-import com.firefighter.aenitto.rooms.domain.Room;
-import com.firefighter.aenitto.rooms.domain.RoomState;
+public interface RoomRepository extends JpaRepository<Room, Long> {
 
-public interface RoomRepository {
-	public Room saveRoom(Room room);
+  @Query("SELECT r FROM Room r WHERE r.invitation = :invitation AND r.deleted = FALSE")
+  Optional<Room> findByInvitation(String invitation);
 
-	public Room mergeRoom(Room room);
+  @Query("SELECT mr.room FROm MemberRoom mr WHERE mr.member.id = :memberId AND mr.room.deleted = FALSE ORDER BY mr.room.startDate ASC, mr.room.id DESC")
+  List<Room> findAllParticipatingRooms(UUID memberId);
 
-	public List<Room> findAllRooms();
-
-	public Optional<Room> findRoomById(Long id);
-
-	public Optional<Room> findByInvitation(String invitation);
-
-	public Optional<MemberRoom> findMemberRoomById(UUID memberId, Long roomId);
-
-	public List<Room> findParticipatingRoomsByMemberIdWithCursor(UUID memberId, Long cursor, int limit);
-
-	public List<Room> findAllParticipatingRooms(UUID memberId);
-
-	public List<Room> findRoomsByState(RoomState state);
-
-	public Optional<Relation> findRelationByManittoId(UUID memberId, Long roomId);
+  @Query("SELECT DISTINCT r FROM Room r JOIN FETCH r.memberRooms WHERE r.state = :state AND r.deleted = FALSE")
+  List<Room> findRoomsByState(RoomState state);
 }

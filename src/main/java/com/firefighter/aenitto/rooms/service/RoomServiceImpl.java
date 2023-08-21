@@ -38,7 +38,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
 
-  @Qualifier("roomRepositoryImpl")
   private final RoomRepository roomRepository;
 
   private final RelationRepository relationRepository;
@@ -59,8 +58,7 @@ public class RoomServiceImpl implements RoomService {
   public Long createRoom(Member currentMember, CreateRoomRequest createRoomRequest) {
     // Dto -> Entity
     final Room room = createRoomRequest.toEntity();
-    final Member member = memberRepository.findById(currentMember.getId())
-      .orElseThrow(MemberNotFoundException::new);
+    final Member member = memberRepository.findById(currentMember.getId()).orElseThrow(MemberNotFoundException::new);
 
     // Room invitation 생성 -> 존재하지 않는 random 코드 나올 때 까지.
     do {
@@ -71,23 +69,18 @@ public class RoomServiceImpl implements RoomService {
     } while (true);
 
     // admin MemberRoom 생성 및 persist
-    MemberRoom memberRoom = MemberRoom.builder()
-      .admin(true)
-      .colorIdx(createRoomRequest.getMember().getColorIdx())
-      .build();
+    MemberRoom memberRoom = MemberRoom.builder().admin(true).colorIdx(createRoomRequest.getMember().getColorIdx()).build();
 
     memberRoom.setMemberRoom(member, room);
-    return roomRepository.saveRoom(room).getId();
+    return roomRepository.save(room).getId();
   }
 
   @Override
-  public VerifyInvitationResponse verifyInvitation(Member member,
-                                                   VerifyInvitationRequest verifyInvitationRequest) {
+  public VerifyInvitationResponse verifyInvitation(Member member, VerifyInvitationRequest verifyInvitationRequest) {
     final String invitation = verifyInvitationRequest.getInvitationCode();
 
     // 초대코드로 Room 조회 -> 결과가 없을 경우 throw
-    Room findRoom = roomRepository.findByInvitation(invitation)
-      .orElseThrow(InvitationNotFoundException::new);
+    Room findRoom = roomRepository.findByInvitation(invitation).orElseThrow(InvitationNotFoundException::new);
 
     return VerifyInvitationResponse.from(findRoom);
   }
@@ -95,15 +88,13 @@ public class RoomServiceImpl implements RoomService {
   @Override
   @Transactional
   public Long participateRoom(Member currentMember, Long roomId, ParticipateRoomRequest request) {
-    Member member = memberRepository.findById(currentMember.getId())
-      .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findById(currentMember.getId()).orElseThrow(MemberNotFoundException::new);
 
     // roomId와 memberId로 MemberRoom 조회 -> 결과가 있을 경우 throw
     throwExceptionIfParticipating(member.getId(), roomId);
 
     // roomId로 방 조회 -> 없을 경우 throw
-    Room findRoom = roomRepository.findRoomById(roomId)
-      .orElseThrow(RoomNotFoundException::new);
+    Room findRoom = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
 
     // 방의 수용인원이 초과했을 경우 -> throw
     if (findRoom.unAcceptable()) {
@@ -122,8 +113,7 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public GetRoomStateResponse getRoomState(Member currentMember, Long roomId) {
-    Member member = memberRepository.findById(currentMember.getId())
-      .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findById(currentMember.getId()).orElseThrow(MemberNotFoundException::new);
 
     // 참여 중인 방이 아닐 경우 -> throw
     MemberRoom memberRoom = throwExceptionIfNotParticipating(member.getId(), roomId);
@@ -141,39 +131,20 @@ public class RoomServiceImpl implements RoomService {
         return RoomDetailResponse.buildPreResponse(room, memberRoom);
       case PROCESSING: {
         // 마니띠, 룰렛 봤는지, admin 인지, 미션, 읽지 않은 메시지 수
-        Relation relationManitto = roomRepository.findRelationByManittoId(member.getId(), roomId)
-          .orElseThrow(RelationNotFoundException::new);
-        Relation relationManittee = relationRepository.findByRoomIdAndManitteeId(roomId,
-            member.getId())
-          .orElseThrow(RelationNotFoundException::new);
-        IndividualMission individualMission = individualMissionRepository.findIndividualMissionByDateAndRoomId(
-            LocalDate.now(), roomId)
-          .orElseThrow(MissionNotFoundException::new);
+        Relation relationManitto = relationRepository.findByRoomIdAndManittoId(roomId, member.getId()).orElseThrow(RelationNotFoundException::new);
+        Relation relationManittee = relationRepository.findByRoomIdAndManitteeId(roomId, member.getId()).orElseThrow(RelationNotFoundException::new);
+        IndividualMission individualMission = individualMissionRepository.findIndividualMissionByDateAndRoomId(LocalDate.now(), roomId).orElseThrow(MissionNotFoundException::new);
         int unreadMessageCount = messageRepository.findUnreadMessageCount(member.getId(), roomId);
         boolean didView = memberRoom.didViewManitto();
         if (!didView) {
           memberRoom.setViewManito();
         }
-        return RoomDetailResponse.buildProcessingResponse(
-          room,
-          relationManitto,
-          relationManittee,
-          memberRoom,
-          didView,
-          individualMission.getMission(),
-          unreadMessageCount
-        );
+        return RoomDetailResponse.buildProcessingResponse(room, relationManitto, relationManittee, memberRoom, didView, individualMission.getMission(), unreadMessageCount);
       }
       case POST: {
-        Relation relation = roomRepository.findRelationByManittoId(member.getId(), roomId)
-          .orElseThrow(RelationNotFoundException::new);
+        Relation relation = relationRepository.findByRoomIdAndManittoId(roomId, member.getId()).orElseThrow(RelationNotFoundException::new);
         int unreadMessageCount = messageRepository.findUnreadMessageCount(member.getId(), roomId);
-        return RoomDetailResponse.buildPostResponse(
-          room,
-          relation,
-          memberRoom,
-          unreadMessageCount
-        );
+        return RoomDetailResponse.buildPostResponse(room, relation, memberRoom, unreadMessageCount);
       }
       default:
         // RoomState 가 올바르지 않음 Exception 던짐.
@@ -182,17 +153,8 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public ParticipatingRoomsResponse getParticipatingRooms(Member member, Long cursor, int limit) {
-    List<Room> participatingRooms = roomRepository.findParticipatingRoomsByMemberIdWithCursor(
-      member.getId(),
-      cursor, limit);
-    return ParticipatingRoomsResponse.of(participatingRooms);
-  }
-
-  @Override
   public ParticipatingRoomsResponse getParticipatingRooms(Member member) {
-    return ParticipatingRoomsResponse.of(
-      RoomComparator.sortRooms(roomRepository.findAllParticipatingRooms(member.getId())));
+    return ParticipatingRoomsResponse.of(RoomComparator.sortRooms(roomRepository.findAllParticipatingRooms(member.getId())));
   }
 
   @Override
@@ -213,14 +175,14 @@ public class RoomServiceImpl implements RoomService {
     }
 
     // 참여인원에 대하여 Relation 생성
-    Relation.createRelations(room);
+    room.createRelations();
 
     // 참여인원에 대하여 individual Mission 생성
     missionService.setInitialIndividualMission(room);
 
     // RoomState 수정
     room.setState(RoomState.PROCESSING);
-    Relation adminManitteeRelation = roomRepository.findRelationByManittoId(member.getId(), roomId)
+    Relation adminManitteeRelation = relationRepository.findByRoomIdAndManittoId(room.getId(), member.getId())
       .orElseThrow(RelationNotFoundException::new);
     return RoomDetailResponse.RelationInfo.ofManittee(adminManitteeRelation);
   }
@@ -260,23 +222,19 @@ public class RoomServiceImpl implements RoomService {
   @Override
   @Transactional
   public void endAenitto() {
-    roomRepository.findAllRooms().stream()
-      .filter(Room::isProcessingAndExpired)
-      .forEach(room -> {
-        room.setState(RoomState.POST);
-      });
+    roomRepository.findAll().stream().filter(Room::isProcessingAndExpired).forEach(room -> {
+      room.setState(RoomState.POST);
+    });
   }
 
   private void throwExceptionIfParticipating(UUID memberId, Long roomId) {
-    roomRepository.findMemberRoomById(memberId, roomId)
-      .ifPresent(memberRoom -> {
-        throw new RoomAlreadyParticipatingException();
-      });
+    memberRoomRepository.findByMemberIdAndRoomId(memberId, roomId).ifPresent(memberRoom -> {
+      throw new RoomAlreadyParticipatingException();
+    });
   }
 
   private MemberRoom throwExceptionIfNotParticipating(UUID memberId, Long roomId) {
-    return roomRepository.findMemberRoomById(memberId, roomId)
-      .orElseThrow(RoomNotParticipatingException::new);
+    return memberRoomRepository.findByMemberIdAndRoomId(memberId, roomId).orElseThrow(RoomNotParticipatingException::new);
   }
 
   private void throwExceptionIfNotAdmin(MemberRoom memberRoom) {
