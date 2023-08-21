@@ -23,6 +23,7 @@ import com.firefighter.aenitto.missions.repository.MissionRepository;
 import com.firefighter.aenitto.notification.service.NotificationService;
 import com.firefighter.aenitto.rooms.domain.MemberRoom;
 import com.firefighter.aenitto.rooms.domain.Relation;
+import com.firefighter.aenitto.rooms.repository.MemberRoomRepository;
 import com.firefighter.aenitto.rooms.repository.RelationRepository;
 import com.firefighter.aenitto.rooms.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,6 @@ public class MessageServiceImpl implements MessageService {
   @Qualifier("messageRepositoryImpl")
   private final MessageRepository messageRepository;
 
-  @Qualifier("roomRepositoryImpl")
   private final RoomRepository roomRepository;
 
   @Qualifier("StorageS3ServiceImpl")
@@ -58,6 +58,8 @@ public class MessageServiceImpl implements MessageService {
   private final NotificationService notificationService;
 
   private final MissionRepository missionRepository;
+
+  private final MemberRoomRepository memberRoomRepository;
 
   @Override
   @Transactional
@@ -240,7 +242,8 @@ public class MessageServiceImpl implements MessageService {
   }
 
   private MemberRoom throwExceptionIfNotParticipating(UUID memberId, Long roomId) {
-    return roomRepository.findMemberRoomById(memberId, roomId).orElseThrow(RoomNotParticipatingException::new);
+    return memberRoomRepository.findByMemberIdAndRoomId(memberId, roomId)
+      .orElseThrow(RoomNotParticipatingException::new);
   }
 
   private Relation throwExceptionIfManitteeNotFound(UUID memberId, Long roomId) {
