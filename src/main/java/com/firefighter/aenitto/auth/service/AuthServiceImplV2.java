@@ -9,12 +9,13 @@ import com.firefighter.aenitto.auth.token.Token;
 import com.firefighter.aenitto.members.domain.Member;
 import com.firefighter.aenitto.members.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Qualifier(value = "authServiceImplV2 ")
@@ -26,6 +27,7 @@ public class AuthServiceImplV2 implements AuthServiceV2 {
   private final RefreshTokenRepository refreshTokenRepository;
 
   private final MemberRepository memberRepository;
+
   @Autowired
   private final TokenService tokenService;
 
@@ -33,73 +35,71 @@ public class AuthServiceImplV2 implements AuthServiceV2 {
 
   @Transactional
   public LoginResponse loginOrSignInV2(LoginRequestV2 loginRequest) {
-    String socialId = clientProxy.validateToken(loginRequest.getIdentityToken());
-    Optional<Member> member = memberRepository.findBySocialId(socialId);
-    if (member.isEmpty()) {
-      return signIn(socialId, loginRequest.getFcmToken());
-    } else {
-      return logIn(socialId, member.get(), loginRequest.getFcmToken());
-    }
+    String identityToken = loginRequest.getIdentityToken();
+    String socialId = clientProxy.validateToken(identityToken);
+    String fcmToken = loginRequest.getFcmToken();
+
+    Member member = memberRepository.findBySocialId(socialId)
+      .orElseGet(() -> signIn(socialId, fcmToken));
+
+    return logIn(member, fcmToken);
   }
 
-  private LoginResponse signIn(String socialId, String fcmToken) {
-    Member member = memberRepository
-      .save(Member.builder().socialId(socialId).fcmToken(fcmToken).build());
+  @NotNull
+  private Member signIn(String socialId, String fcmToken) {
+    Token token = tokenService.generateToken(socialId, "USER");
+    Member newMember = Member.builder()
+      .socialId(socialId)
+      .fcmToken(fcmToken)
+      .build();
 
-    Token token = tokenService.generateToken(member.getSocialId(), "USER");
-    refreshTokenRepository
-      .saveRefreshToken(
-        RefreshToken.builder()
-          .refreshToken(token.getRefreshToken())
-          .memberId(member.getId()).build()
-      );
+    String refreshTokenValue = token.getRefreshToken();
+    UUID memberId = newMember.getId();
+    createRefreshToken(refreshTokenValue, memberId);
 
-    return LoginResponse.builder().accessToken(token.getAccessToken())
-      .nickname(member.getNickname())
-      .refreshToken(token.getRefreshToken()).isNewMember(true)
-      .userSettingDone(false).build();
+    return memberRepository.save(newMember);
   }
 
-  private LoginResponse logIn(String socialId, Member member, String fcmToken) {
+  private LoginResponse logIn(Member member, String fcmToken) {
+    UUID memberId = member.getId();
+
+    String socialId = member.getSocialId();
+    Token token = tokenService.generateToken(socialId, "USER");
+
     member.setFcmToken(fcmToken);
-    member.recovery();
     memberRepository.save(member);
 
-    Token token = tokenService.generateToken(member.getSocialId(), "USER");
-
-
-    refreshTokenRepository.findByMemberId(member.getId())
+    String refreshTokenValue = token.getRefreshToken();
+    refreshTokenRepository.findByMemberId(memberId)
       .ifPresentOrElse(
-        (refreshToken -> refreshToken.updateRefreshToken(token.getRefreshToken())),
-        () -> refreshTokenRepository
-          .saveRefreshToken(
-            RefreshToken.builder()
-              .refreshToken(token.getRefreshToken())
-              .memberId(member.getId())
-              .build()
-          )
+        refreshToken -> refreshToken.updateRefreshToken(refreshTokenValue),
+        () -> createRefreshToken(refreshTokenValue, memberId)
       );
 
-    return LoginResponse.builder()
+    String nickname = member.getNickname();
+    LoginResponse.LoginResponseBuilder builder = LoginResponse.builder()
       .accessToken(token.getAccessToken())
-      .nickname(member.getNickname())
-      .refreshToken(token.getRefreshToken()).isNewMember(false)
-      .userSettingDone(member.getNickname() != null).build();
+      .nickname(nickname)
+      .refreshToken(refreshTokenValue)
+      .isNewMember(member.getNickname() != null)
+      .userSettingDone((member.getNickname() != null) && (!member.getNickname().isEmpty()));
+
+    if (member.isWithdrawal()) {
+      builder
+        .userSettingDone(false)
+        .isNewMember(true);
+      member.recovery();
+    }
+
+    return builder.build();
   }
 
-  public Token saveRefreshToken(Member member) {
-    Token token = tokenService.generateToken(member.getSocialId(), "USER");
-
-    final RefreshToken result = refreshTokenRepository
-      .saveRefreshToken(RefreshToken.builder()
-        .memberId(member.getId()).refreshToken(token.getRefreshToken()).build());
-    return token;
-  }
-
-  public Member saveMember(String socialId) {
-    final Member result = memberRepository
-      .save(Member.builder().socialId(socialId).build());
-    return result;
+  private void createRefreshToken(String refreshTokenValue, UUID memberId) {
+    RefreshToken refreshToken = RefreshToken.builder()
+      .refreshToken(refreshTokenValue)
+      .memberId(memberId)
+      .build();
+    refreshTokenRepository.saveRefreshToken(refreshToken);
   }
 }
 
