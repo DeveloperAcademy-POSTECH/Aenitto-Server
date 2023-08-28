@@ -23,6 +23,7 @@ public class AuthControllerV2 {
   public ResponseEntity<LoginResponse> loginAndSignIn(
       @Valid @RequestBody final LoginRequestV2 loginRequest
   ) {
-    return ResponseEntity.ok(authService.loginOrSignInV2(loginRequest));
+    LoginResponse response = authService.loginOrSignInV2(loginRequest);
+    return ResponseEntity.ok(response);
   }
 }
