@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,7 +31,8 @@ public class MemberController {
 
   @DeleteMapping("/members")
   public ResponseEntity<Void> withdrawal(@CurrentMember Member member) {
-    memberService.withdrawal(member.getId());
+    UUID memberId = member.getId();
+    memberService.withdrawal(memberId);
     return ResponseEntity.noContent().build();
   }
 }
