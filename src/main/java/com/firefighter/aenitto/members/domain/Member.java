@@ -47,6 +47,7 @@ public class Member extends CreationModificationLog {
 
   public void withdrawal() {
     this.withdrawal = true;
+    this.nickname = null;
     this.leaveRooms();
   }
 
