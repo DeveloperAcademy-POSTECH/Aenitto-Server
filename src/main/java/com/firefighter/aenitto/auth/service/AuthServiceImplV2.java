@@ -81,7 +81,7 @@ public class AuthServiceImplV2 implements AuthServiceV2 {
       .accessToken(token.getAccessToken())
       .nickname(nickname)
       .refreshToken(refreshTokenValue)
-      .isNewMember(member.getNickname() != null)
+      .isNewMember(member.getNickname() == null)
       .userSettingDone((member.getNickname() != null) && (!member.getNickname().isEmpty()));
 
     if (member.isWithdrawal()) {
