@@ -5,10 +5,6 @@ on:
   push:
     branches: [ develop, main ]
 
-env:
-  AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: aenitto-deploy
-
 jobs:
   deploy:
     # 실행 환경 지정
@@ -51,9 +47,9 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID  }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       # S3 Bucket으로 copy
       - name: Upload to S3
         run: |
-          aws s3 cp --region ${{ env.AWS_REGION }} ./aenitto-${{ github.ref_name }}.zip s3://${{ env.S3_BUCKET_NAME }}/
+          aws s3 cp --region ${{ secrets.AWS_REGION }} ./aenitto-${{ github.ref_name }}.zip s3://${{ env.S3_BUCKET_NAME }}/
