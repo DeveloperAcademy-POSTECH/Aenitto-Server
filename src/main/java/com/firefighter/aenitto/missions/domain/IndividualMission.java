@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class IndividualMission {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   @Column(name = "individual_mission_id")
   private Long id;
 
