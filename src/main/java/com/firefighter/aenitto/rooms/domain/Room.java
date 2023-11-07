@@ -152,8 +152,8 @@ public class Room extends CreationModificationLog {
   }
 
   public void kickOut(MemberRoom memberRoom) {
-    memberRooms.remove(memberRoom);
     if (state == RoomState.PROCESSING) {
+      memberRooms.remove(memberRoom);
       reassignRelation();
     }
   }
